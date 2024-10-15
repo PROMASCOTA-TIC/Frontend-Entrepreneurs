@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { TopMenu } from "@/components/ui/top-menu/TopMemu";
+import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,6 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TopMenu/>
+        <TopNavbar/>
         {children}
       </body>
     </html>
