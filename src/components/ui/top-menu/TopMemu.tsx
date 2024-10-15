@@ -12,10 +12,14 @@ import MenuItem from '@mui/material/MenuItem';
 import Link from 'next/link';
 
 const items = [
-    { name: 'Inicio', url: '/cart' },
-    { name: 'Enlaces de Interés', url: '/enlaces' },
-    { name: 'Publi-Reportajes', url: '/publi-reportajes' },
-    { name: 'Preguntas Frecuentes', url: '/preguntas-frecuentes' }
+    { name: 'Inicio', url: '/inicio' },
+    { name: 'Registro de Productos', url: '/registroprdocutos' },
+    { name: 'Lista de Productos', url: '/listadeproductos' },
+    { name: 'Pedidos', url: '/pedidos' },
+    { name: 'Enlaces de Interés', url: '/enlacesdeinteres' },
+    { name: 'Publi-Reportajes', url: '/publireportajes' },
+    { name: 'Preguntas Frecuentes', url: '/preguntas-frecuentes' },
+    { name: 'Comisiones y Pagos', url: '/comisionesypago' },
 ]
 
 // export const TopMenu = ({ listaItems }) => {
