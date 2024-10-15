@@ -1,0 +1,90 @@
+.buttonHorarios{
+    background-color: #004040;
+    color: white;
+    border: none;
+    width: 173px;
+    height: 34px;
+    font-size: 24px;
+    text-transform: none;
+    border-radius: 20px;
+}
+
+.h1Bold{
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.h1SemiBold{
+    font-size: 36px;
+    font-weight: 600;
+}
+
+.h1Regular{
+    font-size: 36px;
+    font-weight: normal;
+
+}
+
+.h2Bold{
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.h2SemiBold{
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.h2Regular{
+    font-size: 24px;
+    font-weight: normal;
+}
+
+.normalBold{
+    font-size: 18px;
+    font-weight: bold;
+}
+.normalSemibold{
+    font-size: 18px;
+    font-weight: 600;
+}
+.normalRegular{
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.minimaSubrrayado{
+    font-size: 18px;
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+.minimaBold{
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.minimaSemibold{
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.minimaRegular{
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.miniaturaBold{
+    font-size: 12px;
+    font-weight: bold;
+}
+.miniaturaSemibold{
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.miniaturaRegular{
+    font-size: 12px;
+    font-weight: normal;
+}   
+

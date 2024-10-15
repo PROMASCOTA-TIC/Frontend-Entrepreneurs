@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { TopMenu } from "@/components/ui/top-menu/TopMemu";
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
+import CheckHorarios from "./emprendedores/CheckHorarios";
+
 
 
 const geistSans = localFont({
@@ -34,6 +36,7 @@ export default function RootLayout({
         
         <TopNavbar/>
         <TopMenu/>
+        <CheckHorarios/>
         {children}
       </body>
     </html>
