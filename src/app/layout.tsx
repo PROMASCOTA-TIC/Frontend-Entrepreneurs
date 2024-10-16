@@ -5,6 +5,9 @@ import { TopMenu } from "@/components/ui/top-menu/TopMemu";
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
 import CheckHorarios from "./emprendedores/CheckHorarios";
 import AgregarFotosEmpren from "./emprendedores/AgregarFotosEmpren";
+import TipoPublicacion from "./emprendedores/registroProductos/TipoPublicacion";
+import TipoMascota from "./emprendedores/registroProductos/TipoMascota";
+
 
 
 
@@ -36,7 +39,9 @@ export default function RootLayout({
       >
         
         <TopNavbar/>
-        <AgregarFotosEmpren/>
+        <TopMenu/>
+        <TipoPublicacion/>
+        <TipoMascota/>
         {children}
       </body>
     </html>
