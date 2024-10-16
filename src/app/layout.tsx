@@ -4,6 +4,7 @@ import "./globals.css";
 import { TopMenu } from "@/components/ui/top-menu/TopMemu";
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
 import CheckHorarios from "./emprendedores/CheckHorarios";
+import AgregarFotosEmpren from "./emprendedores/AgregarFotosEmpren";
 
 
 
@@ -35,8 +36,7 @@ export default function RootLayout({
       >
         
         <TopNavbar/>
-        <TopMenu/>
-        <CheckHorarios/>
+        <AgregarFotosEmpren/>
         {children}
       </body>
     </html>
