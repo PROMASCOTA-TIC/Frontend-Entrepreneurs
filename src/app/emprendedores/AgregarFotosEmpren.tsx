@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography, IconButton, Card, CardMedia, CardContent } from '@mui/material';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm, Controller } from 'react-hook-form';
 import '@/assets/styles/emprendedores/general.css';
@@ -137,7 +137,7 @@ const AgregarFotosEmpren: React.FC = () => {
               variant="contained"
               component="span"
               sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', mt: 2 }}
-              startIcon={<PhotoCamera />}
+              startIcon={<FileUploadIcon />}
             >
               Seleccionar Imagenes
             </Button>
@@ -189,7 +189,7 @@ const AgregarFotosEmpren: React.FC = () => {
               variant="contained"
               component="span"
               sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', mt: 2 }}
-              startIcon={<PhotoCamera />}
+              startIcon={<FileUploadIcon  />}
             >
               Seleccionar Imagenes
             </Button>
