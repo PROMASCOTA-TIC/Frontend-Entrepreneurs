@@ -8,6 +8,7 @@ import AgregarFotosEmpren from "./emprendedores/AgregarFotosEmpren";
 import TipoPublicacion from "./emprendedores/registroProductos/TipoPublicacion";
 import TipoMascota from "./emprendedores/registroProductos/TipoMascota";
 import FormularioProductos from "./emprendedores/registroProductos/FormularioProducto";
+import { ArchivosMultimedia } from "./emprendedores/registroProductos/ArchivosMultimedia";
 
 
 
@@ -44,6 +45,7 @@ export default function RootLayout({
         <TipoPublicacion/>
         <TipoMascota/>
         <FormularioProductos/>
+        <ArchivosMultimedia/>
         {children}
       </body>
     </html>

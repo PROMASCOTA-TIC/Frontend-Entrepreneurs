@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Grid2 } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { themePalette } from '@/config/theme.config';
 
@@ -13,29 +13,42 @@ const TipoPublicacion: React.FC = () => {
 
   return (
     <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
       sx={{
         border: '1px solid #004040',
         backgroundColor: themePalette.black10,
         width: '100%',
         maxWidth: '1358px',
-        height: '180px',
+        height: 'auto',
         margin: '0 auto',
         borderRadius: '10px',
-        marginTop: '34px'
+        marginTop: '34px',
+        padding: '20px'
       }}
     >
       {/* Título a la izquierda */}
-      <Typography align="left" sx={{ color: themePalette.primary, width: '100%', fontSize: '24px', paddingLeft: '30px', fontWeight:'bold' }}>
+      <Typography
+        align="left"
+        sx={{
+          color: themePalette.primary,
+          width: '100%',
+          fontSize: '24px',
+          paddingLeft: '30px',
+          fontWeight: 'bold',
+          marginBottom: '16px'
+        }}
+      >
         Tipo de publicación:
       </Typography>
 
-      <Box display="flex" justifyContent="space-evenly" alignItems="center" width="100%">
+      <Grid2 container spacing={2} justifyContent="space-evenly" alignItems="center">
         {/* Botón Producto con icono arriba */}
-        <Box display="flex" flexDirection="column" alignItems="center" mx={2}>
+        <Grid2
+        size={{xs:12,sm:6,md:3}}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+        >
           <Icon icon="material-symbols-light:pet-supplies-outline" style={{ fontSize: '60px', color: themePalette.primary }} />
           <Button
             onClick={() => handleSelect('Producto')}
@@ -46,15 +59,22 @@ const TipoPublicacion: React.FC = () => {
               width: '213px',
               height: '34px',
               borderRadius: '20px',
-              fontSize: '18px'
+              fontSize: '18px',
+              marginTop: '10px'
             }}
           >
             Producto
           </Button>
-        </Box>
+        </Grid2>
 
         {/* Botón Servicio con icono arriba */}
-        <Box display="flex" flexDirection="column" alignItems="center" mx={2}>
+        <Grid2
+        size={{xs:12,sm:6,md:3}}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+        >
           <Icon icon="healthicons:guide-dog-outline" style={{ fontSize: '60px', color: themePalette.primary }} />
           <Button
             onClick={() => handleSelect('Servicio')}
@@ -65,13 +85,14 @@ const TipoPublicacion: React.FC = () => {
               width: '213px',
               height: '34px',
               borderRadius: '20px',
-              fontSize: '18px'
+              fontSize: '18px',
+              marginTop: '10px'
             }}
           >
             Servicio
           </Button>
-        </Box>
-      </Box>
+        </Grid2>
+      </Grid2>
     </Box>
   );
 };
