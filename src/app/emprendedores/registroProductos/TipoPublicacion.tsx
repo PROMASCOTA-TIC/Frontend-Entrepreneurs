@@ -29,7 +29,7 @@ const TipoPublicacion: React.FC = () => {
       }}
     >
       {/* Título a la izquierda */}
-      <Typography align="left" sx={{ color: themePalette.primary, width: '100%', fontSize: '24px', paddingLeft: '13px' }}>
+      <Typography align="left" sx={{ color: themePalette.primary, width: '100%', fontSize: '24px', paddingLeft: '30px', fontWeight:'bold' }}>
         Tipo de publicación:
       </Typography>
 

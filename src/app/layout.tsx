@@ -7,6 +7,7 @@ import CheckHorarios from "./emprendedores/CheckHorarios";
 import AgregarFotosEmpren from "./emprendedores/AgregarFotosEmpren";
 import TipoPublicacion from "./emprendedores/registroProductos/TipoPublicacion";
 import TipoMascota from "./emprendedores/registroProductos/TipoMascota";
+import FormularioProductos from "./emprendedores/registroProductos/FormularioProducto";
 
 
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         <TopMenu/>
         <TipoPublicacion/>
         <TipoMascota/>
+        <FormularioProductos/>
         {children}
       </body>
     </html>
