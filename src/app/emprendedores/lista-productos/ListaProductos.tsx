@@ -7,7 +7,7 @@ import { themePalette } from '@/config/theme.config';
 import EditIcon from '@mui/icons-material/Edit';
 import { Edit } from '@mui/icons-material';
 
-const ProductList: React.FC = () => {
+const ListaProductos: React.FC = () => {
   return (
     <Box sx={{ padding: 3 }}>
       {/* Título */}
@@ -121,4 +121,4 @@ const ProductList: React.FC = () => {
   );
 };
 
-export default ProductList;
+export default ListaProductos;
