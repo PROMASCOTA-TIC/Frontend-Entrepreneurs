@@ -109,13 +109,16 @@ const FormularioRegistroProducto: React.FC = () => {
         textAlign: 'center', // Asegura que el texto también esté alineado al centro
       }}
     >
+      
       <Typography
+        align="left"
         sx={{
           color: themePalette.primary,
           width: '100%',
           fontSize: '24px',
-          paddingLeft: '13px',
+          paddingLeft: '30px',
           fontWeight: 'bold',
+          marginBottom: '16px'
         }}
       >
         Información:
