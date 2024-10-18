@@ -8,7 +8,7 @@ import AgregarFotosEmpren from "./emprendedores/AgregarFotosEmpren";
 import TipoPublicacion from "./emprendedores/registroProductos/TipoPublicacion";
 import TipoMascota from "./emprendedores/registroProductos/TipoMascota";
 import FormularioProductos from "./emprendedores/registroProductos/FormularioProducto";
-import { ArchivosMultimedia } from "./emprendedores/registroProductos/ArchivosMultimedia";
+import ArchivosMultimedia from "./emprendedores/registroProductos/ArchivosMultimedia";
 
 
 
