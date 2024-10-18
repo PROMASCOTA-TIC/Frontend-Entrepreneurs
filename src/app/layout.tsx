@@ -3,12 +3,12 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { TopMenu } from "@/components/ui/top-menu/TopMemu";
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
-import CheckHorarios from "./emprendedores/CheckHorarios";
-import AgregarFotosEmpren from "./emprendedores/AgregarFotosEmpren";
+import AgregarFotosEmpren from "./emprendedores/configuracionEmprendedor/AgregarFotosEmpren";
 import TipoPublicacion from "./emprendedores/registroProductos/TipoPublicacion";
 import TipoMascota from "./emprendedores/registroProductos/TipoMascota";
 import FormularioProductos from "./emprendedores/registroProductos/FormularioProducto";
 import ArchivosMultimedia from "./emprendedores/registroProductos/ArchivosMultimedia";
+import ListaProductos from "./emprendedores/lista-productos/ListaProductos";
 
 
 
@@ -42,10 +42,7 @@ export default function RootLayout({
         
         <TopNavbar/>
         <TopMenu/>
-        <TipoPublicacion/>
-        <TipoMascota/>
-        <FormularioProductos/>
-        <ArchivosMultimedia/>
+        <ListaProductos/>
         {children}
       </body>
     </html>
