@@ -9,6 +9,8 @@ import FormularioProductos from "./emprendedores/registroProductos/FormularioPro
 import ArchivosMultimedia from "./emprendedores/registroProductos/ArchivosMultimedia";
 import ListaProductos from "./emprendedores/lista-productos/ListaProductos";
 import ListaPedidos from "./emprendedores/lista-pedidos/ListaPedidos";
+import ResumenPedido from "./emprendedores/resumen-pedido/ResumenPedido";
+
 
 
 
@@ -42,7 +44,7 @@ export default function RootLayout({
         
         <TopNavbar/>
         <TopMenu/>
-        <ListaPedidos/>
+        <ResumenPedido/>
         {children}
       </body>
     </html>
