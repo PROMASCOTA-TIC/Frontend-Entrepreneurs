@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -13,8 +12,10 @@ import {
   TableRow,
   Button,
   IconButton,
+  TableContainer,
   Grid2,
-  Box
+  Box,
+  Paper
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { themePalette } from '@/config/theme.config';
@@ -100,41 +101,32 @@ const ResumenPedido: React.FC<OrderSummaryProps> = ({
         >Resumen</Typography>
         
         {/* Distribución usando Grid */}
-        <Grid2 container spacing={2} sx={{ marginBottom: 2, color:themePalette.primary,justifyContent: 'center' }}>
-          <Grid2
-          size={{ xs: 6 }}>
+        <Grid2 container spacing={2} sx={{ marginBottom: 2, color: themePalette.primary, justifyContent: 'center' }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Comprador:</strong> {buyer}</Typography>
           </Grid2>
-          <Grid2
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Total:</strong> {total}</Typography>
           </Grid2>
-          <Grid2
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Número:</strong> {orderNumber}</Typography>
           </Grid2>
-          <Grid2 
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Fecha:</strong> {orderDate}</Typography>
           </Grid2>
-          <Grid2 
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Estado del pago:</strong> {paymentStatus}</Typography>
           </Grid2>
-          <Grid2 
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Método de pago:</strong> {paymentMethod}</Typography>
           </Grid2>
-          <Grid2
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Tipo entrega:</strong> {deliveryType}</Typography>
           </Grid2>
-          <Grid2 
-          size={{ xs: 6 }}>
+          <Grid2 size={{ xs: 6 }}>
             <Typography><strong>Sector:</strong> {sector}</Typography>
           </Grid2>
-          <Grid2 
-          size={{ xs: 12 }}>
+          <Grid2 size={{ xs: 12 }}>
             <Typography><strong>Dirección:</strong> {address}</Typography>
           </Grid2>
         </Grid2>
@@ -147,34 +139,38 @@ const ResumenPedido: React.FC<OrderSummaryProps> = ({
             marginTop: 2 
         }}
         >Items</Typography>
-        <Table>
-          <TableHead>
-            <TableRow
-            sx={{
-            backgroundColor: themePalette.black10,
-            }}
-            >
-              <TableCell>ID</TableCell>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Descripción</TableCell>
-              <TableCell>Precio</TableCell>
-              <TableCell>Cantidad</TableCell>
-              <TableCell>Precio Total</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.id}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.description}</TableCell>
-                <TableCell>{item.price}</TableCell>
-                <TableCell>{item.quantity}</TableCell>
-                <TableCell>{item.totalPrice}</TableCell>
+
+        {/* Hacer la tabla responsive */}
+        <TableContainer component={Paper} sx={{ maxHeight: '300px' }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow
+                sx={{
+                  backgroundColor: themePalette.black10,
+                }}
+              >
+                <TableCell>ID</TableCell>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Descripción</TableCell>
+                <TableCell>Precio</TableCell>
+                <TableCell>Cantidad</TableCell>
+                <TableCell>Precio Total</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.id}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.description}</TableCell>
+                  <TableCell>{item.price}</TableCell>
+                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>{item.totalPrice}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </DialogContent>
       <DialogActions
         sx={{
@@ -212,75 +208,4 @@ const ResumenPedido: React.FC<OrderSummaryProps> = ({
   );
 };
 
-// Componente padre que contiene los datos ficticios y controla el diálogo
-const ComponentePadre: React.FC = () => {
-  const [open, setOpen] = useState(false);
-
-  // Datos ficticios del pedido
-  const orderData = {
-    orderNumber: '123456',
-    buyer: 'Carlos Rivera',
-    orderDate: '2024-08-13',
-    total: '$5.00',
-    paymentStatus: 'Pagado',
-    paymentMethod: 'Transferencia',
-    deliveryType: 'Domicilio',
-    sector: 'Norte',
-    address: 'Carcelén Calle N90 y E1D N90-40',
-    items: [
-      {
-        id: '1',
-        name: 'Cama para perros',
-        description: 'Cama grande de algodón',
-        price: '$50.00',
-        quantity: '2',
-        totalPrice: '$100.00',
-      },
-      {
-        id: '2',
-        name: 'Collar para gatos',
-        description: 'Collar azul ajustable',
-        price: '$25.00',
-        quantity: '2',
-        totalPrice: '$50.00',
-      }
-    ],
-  };
-
-  // Función para cerrar el diálogo
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  // Función para marcar el pedido como entregado
-  const handleDelivered = () => {
-    console.log('Pedido entregado');
-    setOpen(false);
-  };
-
-  return (
-    <div>
-      {/* Botón para abrir el diálogo */}
-      <button onClick={() => setOpen(true)}>Ver Resumen del Pedido</button>
-
-      {/* Llamada al componente ResumenPedido pasando las props necesarias */}
-      <ResumenPedido
-        open={open}
-        onClose={handleClose}
-        orderNumber={orderData.orderNumber}
-        buyer={orderData.buyer}
-        orderDate={orderData.orderDate}
-        total={orderData.total}
-        paymentStatus={orderData.paymentStatus}
-        paymentMethod={orderData.paymentMethod}
-        deliveryType={orderData.deliveryType}
-        sector={orderData.sector}
-        address={orderData.address}
-        items={orderData.items}
-        onDelivered={handleDelivered}
-      />
-    </div>
-  );
-};
-
-export default ComponentePadre;
+export default ResumenPedido;
