@@ -9,7 +9,8 @@ import FormularioProductos from "./emprendedores/registroProductos/FormularioPro
 import ArchivosMultimedia from "./emprendedores/registroProductos/ArchivosMultimedia";
 import ListaProductos from "./emprendedores/lista-productos/ListaProductos";
 import ListaPedidos from "./emprendedores/lista-pedidos/ListaPedidos";
-import ResumenPedido from "./emprendedores/resumen-pedido/ResumenPedido";
+import OfertaProducto from "./emprendedores/ofertas-producto/OfertaProducto";
+import ComponentePadre from "./emprendedores/ofertas-producto/OfertaProducto";
 
 
 
@@ -44,7 +45,7 @@ export default function RootLayout({
         
         <TopNavbar/>
         <TopMenu/>
-        <ResumenPedido/>
+        <ComponentePadre/>
         {children}
       </body>
     </html>
