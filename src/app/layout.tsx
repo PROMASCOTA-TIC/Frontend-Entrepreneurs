@@ -3,14 +3,14 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { TopMenu } from "@/components/ui/top-menu/TopMemu";
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
-import TipoPublicacion from "./emprendedores/registroProductos/TipoPublicacion";
-import TipoMascota from "./emprendedores/registroProductos/TipoMascota";
-import FormularioProductos from "./emprendedores/registroProductos/FormularioProducto";
-import ArchivosMultimedia from "./emprendedores/registroProductos/ArchivosMultimedia";
-import ListaProductos from "./emprendedores/lista-productos/ListaProductos";
-import ListaPedidos from "./emprendedores/lista-pedidos/ListaPedidos";
-import OfertaProducto from "./emprendedores/ofertas-producto/OfertaProducto";
-import ComponentePadre from "./emprendedores/ofertas-producto/OfertaProducto";
+import TipoPublicacion from "./(emprendedor)/emprendedores/components/registro-productos/TipoPublicacion";
+import TipoMascota from "./(emprendedor)/emprendedores/components/registro-productos/TipoMascota";
+import FormularioProductos from "./(emprendedor)/emprendedores/components/registro-productos/FormularioProducto";
+import ArchivosMultimedia from "./(emprendedor)/emprendedores/components/registro-productos/ArchivosMultimedia";
+import ListaProductos from "./(emprendedor)/emprendedores/components/lista-productos/ListaProductos";
+import ListaPedidos from "./(emprendedor)/emprendedores/components/lista-pedidos/ListaPedidos";
+import OfertaProducto from "./(emprendedor)/emprendedores/components/oferta-producto/OfertaProducto";
+import ComponentePadre from "./(emprendedor)/emprendedores/components/oferta-producto/OfertaProducto";
 
 
 

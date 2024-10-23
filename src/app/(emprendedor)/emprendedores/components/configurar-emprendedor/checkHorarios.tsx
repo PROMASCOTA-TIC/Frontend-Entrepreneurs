@@ -4,7 +4,8 @@ import React from "react";
 import { Checkbox, FormControlLabel, Grid2, TextField, Typography, Box, Button } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import'@/assets/styles/emprendedores/general.css';
-import { themePalette } from "../config/theme.config";
+import { themePalette } from "@/config/theme.config";
+
 
 
 interface HorarioDia {

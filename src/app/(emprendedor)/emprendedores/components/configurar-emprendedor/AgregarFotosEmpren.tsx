@@ -5,7 +5,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm, Controller } from 'react-hook-form';
 import '@/assets/styles/emprendedores/general.css';
-import { themePalette } from '../config/theme.config';
+import { themePalette } from '@/config/theme.config';
 
 interface FormData {
   localPhotos: File[];
