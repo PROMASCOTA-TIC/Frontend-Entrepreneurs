@@ -22,7 +22,7 @@ const horarioPorDefecto: HorarioDia = {
 
 const diasDeLaSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
-const CheackHorarios: React.FC = () => {
+const CheckHorarios: React.FC = () => {
   const {
     control,
     handleSubmit,
@@ -140,4 +140,4 @@ const CheackHorarios: React.FC = () => {
   );
 };
 
-export default CheackHorarios;
+export default CheckHorarios;

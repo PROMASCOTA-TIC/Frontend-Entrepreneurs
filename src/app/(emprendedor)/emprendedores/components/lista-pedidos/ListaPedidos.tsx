@@ -1,20 +1,19 @@
 "use client";
 import React from 'react';
-import { Box, Typography, TextField, Button, Table, TableBody, TableCell, TableHead, TableRow, Grid2, TableContainer, Paper, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Box, Typography, TextField, Button, Grid2 } from '@mui/material';
+import { DataGrid, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
 import { useForm, Controller } from 'react-hook-form';
 import { themePalette } from '@/config/theme.config';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { esES } from '@mui/x-data-grid/locales';
 
 type FormData = {
   startDate: string;
   endDate: string;
-  clientName: string;
 };
 
 const ListaPedidos: React.FC = () => {
   const { handleSubmit, control, formState: { errors }, getValues, trigger } = useForm<FormData>();
-
 
   const buttonStyle = {
     background: themePalette.primary,
@@ -28,15 +27,7 @@ const ListaPedidos: React.FC = () => {
     if (isValid) {
       const { startDate, endDate } = getValues();
       console.log(`Filtrando desde: ${startDate} hasta: ${endDate}`);
-    }
-  };
-
-  // Función para buscar por nombre de cliente
-  const handleClientSearch = async () => {
-    const isValid = await trigger("clientName");
-    if (isValid) {
-      const { clientName } = getValues();
-      console.log(`Buscando cliente: ${clientName}`);
+      // Lógica para aplicar el filtro en el DataGrid
     }
   };
 
@@ -62,13 +53,60 @@ const ListaPedidos: React.FC = () => {
     />
   );
 
+  // Columnas de la tabla
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', minWidth: 30, flex: 0.5 },
+    { field: 'date', headerName: 'Fecha', minWidth: 100, flex: 1 },
+    { field: 'client', headerName: 'Cliente', minWidth: 150, flex: 1.5 },
+    { field: 'products', headerName: 'Productos', minWidth: 150, flex: 1.5 },
+    { field: 'quantity', headerName: 'Cantidad', minWidth: 80, flex: 1 },
+    { field: 'price', headerName: 'Precio', minWidth: 80, flex: 1 },
+    { field: 'total', headerName: 'Total', minWidth: 80, flex: 1 },
+    { field: 'status', headerName: 'Estado', minWidth: 120, flex: 1 },
+    { field: 'delivery', headerName: 'Tipo de Entrega', minWidth: 120, flex: 1 },
+    {
+      field: 'details',
+      headerName: 'Detalles',
+      minWidth: 70,
+      flex: 0.5,
+      renderCell: () => (
+        <Button
+          sx={{ color: themePalette.primary}}
+          startIcon={<VisibilityIcon />}
+        />
+      ),
+    },
+  ];
+  
+
+  // Datos de ejemplo
+  const rows = [
+    { id: 1, date: '2024-10-18', client: 'Juan Pérez', products: 'Producto 1, Producto 2', quantity: 5, price: '$50', total: '$250', status: 'Enviado', delivery: 'Domicilio' },
+  ];
+  const CustomToolbar = () => {
+    return (
+      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div>
+          <GridToolbarFilterButton />
+          <GridToolbarExport />
+        </div>
+        <GridToolbarQuickFilter
+          debounceMs={500}
+          sx={{ marginLeft: 'auto' }}
+        />
+      </GridToolbarContainer>
+    );
+  };
+
+
+
   return (
     <Box sx={{ padding: 3 }}>
       <Typography align="left" gutterBottom sx={{ color: '#004040', fontWeight: 'bold', fontSize: '34px' }}>
         Pedidos
       </Typography>
 
-      <Grid2 container alignItems="center" spacing={2} sx={{ mb: 4, justifyContent: 'space-between' }}>
+      <Grid2 container alignItems="center" spacing={2} sx={{ mb: 4, justifyContent: 'right' }}>
         <Grid2 size={{ xs: 12, sm: 2 }}>
           {renderTextField("startDate", "Fecha de inicio", "date", {
             required: "La fecha de inicio es requerida",
@@ -87,76 +125,55 @@ const ListaPedidos: React.FC = () => {
             }
           })}
         </Grid2>
-        <Grid2 size={{ xs: 13, sm: 1.5 }}>
+        <Grid2 size={{ xs: 12, sm: 1.5 }}>
           <Button
             variant="contained"
             color="primary"
             fullWidth
-            startIcon={<SearchIcon />}
             onClick={handleFilter}
             sx={buttonStyle}
           >
             Filtrar
           </Button>
         </Grid2>
-
-        <Grid2 size={{ xs: 12, sm: 3 }}>
-          {renderTextField("clientName", "Nombre del cliente", "text", { required: "El nombre del cliente es requerido" })}
-        </Grid2>
-        <Grid2 size={{ xs: 12, sm: 1.5 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            startIcon={<SearchIcon />}
-            onClick={handleClientSearch}
-            sx={buttonStyle}
-          >
-            Buscar
-          </Button>
-        </Grid2>
       </Grid2>
 
-      <Grid2 container spacing={2}>
-        <Grid2 size={{ xs: 12 }}>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Cliente</TableCell>
-                  <TableCell>Productos</TableCell>
-                  <TableCell>Cantidad</TableCell>
-                  <TableCell>Precio</TableCell>
-                  <TableCell>Total</TableCell>
-                  <TableCell>Estado</TableCell>
-                  <TableCell>Tipo de Entrega</TableCell>
-                  <TableCell>Detalles</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell>1</TableCell>
-                  <TableCell>2024-10-18</TableCell>
-                  <TableCell>Juan Pérez</TableCell>
-                  <TableCell>Producto 1, Producto 2</TableCell>
-                  <TableCell>5</TableCell>
-                  <TableCell>$50</TableCell>
-                  <TableCell>$250</TableCell>
-                  <TableCell>Enviado</TableCell>
-                  <TableCell>Domicilio</TableCell>
-                  <TableCell>
-                    <IconButton sx={{color:themePalette.primary}}>
-                      <VisibilityIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Grid2>
-      </Grid2>
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGrid  localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+            rows={rows}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 5 },
+              },
+            }}
+            pageSizeOptions={[5, 10, 25]}
+            slots={{
+              toolbar: CustomToolbar,
+            }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+                quickFilterProps: { debounceMs: 500 },
+              },
+            }}
+            sx={{
+              '& .MuiDataGrid-toolbarContainer': {
+                backgroundColor: themePalette.cwhite,
+                padding: '0.5rem',
+                border: '0px solid',
+              },
+              '& .MuiDataGrid-columnHeader': {
+                backgroundColor: themePalette.black10,
+                fontWeight: 'bold',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                backgroundColor: themePalette.black10,
+                fontWeight: 'bold',
+              },
+            }}
+        />
+      </div>
     </Box>
   );
 };

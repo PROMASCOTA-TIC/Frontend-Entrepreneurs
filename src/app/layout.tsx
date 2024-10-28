@@ -45,7 +45,6 @@ export default function RootLayout({
         
         <TopNavbar/>
         <TopMenu/>
-        <ComponentePadre/>
         {children}
       </body>
     </html>
