@@ -1,14 +1,18 @@
 "use client";
-import React from 'react';
-import { Box, Typography, Button, Grid2, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Button, Paper } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import Delete from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { themePalette } from '@/config/theme.config';
 import { esES } from '@mui/x-data-grid/locales';
+import OfertaProducto from '../oferta-producto/OfertaProducto';
 
 const ListaProductos: React.FC = () => {
+  const [openDialog, setOpenDialog] = useState(false);
+
+  // Columnas de la tabla
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', minWidth: 70, flex: 0.5 },
     { field: 'nombre', headerName: 'Nombre', minWidth: 150, flex: 1 },
@@ -33,7 +37,7 @@ const ListaProductos: React.FC = () => {
       minWidth: 110,
       flex: 0.5,
       renderCell: () => (
-        <Button color="error" startIcon={<DeleteForeverIcon />} />
+        <Button color="error" startIcon={<Delete />} />
       ),
     },
   ];
@@ -51,20 +55,19 @@ const ListaProductos: React.FC = () => {
     },
   ];
 
-  const CustomToolbar = () => {
-    return (
-      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div>
-          <GridToolbarFilterButton />
-          <GridToolbarExport />
-        </div>
-        <GridToolbarQuickFilter
-          debounceMs={500}
-          sx={{ marginLeft: 'auto' }}
-        />
-      </GridToolbarContainer>
-    );
-  };
+  const CustomToolbar = () => (
+    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        <GridToolbarFilterButton />
+        <GridToolbarExport />
+      </div>
+      <GridToolbarQuickFilter debounceMs={500} sx={{ marginLeft: 'auto' }} />
+    </GridToolbarContainer>
+  );
+
+  // Funciones para manejar la apertura y cierre del diálogo
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -72,25 +75,24 @@ const ListaProductos: React.FC = () => {
         Lista de productos
       </Typography>
 
-      <Grid2 container alignItems="center" sx={{ mb: 4, display: 'flex', justifyContent: 'flex-end' }}>
-        <Grid2>
-          <Button
-            variant="outlined"
-            startIcon={<LocalOfferIcon />}
-            sx={{
-              minWidth: '50px',
-              background: themePalette.primary,
-              textTransform: 'none',
-              borderRadius: '20px',
-              color: themePalette.cwhite,
-            }}
-          >
-            Generar Ofertas
-          </Button>
-        </Grid2>
-      </Grid2>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button
+          variant="outlined"
+          startIcon={<LocalOfferIcon />}
+          onClick={handleOpenDialog} // Llama a la función para abrir el diálogo
+          sx={{
+            minWidth: '50px',
+            background: themePalette.primary,
+            textTransform: 'none',
+            borderRadius: '20px',
+            color: themePalette.cwhite,
+          }}
+        >
+          Generar Ofertas
+        </Button>
+      </Box>
 
-      <Paper sx={{ height: 400, width: '100%' }}>
+      <Paper sx={{ height: 400, width: '100%', marginTop: 2 }}>
         <DataGrid
           localeText={esES.components.MuiDataGrid.defaultProps.localeText}
           rows={rows}
@@ -114,7 +116,6 @@ const ListaProductos: React.FC = () => {
             '& .MuiDataGrid-toolbarContainer': {
               backgroundColor: themePalette.cwhite,
               padding: '0.5rem',
-              border: '0px solid',
             },
             '& .MuiDataGrid-columnHeader': {
               backgroundColor: themePalette.black10,
@@ -127,6 +128,9 @@ const ListaProductos: React.FC = () => {
           }}
         />
       </Paper>
+
+      {/* Diálogo de ofertas */}
+      <OfertaProducto open={openDialog} onClose={handleCloseDialog} />
     </Box>
   );
 };

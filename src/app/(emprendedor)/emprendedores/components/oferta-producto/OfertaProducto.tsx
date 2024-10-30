@@ -1,227 +1,293 @@
-"use client";
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Typography,
-  Button,
-  IconButton,
-  InputAdornment,
-  Grid2,
-} from '@mui/material';
-import {  DataGrid,GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
-import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { Dialog, DialogTitle, DialogContent, Button, Typography, TextField, Box, IconButton,Grid2 } from '@mui/material';
+import { Close } from '@mui/icons-material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import { DataGrid, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
 import { useForm, Controller } from 'react-hook-form';
-import { themePalette } from '@/config/theme.config';
+import dayjs from 'dayjs';
 import { esES } from '@mui/x-data-grid/locales';
+import { themePalette } from '@/config/theme.config';
+import { Edit, Delete } from '@mui/icons-material';
 
-const typographyStyle = {
-  fontSize: '18px',
-  fontWeight: 'bold',
-};
-
-const buttonStyle = {
-  background: themePalette.primary,
-  color: themePalette.cwhite,
-  borderRadius: '20px',
-  textTransform: 'none',
-  width: '100px',
-  height: '34px',
-};
-
-type Offer = {
-  id: string;
-  productName: string;
-  startDate: string;
-  endDate: string;
-  originalPrice: number;
-  discountPercentage: number;
-  discountedPrice: number;
-};
-
-type OfertaProductoProps = {
+interface OfertaProductoProps {
   open: boolean;
   onClose: () => void;
-};
+}
 
 const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
-  const { control, handleSubmit, reset, watch, formState: { errors } } = useForm({
-    defaultValues: {
-      productName: '',
-      startDate: dayjs(),
-      endDate: dayjs(),
-      originalPrice: 0,
-      discountPercentage: 0,
-    },
-  });
+  const [precioActual, setPrecioActual] = useState(100);
+  const [precioConDescuento, setPrecioConDescuento] = useState(0);
 
-  const originalPrice = watch('originalPrice');
-  const discountPercentage = watch('discountPercentage');
-  const discountedPrice = originalPrice - (originalPrice * discountPercentage) / 100;
-
-  const [offers, setOffers] = useState<Offer[]>([]);
-
-  const onSubmit = (data: any) => {
-    const newOffer: Offer = {
-      id: (offers.length + 1).toString(),
-      productName: data.productName,
-      startDate: data.startDate.format('YYYY-MM-DD'),
-      endDate: data.endDate.format('YYYY-MM-DD'),
-      originalPrice: data.originalPrice,
-      discountPercentage: data.discountPercentage,
-      discountedPrice: discountedPrice,
-    };
-    setOffers([...offers, newOffer]);
-    reset();
-  };
+  const { control, handleSubmit, watch, formState: { errors } } = useForm();
+  const startDate = watch('startDate');
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'productName', headerName: 'Nombre del producto', width: 200 },
-    { field: 'startDate', headerName: 'Fecha inicio', width: 150 },
-    { field: 'endDate', headerName: 'Fecha fin', width: 150 },
-    { field: 'originalPrice', headerName: 'Precio original', width: 150, valueFormatter: ({ value }) => `$${value.toFixed(2)}` },
-    { field: 'discountPercentage', headerName: 'Porcentaje descuento', width: 180 },
-    { field: 'discountedPrice', headerName: 'Precio promocion', width: 180, valueFormatter: ({ value }) => `$${value.toFixed(2)}` },
+    { field: 'id', headerName: 'ID', minWidth: 70, flex: 0.5 },
+    { field: 'producto', headerName: 'Producto', minWidth: 150, flex: 1 },
+    { field: 'fechaInicio', headerName: 'Fecha Inicio', minWidth: 150, flex: 1 },
+    { field: 'fechaFin', headerName: 'Fecha Fin', minWidth: 150, flex: 1 },
+    { field: 'precio', headerName: 'Precio', minWidth: 100, flex: 0.75 },
+    { field: 'porcentajeDescuento', headerName: 'Descuento', minWidth: 150, flex: 1 },
+    { field: 'precioPromocion', headerName: 'Precio Promoción', minWidth: 150, flex: 1 },
     {
-      field: 'edit',
+      field: 'editar',
       headerName: 'Editar',
-      width: 100,
-      renderCell: () => <Button>Editar</Button>,
+      minWidth: 90,
+      flex: 0.5,
+      renderCell: () => (
+        <IconButton sx={{color:themePalette.primary}}>
+          <Edit />
+        </IconButton>
+      ),
     },
     {
-      field: 'delete',
+      field: 'eliminar',
       headerName: 'Eliminar',
-      width: 100,
-      renderCell: () => <Button>Eliminar</Button>,
+      minWidth: 100,
+      flex: 0.5,
+      renderCell: () => (
+        <IconButton color="error">
+          <Delete />
+        </IconButton>
+      ),
+    },
+  ];
+  
+  const rows = [
+    {
+      id: 1,
+      producto: 'Producto 1',
+      fechaInicio: '2024-10-01',
+      fechaFin: '2024-10-15',
+      precio: '$100',
+      porcentajeDescuento: '10%',
+      precioPromocion: '$90',
     },
   ];
 
-  const CustomToolbar = () => {
-    return (
-        <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>
-                <GridToolbarFilterButton />
-                <GridToolbarExport />
-            </div>
-            <GridToolbarQuickFilter 
-                debounceMs={500}
-                sx={{ marginLeft: 'auto' }}
-            />
-        </GridToolbarContainer>
-    );
+  const onSubmit = (data: any) => {
+    console.log(data);
   };
 
+  const CustomToolbar = () => (
+    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        <GridToolbarFilterButton />
+        <GridToolbarExport />
+      </div>
+      <GridToolbarQuickFilter debounceMs={500} sx={{ marginLeft: 'auto' }} />
+    </GridToolbarContainer>
+  );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: '24px',
-          color: themePalette.cwhite,
-          fontWeight: 'bold',
-          backgroundColor: themePalette.primary,
-        }}
-      >
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <DialogTitle
+      sx={{
+        backgroundColor: themePalette.primary,
+        color: themePalette.cwhite,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+      }}
+    >
+      <Typography sx={{ fontWeight: 'bold', fontSize: '36px', textAlign: 'center' }}>
         Lista de ofertas
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: themePalette.cwhite,
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+      </Typography>
+      <IconButton
+        onClick={onClose}
+        sx={{ color: themePalette.cwhite, position: 'absolute', right: 8 }}
+      >
+        <Close />
+      </IconButton>
+    </DialogTitle>
 
       <DialogContent dividers>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Formulario */}
-          <Grid2 container spacing={2}>
-            {/* Campos del formulario */}
-            {/* Similar al código original */}
-          </Grid2>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} display="flex" flexDirection="column" alignItems="center" gap={2}>
+            <Grid2 container spacing={2} justifyContent="right" alignItems="center">
+              <Grid2 size={{ xs: 12, sm: 4 }}>
+                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
+                  Nombre de producto:
+                </Typography>
+              </Grid2>
+              <Grid2 size={{ xs: 12, sm: 8 }}>
+                <Controller
+                  name="producto"
+                  control={control}
+                  rules={{ required: "El nombre del producto es obligatorio" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      sx={{ maxWidth: '400px' }}
+                      error={Boolean(errors.producto)}
+                      helperText={errors.producto ? String(errors.producto.message) : ''}
+                    />
+                  )}
+                />
+              </Grid2>
 
-          <DialogActions sx={{ display: 'flex', justifyContent: 'center', gap: '23px' }}>
-            <Button sx={buttonStyle} onClick={onClose}>
-              Cancelar
-            </Button>
-            <Button sx={buttonStyle} type="submit">
-              Guardar
-            </Button>
-          </DialogActions>
-        </form>
+              <Grid2 size={{ xs: 12, sm: 4 }}>
+                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
+                  Fecha de inicio:
+                </Typography>
+              </Grid2>
+              <Grid2 size={{ xs: 12, sm: 8 }}>
+                <Controller
+                  name="startDate"
+                  control={control}
+                  rules={{ required: "La fecha de inicio es obligatoria" }}
+                  render={({ field }) => (
+                    <>
+                      <DatePicker
+                        {...field}
+                        format="DD/MM/YYYY"
+                        onChange={(date) => field.onChange(date)}
+                        slotProps={{ textField: { fullWidth: true, sx: { maxWidth: '180px' }, error: Boolean(errors.startDate) } }}
+                      />
+                      {errors.startDate && (
+                        <Typography color="error" variant="body2">
+                          {String(errors.startDate.message)}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                />
+              </Grid2>
 
-        {/* Tabla de ofertas ingresadas */}
-        <Typography sx={{ color: themePalette.primary, marginBottom: 2, fontSize: '24px', fontWeight: 'bold' }}>
-          Ofertas ingresadas
-        </Typography>
-        <div style={{ height: 400, width: '100%' }}>
-          <DataGrid
-            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-            rows={rows}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 5 },
-              },
-            }}
-            pageSizeOptions={[5, 10, 25]}
-            slots={{
-              toolbar: CustomToolbar,
-            }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-                quickFilterProps: { debounceMs: 500 },
-              },
-            }}
-            sx={{
-              '& .MuiDataGrid-toolbarContainer': {
-                backgroundColor: themePalette.cwhite,
-                padding: '0.5rem',
-                border: '0px solid',
-              },
-              '& .MuiDataGrid-columnHeader': {
-                backgroundColor: themePalette.black10,
-                fontWeight: 'bold',
-              },
-              '& .MuiDataGrid-footerContainer': {
-                backgroundColor: themePalette.black10,
-                fontWeight: 'bold',
-              },
-            }}
-          />
-        </div>
+              <Grid2 size={{ xs: 12, sm: 4 }}>
+                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
+                  Fecha de fin:
+                </Typography>
+              </Grid2>
+              <Grid2 size={{ xs: 12, sm: 8 }}>
+                <Controller
+                  name="endDate"
+                  control={control}
+                  rules={{
+                    required: "La fecha de fin es obligatoria",
+                    validate: (value) =>
+                      startDate && dayjs(value).isAfter(dayjs(startDate)) ||
+                      "La fecha de fin no puede ser anterior a la fecha de inicio",
+                  }}
+                  render={({ field }) => (
+                    <>
+                      <DatePicker
+                        {...field}
+                        format="DD/MM/YYYY"
+                        onChange={(date) => field.onChange(date)}
+                        minDate={startDate || undefined}
+                        slotProps={{ textField: { fullWidth: true, sx: { maxWidth: '180px' }, error: Boolean(errors.endDate) } }}
+                      />
+                      {errors.endDate && (
+                        <Typography color="error" variant="body2">
+                          {String(errors.endDate.message)}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                />
+              </Grid2>
+
+              <Grid2 size={{ xs: 12, sm: 4 }}>
+                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
+                  Precio actual:
+                </Typography>
+              </Grid2>
+              <Grid2 size={{ xs: 12, sm: 8 }}>
+                <TextField
+                  value={`$${precioActual}`}
+                  InputProps={{ readOnly: true }}
+                  fullWidth
+                  sx={{ maxWidth: '100px' }}
+                />
+              </Grid2>
+
+              <Grid2 size={{ xs: 12, sm: 4 }}>
+                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
+                  Porcentaje de descuento:
+                </Typography>
+              </Grid2>
+              <Grid2 size={{ xs: 12, sm: 8 }}>
+                <Controller
+                  name="porcentajeDescuento"
+                  control={control}
+                  rules={{ required: "El porcentaje de descuento es obligatorio" }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      type="number"
+                      fullWidth
+                      sx={{ maxWidth: '110px' }}
+                      error={Boolean(errors.porcentajeDescuento)}
+                      helperText={errors.porcentajeDescuento ? String(errors.porcentajeDescuento.message) : ''}
+                    />
+                  )}
+                />
+              </Grid2>
+
+              <Grid2 size={{ xs: 12, sm: 4 }}>
+                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
+                  Precio con descuento:
+                </Typography>
+              </Grid2>
+              <Grid2 size={{ xs: 12, sm: 8 }}>
+                <TextField
+                  value={`$${precioConDescuento.toFixed(2)}`}
+                  InputProps={{ readOnly: true }}
+                  fullWidth
+                  sx={{ maxWidth: '100px' }}
+                />
+              </Grid2>
+            </Grid2>
+
+            <Box display="flex" justifyContent="center" gap={2} mt={2}>
+              <Button onClick={onClose} variant="outlined" sx={{ textTransform: 'none', background: themePalette.primary, color: themePalette.cwhite }}>
+                Cancelar
+              </Button>
+              <Button variant="contained" type="submit" sx={{ textTransform: 'none', background: themePalette.primary, color: themePalette.cwhite }}>
+                Guardar
+              </Button>
+            </Box>
+
+            <Box sx={{ height: 300, width: '100%' }}>
+              <DataGrid
+                localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+                rows={rows}
+                columns={columns}
+                initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+                pageSizeOptions={[5, 10, 25]}
+                slots={{ toolbar: CustomToolbar }}
+                slotProps={{
+                  toolbar: {
+                    showQuickFilter: true,
+                    quickFilterProps: { debounceMs: 500 },
+                  },
+                }}
+                sx={{
+                  '& .MuiDataGrid-toolbarContainer': {
+                    backgroundColor: themePalette.cwhite,
+                    padding: '0.5rem',
+                  },
+                  '& .MuiDataGrid-columnHeader': {
+                    backgroundColor: themePalette.black10,
+                    fontWeight: 'bold',
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    backgroundColor: themePalette.black10,
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Box>
+          </Box>
+        </LocalizationProvider>
       </DialogContent>
     </Dialog>
   );
 };
 
-// Componente padre que controla el estado del diálogo
-const OfertaProductos: React.FC = () => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div>
-      <Button onClick={() => setOpen(true)}>Ver lista de ofertas</Button>
-      <OfertaProducto open={open} onClose={() => setOpen(false)} />
-    </div>
-  );
-};
-
-export default OfertaProductos;
+export default OfertaProducto;
