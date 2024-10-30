@@ -1,211 +1,124 @@
-import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Button,
-  IconButton,
-  TableContainer,
-  Grid2,
-  Box,
-  Paper
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import React from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, IconButton } from '@mui/material';
+import { Close } from '@mui/icons-material';
 import { themePalette } from '@/config/theme.config';
+import { DataGrid, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
+import { esES } from '@mui/x-data-grid/locales';
 
-// Tipo para los items del pedido
-type OrderItem = {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  quantity: string;
-  totalPrice: string;
-};
-
-// Tipos de propiedades que espera el componente ResumenPedido
-type OrderSummaryProps = {
+interface DetallesPedidoProps {
   open: boolean;
   onClose: () => void;
-  orderNumber: string;
-  buyer: string;
-  orderDate: string;
-  total: string;
-  paymentStatus: string;
-  paymentMethod: string;
-  deliveryType: string;
-  sector: string;
-  address: string;
-  items: OrderItem[];
-  onDelivered: () => void;
-};
+  orderData: {
+    id: number;
+    client: string;
+    orderNumber: string;
+    date: string;
+    total: string;
+    paymentStatus: string;
+    paymentMethod: string;
+    deliveryType: string;
+    sector: string;
+    address: string;
+    items: Array<{ id: number; name: string; description: string; category: string; subcategory: string; quantity: number; price: string }>;
+  } | null;
+}
 
-// Componente ResumenPedido que mostrará el resumen del pedido en un diálogo
-const ResumenPedido: React.FC<OrderSummaryProps> = ({
-  open,
-  onClose,
-  orderNumber,
-  buyer,
-  orderDate,
-  total,
-  paymentStatus,
-  paymentMethod,
-  deliveryType,
-  sector,
-  address,
-  items,
-  onDelivered,
-}) => {
+const DetallesPedido: React.FC<DetallesPedidoProps> = ({ open, onClose, orderData }) => {
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', minWidth: 50, flex: 0.5 },
+    { field: 'name', headerName: 'Nombre', minWidth: 150, flex: 1 },
+    { field: 'description', headerName: 'Descripción', minWidth: 200, flex: 1.5 },
+    { field: 'category', headerName: 'Categoría', minWidth: 100, flex: 1 },
+    { field: 'subcategory', headerName: 'Subcategoría', minWidth: 100, flex: 1 },
+    { field: 'quantity', headerName: 'Cantidad', minWidth: 80, flex: 0.5 },
+    { field: 'price', headerName: 'Precio', minWidth: 80, flex: 0.5 },
+  ];
+
+  const CustomToolbar = () => (
+    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        <GridToolbarFilterButton />
+        <GridToolbarExport />
+      </div>
+      <GridToolbarQuickFilter debounceMs={500} sx={{ marginLeft: 'auto' }} />
+    </GridToolbarContainer>
+  );
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: '24px',
-          color: themePalette.cwhite,
-          fontWeight: 'bold',
-          backgroundColor: themePalette.primary,
-        }}
-      >
-        Pedido: #{orderNumber}
-        <IconButton
-          aria-label="close"
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: themePalette.cwhite,
-          }}
-        >
-          <CloseIcon />
+      <DialogTitle sx={{ backgroundColor: themePalette.primary, color: themePalette.cwhite, textAlign: 'center' }}>
+        Pedido #{orderData?.orderNumber || 'Cargando...'}
+        <IconButton onClick={onClose} sx={{ color: themePalette.cwhite, position: 'absolute', right: 8 }}>
+          <Close />
         </IconButton>
       </DialogTitle>
+      
       <DialogContent dividers>
-        <Typography 
-        sx={{
-            color: themePalette.primary,
-            marginBottom: 2,
-            fontSize: '24px',
-            fontWeight: 'bold'
-        }}
-        >Resumen</Typography>
-        
-        {/* Distribución usando Grid */}
-        <Grid2 container spacing={2} sx={{ marginBottom: 2, color: themePalette.primary, justifyContent: 'center' }}>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Comprador:</strong> {buyer}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Total:</strong> {total}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Número:</strong> {orderNumber}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Fecha:</strong> {orderDate}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Estado del pago:</strong> {paymentStatus}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Método de pago:</strong> {paymentMethod}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Tipo entrega:</strong> {deliveryType}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 6 }}>
-            <Typography><strong>Sector:</strong> {sector}</Typography>
-          </Grid2>
-          <Grid2 size={{ xs: 12 }}>
-            <Typography><strong>Dirección:</strong> {address}</Typography>
-          </Grid2>
-        </Grid2>
+        {orderData ? (
+          <>
+            <Box sx={{ mb: 1 }}>
+              <Typography sx={{ fontWeight: 'bold', mb: 1, textAlign: 'left', fontSize: '24px' }}>Resumen</Typography>
+              <Box sx={{ textAlign: 'left', color: themePalette.black }}>
+                <Typography sx={{fontSize:'18px'}}><strong>Comprador:</strong> {orderData.client}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Fecha:</strong> {orderData.date}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Total:</strong> {orderData.total}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Estado del pago:</strong> {orderData.paymentStatus}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Método de pago:</strong> {orderData.paymentMethod}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Tipo de entrega:</strong> {orderData.deliveryType}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Sector:</strong> {orderData.sector}</Typography>
+                <Typography sx={{fontSize:'18px'}}><strong>Dirección:</strong> {orderData.address}</Typography>
+              </Box>
+            </Box>
 
-        <Typography 
-          sx={{
-            color: themePalette.primary,
-            fontSize: '24px',
-            fontWeight: 'bold',
-            marginTop: 2 
-        }}
-        >Items</Typography>
-
-        {/* Hacer la tabla responsive */}
-        <TableContainer component={Paper} sx={{ maxHeight: '300px' }}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow
-                sx={{
-                  backgroundColor: themePalette.black10,
+            <Box sx={{ height: 300, width: '100%' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>Items</Typography>
+              <DataGrid
+                localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+                rows={orderData.items}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 5 },
+                  },
                 }}
-              >
-                <TableCell>ID</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell>Precio</TableCell>
-                <TableCell>Cantidad</TableCell>
-                <TableCell>Precio Total</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell>{item.price}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>{item.totalPrice}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                pageSizeOptions={[5, 10, 25]}
+                slots={{
+                  toolbar: CustomToolbar,
+                }}
+                slotProps={{
+                  toolbar: {
+                    showQuickFilter: true,
+                    quickFilterProps: { debounceMs: 500 },
+                  },
+                }}
+                sx={{
+                  '& .MuiDataGrid-toolbarContainer': {
+                    backgroundColor: themePalette.cwhite,
+                    padding: '0.5rem',
+                  },
+                  '& .MuiDataGrid-columnHeader': {
+                    backgroundColor: themePalette.black10,
+                    fontWeight: 'bold',
+                  },
+                  '& .MuiDataGrid-footerContainer': {
+                    backgroundColor: themePalette.black10,
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Box>
+          </>
+        ) : (
+          <Typography>Cargando detalles del pedido...</Typography>
+        )}
       </DialogContent>
-      <DialogActions
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          padding: 2,
-        }}
-      >
-        <Button onClick={onClose} 
-        sx={{
-        background: themePalette.primary,
-        color: themePalette.cwhite,
-        borderRadius: '20px',
-        textTransform: 'none',
-        width: '100px',
-        height: '34px',
-        }}
-        >
-          Cerrar
-        </Button>
-        <Button onClick={onDelivered}
-        sx={{
-            background: themePalette.primary,
-            color: themePalette.cwhite,
-            borderRadius: '20px',
-            textTransform: 'none',
-            width: '100px',
-            height: '34px',
-            }}
-        >
-          Entregado
-        </Button>
+      
+      <DialogActions sx={{ justifyContent: 'center', gap:'30px' }}>
+        <Button onClick={onClose} variant="outlined" sx={{background:themePalette.primary, color:themePalette.cwhite, textTransform:'none', fontSize:'18px', borderRadius:'20px', width:'100px'}}>Cerrar</Button>
+        <Button variant="contained" sx={{background:themePalette.primary, color:themePalette.cwhite, textTransform:'none', fontSize:'18px', borderRadius:'20px', width:'100px'}}>Enviado</Button>
       </DialogActions>
     </Dialog>
   );
 };
 
-export default ResumenPedido;
+export default DetallesPedido;

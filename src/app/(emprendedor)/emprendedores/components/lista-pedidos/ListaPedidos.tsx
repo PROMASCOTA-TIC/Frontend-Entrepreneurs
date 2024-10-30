@@ -1,59 +1,46 @@
 "use client";
-import React from 'react';
-import { Box, Typography, TextField, Button, Grid2 } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Button,Grid2 } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
 import { useForm, Controller } from 'react-hook-form';
-import { themePalette } from '@/config/theme.config';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { themePalette } from '@/config/theme.config';
+import ResumenPedido from '../resumen-pedido/ResumenPedido';
 import { esES } from '@mui/x-data-grid/locales';
+import dayjs, { Dayjs } from 'dayjs';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 type FormData = {
-  startDate: string;
-  endDate: string;
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
 };
 
 const ListaPedidos: React.FC = () => {
-  const { handleSubmit, control, formState: { errors }, getValues, trigger } = useForm<FormData>();
+  const { handleSubmit, control, formState: { errors }, getValues, trigger } = useForm<FormData>({
+    defaultValues: {
+      startDate: null,
+      endDate: null,
+    },
+  });
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
-  const buttonStyle = {
-    background: themePalette.primary,
-    textTransform: 'none',
-    borderRadius: '20px',
-  };
-
-  // Función para manejar el filtro por fechas
   const handleFilter = async () => {
     const isValid = await trigger(["startDate", "endDate"]);
     if (isValid) {
       const { startDate, endDate } = getValues();
-      console.log(`Filtrando desde: ${startDate} hasta: ${endDate}`);
+      console.log(`Filtrando desde: ${startDate?.format('DD/MM/YYYY')} hasta: ${endDate?.format('DD/MM/YYYY')}`);
       // Lógica para aplicar el filtro en el DataGrid
     }
   };
 
-  // Reutilizar lógica para renderizar TextField
-  const renderTextField = (name: keyof FormData, label: string, type: string = "text", rules: any = {}) => (
-    <Controller
-      name={name}
-      control={control}
-      defaultValue=""
-      rules={rules}
-      render={({ field }) => (
-        <TextField
-          {...field}
-          type={type}
-          label={label}
-          variant="outlined"
-          fullWidth
-          InputLabelProps={{ shrink: true }}
-          error={!!errors[name]}
-          helperText={errors[name]?.message}
-        />
-      )}
-    />
-  );
+  const handleOpenModal = (orderData: any) => {
+    setSelectedOrder(orderData);
+    setOpenModal(true);
+  };
 
-  // Columnas de la tabla
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', minWidth: 30, flex: 0.5 },
     { field: 'date', headerName: 'Fecha', minWidth: 100, flex: 1 },
@@ -69,77 +56,120 @@ const ListaPedidos: React.FC = () => {
       headerName: 'Detalles',
       minWidth: 70,
       flex: 0.5,
-      renderCell: () => (
+      renderCell: (params) => (
         <Button
-          sx={{ color: themePalette.primary}}
+          onClick={() => handleOpenModal(params.row)}
+          sx={{ color: themePalette.primary }}
           startIcon={<VisibilityIcon />}
         />
       ),
     },
   ];
-  
 
-  // Datos de ejemplo
   const rows = [
-    { id: 1, date: '2024-10-18', client: 'Juan Pérez', products: 'Producto 1, Producto 2', quantity: 5, price: '$50', total: '$250', status: 'Enviado', delivery: 'Domicilio' },
+    { 
+      id: 1, 
+      date: '2024-10-18', 
+      client: 'Juan Pérez', 
+      orderNumber: '1234', 
+      total: '$250', 
+      paymentStatus: 'Pagado', 
+      paymentMethod: 'Tarjeta', 
+      deliveryType: 'Domicilio', 
+      sector: 'Centro', 
+      address: 'Av. Siempre Viva 123', 
+      items: [
+        { id: 1, name: 'Producto 1', description: 'Descripción 1', category: 'Categoria1', subcategory: 'Subcategoria', quantity: 2, price: '$150' }
+      ] 
+    },
   ];
-  const CustomToolbar = () => {
-    return (
-      <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div>
-          <GridToolbarFilterButton />
-          <GridToolbarExport />
-        </div>
-        <GridToolbarQuickFilter
-          debounceMs={500}
-          sx={{ marginLeft: 'auto' }}
-        />
-      </GridToolbarContainer>
-    );
-  };
 
-
+  const CustomToolbar = () => (
+    <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        <GridToolbarFilterButton />
+        <GridToolbarExport />
+      </div>
+      <GridToolbarQuickFilter debounceMs={500} sx={{ marginLeft: 'auto' }} />
+    </GridToolbarContainer>
+  );
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography align="left" gutterBottom sx={{ color: '#004040', fontWeight: 'bold', fontSize: '34px' }}>
-        Pedidos
-      </Typography>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Typography align="left" gutterBottom sx={{ color: '#004040', fontWeight: 'bold', fontSize: '34px' }}>
+          Pedidos
+        </Typography>
+        <Grid2 container spacing={2} alignItems="center" justifyContent="flex-end">
+        <Grid2 size={{ xs: 12, sm: 4, md: 2.09 }}>
+          <Controller
+            name="startDate"
+            control={control}
+            rules={{ required: "La fecha de inicio es obligatoria" }}
+            render={({ field }) => (
+              <>
+                <DatePicker
+                  {...field}
+                  label="Fecha de inicio"
+                  format="DD/MM/YYYY"
+                  onChange={(date) => field.onChange(date)}
+                  sx={{ width: "100%" }}
+                />
+                {errors.startDate && (
+                  <Typography color="error" variant="body2">
+                    {errors.startDate.message}
+                  </Typography>
+                )}
+              </>
+            )}
+          />
+   </Grid2>
 
-      <Grid2 container alignItems="center" spacing={2} sx={{ mb: 4, justifyContent: 'right' }}>
-        <Grid2 size={{ xs: 12, sm: 2 }}>
-          {renderTextField("startDate", "Fecha de inicio", "date", {
-            required: "La fecha de inicio es requerida",
-            validate: (value: string) => {
-              const endDate = getValues('endDate');
-              return endDate && value > endDate ? "La fecha de inicio no puede ser posterior a la fecha de fin" : true;
-            }
-          })}
-        </Grid2>
-        <Grid2 size={{ xs: 12, sm: 2 }}>
-          {renderTextField("endDate", "Fecha de fin", "date", {
-            required: "La fecha de fin es requerida",
-            validate: (value: string) => {
-              const startDate = getValues('startDate');
-              return startDate && value < startDate ? "La fecha de fin no puede ser anterior a la fecha de inicio" : true;
-            }
-          })}
-        </Grid2>
-        <Grid2 size={{ xs: 12, sm: 1.5 }}>
+   <Grid2 size={{ xs: 12, sm: 4, md: 2 }}>
+          <Controller
+            name="endDate"
+            control={control}
+            rules={{
+              required: "La fecha de fin es obligatoria",
+              validate: (value) => {
+                const startDate = getValues("startDate");
+                return startDate && value && dayjs(value).isBefore(startDate) ? "La fecha de fin no puede ser anterior a la fecha de inicio" : true;
+              },
+            }}
+            render={({ field }) => (
+              <>
+                <DatePicker
+                  {...field}
+                  label="Fecha de fin"
+                  format="DD/MM/YYYY"
+                  minDate={getValues("startDate") || undefined}
+                  onChange={(date) => field.onChange(date)}
+                  sx={{ width: "100%" }}
+                />
+                {errors.endDate && (
+                  <Typography color="error" variant="body2">
+                    {errors.endDate.message}
+                  </Typography>
+                )}
+              </>
+            )}
+          />
+ </Grid2>
+
+ <Grid2 size={{ xs: 12, sm: 4, md: 1 }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             variant="contained"
             color="primary"
-            fullWidth
-            onClick={handleFilter}
-            sx={buttonStyle}
+            onClick={handleSubmit(handleFilter)}
+            sx={{ background: themePalette.primary, textTransform: 'none', borderRadius: '20px', width: '100%', mr: 2 }}
           >
             Filtrar
           </Button>
-        </Grid2>
-      </Grid2>
-
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid  localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+          </Grid2>
+       </Grid2>
+    
+    <Box sx={{ height: 400, width: "100%", marginTop: "30px" }}>
+          <DataGrid
+            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
             rows={rows}
             columns={columns}
             initialState={{
@@ -161,7 +191,6 @@ const ListaPedidos: React.FC = () => {
               '& .MuiDataGrid-toolbarContainer': {
                 backgroundColor: themePalette.cwhite,
                 padding: '0.5rem',
-                border: '0px solid',
               },
               '& .MuiDataGrid-columnHeader': {
                 backgroundColor: themePalette.black10,
@@ -172,9 +201,16 @@ const ListaPedidos: React.FC = () => {
                 fontWeight: 'bold',
               },
             }}
+          />
+
+        <ResumenPedido
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          orderData={selectedOrder}
         />
-      </div>
-    </Box>
+      </Box>
+    
+    </LocalizationProvider>
   );
 };
 
