@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { esES } from '@mui/x-data-grid/locales';
@@ -84,7 +84,11 @@ const CustomToolbar = () => (
 
 const ProductTable: React.FC = () => {
   return (
-    <Box sx={{ height: 400, width: '90%', mx: 'auto' }}> {/* Ajusta el ancho al 90% y centra */}
+    <Box sx={{ padding: '15px' }}>
+    <Typography  sx={{ marginBottom: '20px', textAlign: 'left', fontSize:'24px',fontWeight:'bold',color:themePalette.primary }}>
+      Productos por acabar stock
+    </Typography>
+      
       <DataGrid
         localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         rows={rows}
