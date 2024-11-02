@@ -23,7 +23,7 @@ const rows: Product[] = [
     nombre: 'Producto A',
     descripcion: 'Descripción del Producto A',
     categoria: 'Categoría 1',
-    cantidad: 10,
+    cantidad: 3,
     precio: 100,
     subcategoria: 'Subcategoría 1',
     imagen: 'https://via.placeholder.com/50'
@@ -54,7 +54,7 @@ const columns: GridColDef[] = [
     minWidth: 90,
     flex: 1,
     renderCell: () => (
-      <IconButton color="primary" aria-label="Editar">
+      <IconButton  aria-label="Editar" sx={{color:themePalette.primary}}>
         <EditIcon />
       </IconButton>
     ),
@@ -65,7 +65,7 @@ const columns: GridColDef[] = [
     minWidth: 90,
     flex: 1,
     renderCell: () => (
-      <IconButton color="secondary" aria-label="Eliminar">
+      <IconButton color="error" aria-label="Eliminar">
         <DeleteIcon />
       </IconButton>
     ),
