@@ -1,11 +1,10 @@
-"use client";
 import React, { useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
+import { Box, Button, FormControl, FormControlLabel, FormLabel, TextField, Checkbox } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema } from '@/validations/registerSchema';
@@ -22,7 +21,7 @@ type Inputs = {
 };
 
 type RegisterFormProps = {
-    nextStep: () => void;  // Nueva prop para avanzar al siguiente paso
+    nextStep: () => void;
 };
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ nextStep }) => {
@@ -33,14 +32,18 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ nextStep }) => {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+    const [acceptTerms, setAcceptTerms] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleClickShowPasswordConfirm = () => setShowPasswordConfirm((show) => !show);
 
-    // Avanza solo si las validaciones son exitosas
     const onSubmit = (data: Inputs) => {
-        console.log(data);
-        nextStep();  // Avanza al siguiente paso después de una validación exitosa
+        if (acceptTerms) {
+            console.log(data);
+            nextStep();
+        } else {
+            alert('Debe aceptar los términos y condiciones para continuar.');
+        }
     };
 
     return (
@@ -173,13 +176,31 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ nextStep }) => {
             />
             {errors.passwordConfirm && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.passwordConfirm.message}</p>}
 
+            {/* Checkbox para aceptar términos y condiciones */}
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={acceptTerms}
+                        onChange={(e) => setAcceptTerms(e.target.checked)}
+                        color="primary"
+                    />
+                }
+                label="Acepto los términos y condiciones"
+                sx={{ color: 'black', margin: '10px 0' }}
+            />
+
             <Box style={{ margin: '20px 0' }} className="button-is space-x-4">
                 <Button variant="contained" className="h-e34 text-white rounded-[20px] normal-case"
                     sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
                 >
-                    Regresar                </Button>
-                <Button variant="contained" type="submit" className="h-e34 text-white rounded-[20px] normal-case"
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
+                    Regresar
+                </Button>
+                <Button 
+                    variant="contained" 
+                    type="submit" 
+                    disabled={!acceptTerms}  // Desactiva el botón si no se aceptan los términos
+                    className="h-e34 text-white rounded-[20px] normal-case"
+                    sx={{ backgroundColor: acceptTerms ? themePalette.primary : 'gray', width: '171px', height: '50px', fontSize: '18px' }}
                 >
                     Siguiente
                 </Button>
