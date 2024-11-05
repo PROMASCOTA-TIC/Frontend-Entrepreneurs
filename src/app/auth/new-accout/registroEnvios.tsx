@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { registroEnvios } from '@/validations/registroEnvios';
 import { themePalette } from '@/config/theme.config';
 import { GoogleMap, LoadScript, Polygon } from '@react-google-maps/api';
+const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 type Inputs = {
     deliveryOptions: string[];
@@ -242,7 +243,7 @@ export const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({ nextSt
             {errors.sector && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.sector.message}</p>}
 
             <FormLabel sx={{ color: 'black' }}>Mapa de sectorización</FormLabel>
-            <LoadScript googleMapsApiKey="AIzaSyDxji8LqpgFxzmWO0d_DwdWSGWsNfAOQMw">
+            <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
                 <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
                     {zonas.map((zona, index) => (
                         <Polygon
