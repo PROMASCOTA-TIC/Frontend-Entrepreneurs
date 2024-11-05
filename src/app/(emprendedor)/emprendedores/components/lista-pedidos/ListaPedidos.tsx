@@ -96,9 +96,9 @@ const ListaPedidos: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Typography align="left" gutterBottom sx={{ color: '#004040', fontWeight: 'bold', fontSize: '34px' }}>
-          Pedidos
-        </Typography>
+         <Typography  sx={{ marginBottom: '20px', textAlign: 'left', fontSize:'24px',fontWeight:'bold',color:themePalette.primary, padding:'15px' }}>
+        Lista de pedidos
+      </Typography>
         <Grid2 container spacing={2} alignItems="center" justifyContent="flex-end">
         <Grid2 size={{ xs: 12, sm: 4, md: 2.09 }}>
           <Controller

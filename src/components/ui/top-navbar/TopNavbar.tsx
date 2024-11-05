@@ -12,7 +12,7 @@ import { themePalette } from '@/app/config/theme.config';
 
 const settings = [
   { path: '/settings', text: 'Configurar cuenta' },
-  { path: '/upload', text: 'Cargar imágenes emprendimiento' },
+  { path: '/emprendedores/agregar-fotos', text: 'Cargar imágenes emprendimiento' },
   { path: '/logout', text: 'Cerrar sesión' },
 ];
 

@@ -70,22 +70,23 @@ const ListaProductos: React.FC = () => {
   const handleCloseDialog = () => setOpenDialog(false);
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography align="left" gutterBottom sx={{ color: '#004040', fontWeight: 'bold', fontSize: '34px' }}>
+    <Box >
+      <Typography  sx={{ marginBottom: '20px', textAlign: 'left', fontSize:'24px',fontWeight:'bold',color:themePalette.primary, padding:'15px' }}>
         Lista de productos
       </Typography>
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
         <Button
           variant="outlined"
           startIcon={<LocalOfferIcon />}
-          onClick={handleOpenDialog} // Llama a la función para abrir el diálogo
+          onClick={handleOpenDialog} 
           sx={{
             minWidth: '50px',
             background: themePalette.primary,
             textTransform: 'none',
             borderRadius: '20px',
             color: themePalette.cwhite,
+            mr: 2,
           }}
         >
           Generar Ofertas
