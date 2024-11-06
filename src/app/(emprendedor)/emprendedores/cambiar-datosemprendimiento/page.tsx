@@ -3,8 +3,6 @@ import { CambioDatosEmprendimiento } from '../components/configurar-emprendedor/
 
 
 
-
-
 export default function CambiarHorario() {
   return (
 <CambioDatosEmprendimiento />
