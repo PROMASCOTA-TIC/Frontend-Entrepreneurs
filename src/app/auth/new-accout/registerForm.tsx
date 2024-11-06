@@ -198,7 +198,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ nextStep }) => {
                 <Button 
                     variant="contained" 
                     type="submit" 
-                    disabled={!acceptTerms}  // Desactiva el botón si no se aceptan los términos
+                    disabled={!acceptTerms}  
                     className="h-e34 text-white rounded-[20px] normal-case"
                     sx={{ backgroundColor: acceptTerms ? themePalette.primary : 'gray', width: '171px', height: '50px', fontSize: '18px' }}
                 >

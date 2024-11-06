@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Box, Button, Typography, IconButton, Card, CardMedia, CardContent } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm, Controller } from 'react-hook-form';
+import { useRouter } from 'next/navigation'; // Importa useRouter
 import '@/assets/styles/emprendedores/general.css';
 import { themePalette } from '@/config/theme.config';
 
@@ -20,10 +21,11 @@ const AgregarFotosEmpren: React.FC = () => {
     },
   });
 
+  const router = useRouter(); // Instancia useRouter
+
   const localPhotos = watch('localPhotos');
   const logoPhotos = watch('logoPhotos');
 
-  // Para recargar estilos
   useEffect(() => {
     const head = document.querySelector('head');
     const link = document.createElement('link');
@@ -32,19 +34,18 @@ const AgregarFotosEmpren: React.FC = () => {
     head?.appendChild(link);
 
     return () => {
-      head?.removeChild(link); // Limpiar al desmontar el componente
+      head?.removeChild(link);
     };
   }, []);
 
   const onSubmit = (data: FormData) => {
-    // Aquí puedes manejar la subida de fotos o los datos del formulario
     console.log(data);
   };
 
   const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const fileArray = Array.from(files).slice(0, 4); // Limitar a 4 archivos
+      const fileArray = Array.from(files).slice(0, 4);
       setValue('localPhotos', fileArray);
     }
   };
@@ -52,7 +53,7 @@ const AgregarFotosEmpren: React.FC = () => {
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const fileArray = Array.from(files).slice(0, 2); // Limitar a 2 archivos
+      const fileArray = Array.from(files).slice(0, 2);
       setValue('logoPhotos', fileArray);
     }
   };
@@ -189,7 +190,7 @@ const AgregarFotosEmpren: React.FC = () => {
               variant="contained"
               component="span"
               sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', mt: 2 }}
-              startIcon={<FileUploadIcon  />}
+              startIcon={<FileUploadIcon />}
             >
               Seleccionar Imagenes
             </Button>
@@ -216,10 +217,14 @@ const AgregarFotosEmpren: React.FC = () => {
 
         {/* Botones de Guardar y Cancelar */}
         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Button  type="submit" variant="contained" sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', width:'150px', height:'34px', fontSize:'18px'}}>
+          <Button type="submit" variant="contained" sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', width: '150px', height: '34px', fontSize: '18px' }}>
             Guardar
           </Button>
-          <Button variant="outlined"  sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', width:'150px', height:'34px', fontSize:'18px'}}>
+          <Button
+            variant="outlined"
+            onClick={() => router.push('/emprendedores/inicio')} 
+            sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', width: '150px', height: '34px', fontSize: '18px' }}
+          >
             Cancelar
           </Button>
         </Box>
