@@ -11,6 +11,7 @@ import { registerSchema } from '@/validations/registerSchema';
 import '@/app/auth/new-accout/Login.css';
 import "./Login.css";
 import { themePalette } from '@/config/theme.config';
+import { useRouter } from 'next/navigation';
 
 type Inputs = {
     name: string;
@@ -29,6 +30,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ nextStep }) => {
         resolver: zodResolver(registerSchema),
         mode: 'onChange',
     });
+    const router = useRouter(); 
 
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
@@ -192,6 +194,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ nextStep }) => {
             <Box style={{ margin: '20px 0' }} className="button-is space-x-4">
                 <Button variant="contained" className="h-e34 text-white rounded-[20px] normal-case"
                     sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
+                    onClick={() => router.push('/auth/login')} 
                 >
                     Regresar
                 </Button>

@@ -11,9 +11,9 @@ import { themePalette } from '@/app/config/theme.config';
 
 
 const settings = [
-  { path: '/settings', text: 'Configurar cuenta' },
-  { path: '/emprendedores/agregar-fotos', text: 'Cargar imágenes emprendimiento' },
-  { path: '/logout', text: 'Cerrar sesión' },
+  { path: '/configurar-cuenta', text: 'Configurar cuenta' },
+  { path: '/agregar-fotos', text: 'Cargar imágenes emprendimiento' },
+  { path: '/auth/login', text: 'Cerrar sesión' },
 ];
 
 const NavbarEm: React.FC = () => {
@@ -31,13 +31,11 @@ const NavbarEm: React.FC = () => {
     <AppBar position="static" sx={{ width: '100%', height: { xs: '60px', md: '80px',background:themePalette.primary } }}>
       <Container maxWidth="xl" >
       <Toolbar disableGutters sx={{ height: '100%', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        {/* Logo y título */}
+       <Link href="/inicio" passHref>
         <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
             <Typography
               variant="h6"
               noWrap
-              component="a"
-              href="#"
               sx={{
                 mr: 2,
                 fontFamily: 'Work Sans, sans-serif',
@@ -50,9 +48,8 @@ const NavbarEm: React.FC = () => {
               PROMASCOTA
             </Typography>
             <img src={logo.src} alt="Logo" style={{ height: '40px', marginRight: '8px' }} />
-
         </Box>
-
+</Link>
         {/* Menú de cuenta visible en todas las pantallas */}
         <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', ml: 'auto' }}>
           <Tooltip title="Open settings">
