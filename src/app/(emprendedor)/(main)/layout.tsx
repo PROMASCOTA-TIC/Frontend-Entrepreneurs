@@ -10,21 +10,18 @@ const items = [
     { name: 'Enlaces de Interés', url: '/enlaces-interes' },
     { name: 'Publi-Reportajes', url: '/preguntas-frecuentes' },
     { name: 'Preguntas Frecuentes', url: '/preguntas-frecuentes' },
-    { name: 'Comisiones y Pago', url: '/contacto' },
-
-      
+    { name: 'Comisiones y Pago', url: '/comisiones-y-pagos' },
 ]
-  
+
 
 export default function ShopLayout({ children }: {
     children: React.ReactNode;
 }) {
     return (
         <main>
-           
             <TopNavbar />
             <TopMenu listaItems={items}/>
-            { children }
+            {children}
         </main>
     );
 }
