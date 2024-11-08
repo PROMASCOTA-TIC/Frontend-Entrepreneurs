@@ -18,7 +18,7 @@ export enum themePalette {
   cwhite = '#FFFFFF',
 }
 
-const theme = createTheme({
+export const theme = createTheme({
   palette: {
     primary: {
       main: themePalette.primary,
