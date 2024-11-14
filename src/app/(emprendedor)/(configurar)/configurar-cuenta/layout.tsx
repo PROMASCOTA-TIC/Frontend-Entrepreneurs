@@ -1,3 +1,4 @@
+import PieDePagina from "@/components/ui/footer/PieDePagina";
 import { TopMenu } from "@/components/ui/top-menu/TopMenu";
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
 const items = [
@@ -14,9 +15,10 @@ export default function ConfiguracionCuentaLayout({
 }) {
     return (
         <main>
-             <TopNavbar/>
+            <TopNavbar/>
             <TopMenu listaItems={items} />
             {children}
+            <PieDePagina />
         </main>
     );
 }
