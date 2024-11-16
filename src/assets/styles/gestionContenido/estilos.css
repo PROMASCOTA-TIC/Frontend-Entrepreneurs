@@ -1,0 +1,45 @@
+/********** CATEGORIAS: ARTICULOS CON IMAGEN ***********/
+.categorias_articulo_contenedor {
+    display: flex;
+    align-items: center;
+    padding: 34px;
+
+    border: solid 1px #004040;
+    border-radius: 10px;
+    background-color: #00aa2808;
+}
+
+.categorias_articulo_imagen {
+    height: auto;
+
+    border-radius: 10px;
+}
+
+/********** ARTICULO ***********/
+.articulo_imagen {
+    width: 20%;
+    height: auto;
+    border-radius: 10px;
+
+    object-fit: contain;
+    align-self: flex-start
+}
+
+/********** ARTICULOS SIN IMAGEN ***********/
+.articulo_contenedor {
+    display: flex;
+    flex-direction: column;   
+    padding: 34px;
+
+    border: solid 1px #004040;
+    border-radius: 10px;
+    background-color: #00aa2808;
+
+    gap: 8px;
+}
+
+.categorias_articulo_imagen {
+    height: auto;
+
+    border-radius: 10px;
+}

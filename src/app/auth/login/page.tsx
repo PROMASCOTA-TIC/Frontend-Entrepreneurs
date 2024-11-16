@@ -2,7 +2,7 @@ import { theme } from '@/app/config/theme.config';
 import { Box, Grid2, Typography } from "@mui/material";
 import Image from "next/image";
 import LogoVerde from "@/assets/images/logoVerde.png";
-import Imagen from "@/assets/images/Foto.png";
+import FondoDuenos from "@/assets/images/fondoRegDuenos.png";
 import { LoginForm } from "./ui/LoginForm";
 
 export default function Login() {
@@ -85,7 +85,7 @@ export default function Login() {
               pointerEvents: 'none',
             }
           }}>
-          <Image src={Imagen} alt="imagen"
+          <Image src={FondoDuenos} alt="imagen"
             style={{
               margin: 0,
               padding: 0,

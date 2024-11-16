@@ -1,0 +1,256 @@
+                                    /**************** BACKGROUND COLOR ***********************/
+.bg-primary {
+    background-color: #004040;
+}
+
+.bg-secondary {
+    background-color: #00AA28;
+}
+
+.bg-tertiary {
+    background-color: #46DA69;
+}
+
+.bg-tertiary20 {
+    background-color: #46DA6933;
+}
+
+.bg-black10 {
+    background-color: #0000001A;
+}
+
+/* .bg-primarydos{
+    background-color: #00404099;
+}
+
+.bg-secondary40 {
+    background-color: #00AA2866;
+}
+
+.bg-quarternary {
+    background-color: #002828;
+}
+
+.bg-quarternary40 {
+    background-color: #00282866;
+}
+
+.bg-quintenary {
+    background-color: #006060;
+}
+
+.bg-quinary50 {
+    background-color: #00606080;
+}
+ */
+
+/***********************************************************************************************************************/
+                                        /**************** Text Color ***********************/
+.txtcolor-primary{
+    color: #004040;
+}
+
+.txtcolor-secondary {
+    color: #00AA28;
+}
+
+.txtcolor-tertiary {
+    color: #46DA69;
+}
+
+.txtcolor-white {
+    color: white;
+}
+
+.txtcolor-black {
+    color: black;
+}
+
+/***********************************************************************************************************************/
+                                        /**************** FONTS ***********************/
+:root {
+    --font-size-h1: 36px;
+    --font-size-h2: 24px;
+    --font-size-n: 18px;
+    --font-size-minima: 14px;
+    --font-size-miniatura: 12px;
+}
+
+/* Títulos H1 */
+.h1-bold {
+    font-size: var(--font-size-h1);
+    font-weight: bold;
+}
+
+.h1-semiBold {
+    font-size: var(--font-size-h1);
+    font-weight: 600;
+}
+
+.h1-regular {
+    font-size: var(--font-size-h1);
+    font-weight: 400;
+}
+
+/* Títulos H2 */
+.h2-bold {
+    font-size: var(--font-size-h2);
+    font-weight: bold;
+}
+
+.h2-semiBold {
+    font-size: var(--font-size-h2);
+    font-weight: 600;
+}
+
+.h2-regular {
+    font-size: var(--font-size-h2);
+    font-weight: 400;
+}
+
+/* Texto Normal */
+.n-bold {
+    font-size: var(--font-size-n);
+    font-weight: bold;
+}
+
+.n-semiBold {
+    font-size: var(--font-size-n);
+    font-weight: 600;
+}
+
+.n-regular {
+    font-size: var(--font-size-n);
+    font-weight: 400;
+}
+
+.n-subrayado {
+    font-size: var(--font-size-n);
+    font-weight: 400;
+    text-decoration: underline;
+}
+
+/* Texto Mínimo */
+.minima-bold {
+    font-size: var(--font-size-minima);
+    font-weight: bold;
+}
+
+.minima-semiBold {
+    font-size: var(--font-size-minima);
+    font-weight: 600;
+}
+
+.minima-regular {
+    font-size: var(--font-size-minima);
+    font-weight: 400;
+}
+
+/* Texto Miniatura */
+.miniatura-bold {
+    font-size: var(--font-size-miniatura);
+    font-weight: bold;
+}
+
+.miniatura-semiBold {
+    font-size: var(--font-size-miniatura);
+    font-weight: 600;
+}
+
+.miniatura-regular {
+    font-size: var(--font-size-miniatura);
+    font-weight: 400;
+}
+
+/* Estilos del placeholder */
+input::placeholder {
+    color: #A9A9A9; /* Cambia el color del placeholder */
+    font-size: var(--font-size-minima); /* Establece el tamaño del placeholder */
+    font-weight: 400; /* Peso de la fuente */
+}
+
+/* Media Queries para pantallas xs */
+@media (max-width: 600px) {
+    :root {
+        --font-size-h1: 24px; /* Ajusta el tamaño según sea necesario */
+        --font-size-h2: 20px; /* Ajusta el tamaño según sea necesario */
+        --font-size-n: 16px; /* Ajusta el tamaño según sea necesario */
+        --font-size-minima: 12px; /* Ajusta el tamaño según sea necesario */
+        --font-size-miniatura: 10px; /* Ajusta el tamaño según sea necesario */
+    }
+
+    /* Estilos del placeholder para pantallas xs */
+    input::placeholder {
+        font-size: var(--font-size-minima); /* Cambia el tamaño según la pantalla */
+    }
+}
+
+
+/***********************************************************************************************************************/
+                                        /**************** Padding ***********************/
+.p-5 {
+    padding: 5px;
+}
+
+.p-8 {
+    padding: 8px;
+}
+
+.p-13 {
+    padding: 13px;
+}
+
+.p-21 {
+    padding: 21px;
+}
+
+.p-34 {
+    padding: 34px;
+}
+
+.p-55 {
+    padding: 55px;
+}
+
+.p-63 {
+    padding: 63px;
+}
+
+/***********************************************************************************************************************/
+                                        /**************** Align ***********************/
+.txt-center {
+    text-align: center;
+}
+
+.txt-justify {
+    text-align: justify;
+}
+
+.txt-left {
+    text-align: left;
+}
+
+/***********************************************************************************************************************/
+                                        /**************** Flex ***********************/
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-spaceBetween {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-spaceAround {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
