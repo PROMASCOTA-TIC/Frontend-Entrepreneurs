@@ -86,7 +86,7 @@ export default function Login() {
               pointerEvents: 'none',
             }
           }}>
-          <Image src={Imagen} alt="imagen"
+          <Image src={fondoDuenos} alt="imagen"
             style={{
               margin: 0,
               padding: 0,
