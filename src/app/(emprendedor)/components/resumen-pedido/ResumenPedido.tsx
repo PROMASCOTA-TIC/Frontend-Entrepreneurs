@@ -115,7 +115,7 @@ const DetallesPedido: React.FC<DetallesPedidoProps> = ({ open, onClose, orderDat
       
       <DialogActions sx={{ justifyContent: 'center', gap:'30px' }}>
         <Button onClick={onClose} variant="outlined" sx={{background:themePalette.primary, color:themePalette.cwhite, textTransform:'none', fontSize:'18px', borderRadius:'20px', width:'100px'}}>Cerrar</Button>
-        <Button variant="contained" sx={{background:themePalette.primary, color:themePalette.cwhite, textTransform:'none', fontSize:'18px', borderRadius:'20px', width:'100px'}}>Enviado</Button>
+        <Button variant="contained" sx={{background:themePalette.primary, color:themePalette.cwhite, textTransform:'none', fontSize:'18px', borderRadius:'20px', width:'100px'}}>Entregado</Button>
       </DialogActions>
     </Dialog>
   );

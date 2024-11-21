@@ -96,12 +96,6 @@ export const BusinessDataForm: React.FC<BusinessDataFormProps> = ({ nextStep, pr
             />
             {errors.phoneNumber && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.phoneNumber.message}</p>}
 
-            <FormLabel sx={{ color: 'black' }}>¿Qué vende tu emprendimiento?</FormLabel>
-            <RadioGroup sx={{justifyContent:'center'}} row aria-label="businessType" {...register('businessType')} defaultValue="">
-                <FormControlLabel value="Productos" control={<Radio />} label="Productos" />
-                <FormControlLabel value="Servicios" control={<Radio />} label="Servicios" />
-            </RadioGroup>
-            {errors.businessType && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.businessType.message}</p>}
 
             <FormLabel htmlFor="bankName" sx={{ color: 'black' }}>Nombre del banco</FormLabel>
             <TextField
