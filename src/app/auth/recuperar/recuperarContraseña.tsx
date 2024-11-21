@@ -52,7 +52,7 @@ export default function PasswordRecovery() {
               sx={{ fontSize: { xs: '32px', md: '42px' } }}
               className="text-primary"
             >
-              PROMASCOTA
+              PROMASKOTA
             </Typography>
             <Image
               src={icon}

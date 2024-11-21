@@ -4,6 +4,7 @@ import Image from "next/image";
 import LogoVerde from "@/assets/images/logoVerde.png";
 import Imagen from "@/assets/images/Foto.png";
 import { LoginForm } from "./ui/LoginForm";
+import { fondoDuenos } from '@/assets/images';
 
 export default function Login() {
   return (
@@ -34,7 +35,7 @@ export default function Login() {
                 fontSize: { xs: '32px', md: '42px' },
                 color: theme.palette.primary.main,
               }}>
-              PROMASCOTA
+              PROMASKOTA
             </Typography>
             <Image src={LogoVerde}
               style={{
@@ -85,7 +86,7 @@ export default function Login() {
               pointerEvents: 'none',
             }
           }}>
-          <Image src={Imagen} alt="imagen"
+          <Image src={fondoDuenos} alt="imagen"
             style={{
               margin: 0,
               padding: 0,

@@ -62,7 +62,7 @@ export default function Login() {
             <Typography
               sx={{ fontSize: { xs: "32px", md: "42px", color: themePalette.primary } }}
             >
-              PROMASCOTA
+              PROMASKOTA
             </Typography>
             <Image
               src={icon}
@@ -133,7 +133,7 @@ export default function Login() {
               margin: 0,
               padding: 0,
               width: "100%",
-              height: "100vh",
+              height: "auto",
             }}
             priority
           />
