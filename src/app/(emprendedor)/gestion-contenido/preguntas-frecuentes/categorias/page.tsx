@@ -1,57 +1,96 @@
 "use client";
 
+import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
+import ArticulosSinFoto from '@/components/gestionContenido/ArticulosSinFoto';
+import { CircularProgress } from '@mui/material';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import '/src/assets/styles/gestionContenido/general.css';
-import ArticulosSinFoto from '@/components/gestionContenido/ArticulosSinFoto';
-
-const articulos = [
-    {
-        id: 1,
-        titulo: 'Título del Artículo 1',
-        descripcion: 'Lorem ipsum dolor sit amet consectetur adipiscing elit nulla, lectus feugiat tristique per dui erat nullam posuere conubia, interdum parturient tempor quam aliquet dictumst cubilia. Iaculis risus quisque duis fusce sem vestibulum odio, penatibus nibh euismod dictum sodales porta laoreet, class orci venenatis porttitor tortor curae. Aliquet faucibus volutpat laoreet parturient erat feugiat blandit habitant penatibus quisque lacus augue nascetur proin primis, pretium nam accumsan gravida rhoncus ligula ac vivamus arcu quis eu praesent massa risus.',
-        link: '/articulo/1',
-    },
-    {
-        id: 2,
-        titulo: 'Título del Artículo 2',
-        descripcion: 'Descripción del Artículo 2Lorem ipsum dolor sit amet consectetur adipiscing elit nulla, lectus feugiat tristique per dui erat nullam posuere conubia, interdum parturient tempor quam aliquet dictumst cubilia. Iaculis risus quisque duis fusce sem vestibulum odio, penatibus nibh euismod dictum sodales porta laoreet, class orci venenatis porttitor tortor curae. Aliquet faucibus volutpat laoreet parturient erat feugiat blandit habitant penatibus quisque lacus augue nascetur proin primis, pretium nam accumsan gravida rhoncus ligula ac vivamus arcu quis eu praesent massa risus.',
-        link: '/articulo/2',
-    },
-    {
-        id: 3,
-        titulo: 'Título del Artículo 3',
-        descripcion: 'Lorem ipsum dolor sit amet consectetur adipiscing elit nulla, lectus feugiat tristique per dui erat nullam posuere conubia, interdum parturient tempor quam aliquet dictumst cubilia. Iaculis risus quisque duis fusce sem vestibulum odio, penatibus nibh euismod dictum sodales porta laoreet, class orci venenatis porttitor tortor curae. Aliquet faucibus volutpat laoreet parturient erat feugiat blandit habitant penatibus quisque lacus augue nascetur proin primis, pretium nam accumsan gravida rhoncus ligula ac vivamus arcu quis eu praesent massa risus.',
-        link: '/articulo/3',
-    },
-];
+const categoryNames: { [key: string]: string } = {
+  "1": "Publicar contenido",
+  "2": "Registro y Cuenta",
+  "3": "Compras y Pagos",
+  "4": "Productos y Servicios",
+  "5": "Soporte al cliente",
+  "6": "Seguridad y Privacidad",
+};
 
 const PF_Categorias = () => {
-    // const [categoria, setCategoria] = useState('');
-    // const [articulos, setArticulos] = useState([]);
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("categoryId"); // Obtener el ID de la categoría desde la URL
+  const [articulos, setArticulos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const categoryName = categoryId ? categoryNames[categoryId] : "Categoría desconocida";
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         // Aquí obtendrás los datos de la base de datos
-    //         // Reemplaza la URL con tu API real
-    //         const response = await fetch('/api/articulos'); // API ficticia para el ejemplo
-    //         const data = await response.json();
+  useEffect(() => {
+    const fetchArticulosPorCategoria = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/api/faqs/categories/${categoryId}/faqs`);
+        const data = await response.json();
+        // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
+        const articulosAdaptados = data.map((articulo: any) => ({
+          id: articulo.id || articulo.faqId, // Asignar `faqId` si `id` no existe
+          titulo: articulo.title || "Sin título",
+          descripcion: articulo.description || "Sin descripción disponible",
+        }));
 
-    //         setCategoria(data.categoria);
-    //         setArticulos(data.articulos);
-    //     };
+        setArticulos(articulosAdaptados);
+      } catch (error) {
+        console.error("Error al obtener los resultados:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    //     fetchData();
-    // }, []);
+    if (categoryId) {
+      fetchArticulosPorCategoria();
+    }
+  }, [categoryId]);
 
+  if (loading) {
     return (
-        <div>
-            {/* <h1 className='h1-bold colortext-primary' style={{ padding: '34px 0px 0px 55px' }}>{categoria}</h1> */}
-            <h1 className='h1-bold txtcolor-primary' style={{ padding: '21px 0px 0px 55px' }}>Categoria</h1>
-
-            <ArticulosSinFoto articulos={articulos} />
-        </div>
+      <div
+        className="flex-center"
+        style={{
+          height: "100vh", // Ocupa el 100% del alto de la pantalla
+          flexDirection: "column", // Coloca el icono y el texto uno debajo del otro
+          gap: "20px", // Espacio entre el ícono y el texto
+        }}
+      >
+        <CircularProgress style={{ color: "#004040" }} size={60} /> {/* Ícono de carga */}
+        <h1 className="h1-bold txtcolor-primary">
+          Cargando resultados...
+        </h1>
+      </div>
     );
+  }
+
+  return (
+    <div>
+      <h1 className="h1-bold txtcolor-primary" style={{ padding: "21px 0px 0px 55px" }}>
+        Categoría: {categoryName}
+      </h1>
+
+      {/* Mostrar mensaje si no hay artículos */}
+      {articulos.length === 0 ? (
+        <div
+          className="flex-center"
+          style={{
+            height: "50vh",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <h2 className="h2-semiBold txtcolor-primary">No existen artículos en esta categoría.</h2>
+        </div>
+      ) : (
+        <ArticulosSinFoto
+          articulos={articulos}
+          basePath="/gestion-contenido/preguntas-frecuentes/categorias/articulo"
+        />
+      )}
+    </div>
+  );
 };
 
 export default PF_Categorias;
