@@ -1,36 +1,36 @@
 "use client";
 
-import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
-import { CircularProgress } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import ArticulosConFoto from "@/components/gestionContenido/ArticulosConFoto";
+import { CircularProgress } from "@mui/material";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const categoryNames: { [key: string]: string } = {
-  "1": "Higiene",
-  "2": "Salud",
-  "3": "Adiestramiento",
-  "4": "Nutrición",
-  "5": "Seguridad",
-  "6": "Actividades",
-};
+interface Articulo {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  link: string;
+  imagen: string;
+}
 
-const EI_Categorias = () => {
+const ResultadosPage = () => {
   const searchParams = useSearchParams();
-  const categoryId = searchParams.get("categoryId"); // Obtener el ID de la categoría desde la URL
-  const [articulos, setArticulos] = useState([]);
+  const query = searchParams.get("query") || "";
+  const endpoint = searchParams.get("endpoint") || "";
+  const [articulos, setArticulos] = useState<Articulo[]>([]);
   const [loading, setLoading] = useState(true);
-  const categoryName = categoryId ? categoryNames[categoryId] : "Categoría desconocida";
 
   useEffect(() => {
-    const fetchArticulosPorCategoria = async () => {
+    const fetchResults = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/links/categories/${categoryId}/links`);
+        const response = await fetch(`${endpoint}?query=${query}`);
         const data = await response.json();
+
         // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
         const articulosAdaptados = data.map((articulo: any) => ({
           id: articulo.id || articulo.linkId, // Asignar `linkId` si `id` no existe
-          titulo: articulo.title || "Sin título",
-          descripcion: articulo.description || "Sin descripción disponible",
+          titulo: articulo.title,
+          descripcion: articulo.description,
           link: articulo.sourceLink || "#", // Si no hay un enlace, se deja vacío
           imagen: articulo.image || "/default-image.jpg", // Imagen por defecto si no tiene imagen
         }));
@@ -43,10 +43,10 @@ const EI_Categorias = () => {
       }
     };
 
-    if (categoryId) {
-      fetchArticulosPorCategoria();
+    if (query && endpoint) {
+      fetchResults();
     }
-  }, [categoryId]);
+  }, [query, endpoint]);
 
   if (loading) {
     return (
@@ -68,22 +68,9 @@ const EI_Categorias = () => {
 
   return (
     <div>
-      <h1 className="h1-bold txtcolor-primary" style={{ padding: "21px 0px 0px 55px" }}>
-        Categoría: {categoryName}
-      </h1>
-
-      {/* Mostrar mensaje si no hay artículos */}
+      <h1 className="h2-bold txtcolor-primary txt-center">Resultados de búsqueda para: "{query}"</h1>
       {articulos.length === 0 ? (
-        <div
-          className="flex-center"
-          style={{
-            height: "50vh",
-            flexDirection: "column",
-            gap: "10px",
-          }}
-        >
-          <h2 className="h2-semiBold txtcolor-primary">No existen artículos en esta categoría.</h2>
-        </div>
+        <p>No se encontraron resultados.</p>
       ) : (
         <ArticulosConFoto
           articulos={articulos}
@@ -94,4 +81,4 @@ const EI_Categorias = () => {
   );
 };
 
-export default EI_Categorias;
+export default ResultadosPage;
