@@ -1,46 +1,93 @@
 /********** CATEGORIAS: ARTICULOS CON IMAGEN ***********/
 .categorias_articulo_contenedor {
-    display: flex;
-    align-items: center;
-    padding: 34px;
+  display: flex;
+  align-items: center;
+  padding: 34px;
 
-    border: solid 1px #004040;
-    border-radius: 10px;
-    background-color: #00aa2808;
+  border: solid 1px #004040;
+  border-radius: 10px;
+  background-color: #00aa2808;
 }
 
 .categorias_articulo_imagen {
-    height: auto;
+  height: auto;
 
-    border-radius: 10px;
+  border-radius: 10px;
 }
 
 /********** ARTICULO ***********/
 .articulo_imagen {
-    width: 20%;
-    height: auto;
-    border-radius: 10px;
+  width: 20%;
+  height: auto;
+  border-radius: 10px;
 
-    object-fit: contain;
-    align-self: flex-start
+  object-fit: contain;
+  align-self: flex-start
 }
 
 /********** ARTICULOS SIN IMAGEN ***********/
 .articulo_contenedor {
-    display: flex;
-    flex-direction: column;   
-    padding: 34px;
+  display: flex;
+  flex-direction: column;
+  padding: 34px;
 
-    border: solid 1px #004040;
-    border-radius: 10px;
-    background-color: #00aa2808;
+  border: solid 1px #004040;
+  border-radius: 10px;
+  background-color: #00aa2808;
 
-    gap: 8px;
+  gap: 8px;
 }
 
 .categorias_articulo_imagen {
-    height: auto;
+  height: auto;
 
-    border-radius: 10px;
+  border-radius: 10px;
 }
 
+/****************************************/
+/* Chatbot */
+
+.chatbotContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.floatingButton {
+  background-color: #00AA28;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+}
+
+.chatWindow {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 300px;
+  height: 400px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+  /* scroll para los mensajes */
+}
+
+.chatWindow input {
+  border: none;
+  border-top: 1px solid #ccc;
+  padding: 8px;
+  font-size: 14px;
+  outline: none;
+  border-radius: 0 0 8px 8px;
+}
