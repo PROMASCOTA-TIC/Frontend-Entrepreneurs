@@ -10,6 +10,8 @@ import dayjs from 'dayjs';
 import { esES } from '@mui/x-data-grid/locales';
 import { themePalette } from '@/config/theme.config';
 import { Edit, Delete } from '@mui/icons-material';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+dayjs.extend(isSameOrAfter);
 
 interface OfertaProductoProps {
   open: boolean;
@@ -114,48 +116,40 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
                 </Typography>
               </Grid2>
               <Grid2 size={{ xs: 12, sm: 8 }}>
-                <Controller
-                  name="producto"
-                  control={control}
-                  rules={{ required: "El nombre del producto es obligatorio" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      fullWidth
-                      sx={{ maxWidth: '400px' }}
-                      error={Boolean(errors.producto)}
-                      helperText={errors.producto ? String(errors.producto.message) : ''}
-                    />
-                  )}
-                />
-              </Grid2>
-
-              <Grid2 size={{ xs: 12, sm: 4 }}>
-                <Typography align="right" sx={{ fontSize: '24px', fontWeight: '600', color: themePalette.primary }}>
-                  Fecha de inicio:
-                </Typography>
-              </Grid2>
-              <Grid2 size={{ xs: 12, sm: 8 }}>
-                <Controller
-                  name="startDate"
-                  control={control}
-                  rules={{ required: "La fecha de inicio es obligatoria" }}
-                  render={({ field }) => (
-                    <>
-                      <DatePicker
-                        {...field}
-                        format="DD/MM/YYYY"
-                        onChange={(date) => field.onChange(date)}
-                        slotProps={{ textField: { fullWidth: true, sx: { maxWidth: '180px' }, error: Boolean(errors.startDate) } }}
-                      />
-                      {errors.startDate && (
-                        <Typography color="error" variant="body2">
-                          {String(errors.startDate.message)}
-                        </Typography>
-                      )}
-                    </>
-                  )}
-                />
+              <Controller
+  name="startDate"
+  control={control}
+  rules={{
+    required: "La fecha de inicio es obligatoria",
+    validate: (value) => {
+      const selectedDate = dayjs(value);
+      const tomorrow = dayjs().add(1, 'day').startOf('day');
+      return selectedDate.isSameOrAfter(tomorrow) || "La fecha de inicio debe ser al menos el día siguiente";
+    },
+  }}
+  render={({ field }) => (
+    <>
+      <DatePicker
+        {...field}
+        format="DD/MM/YYYY"
+        onChange={(date) => field.onChange(date)}
+        minDate={dayjs().add(1, 'day').startOf('day')} // Configura visualmente el mínimo
+        slotProps={{
+          textField: {
+            fullWidth: true,
+            sx: { maxWidth: '180px' },
+            error: Boolean(errors.startDate),
+          },
+        }}
+      />
+      {errors.startDate && (
+        <Typography color="error" variant="body2">
+          {String(errors.startDate.message)}
+        </Typography>
+      )}
+    </>
+  )}
+/>
               </Grid2>
 
               <Grid2 size={{ xs: 12, sm: 4 }}>

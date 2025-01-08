@@ -137,7 +137,7 @@ const FormularioRegistroProducto: React.FC = () => {
         {formData.category && createField('Subcategoría', 'subcategory', 'text', subcategories[formData.category as keyof typeof subcategories], true)}
         {formData.category === 'Comida' && createField('Peso (kg)', 'weight', 'number')}
         {createField('Stock', 'stock', 'number')}
-        {createField('Precio sin IVA', 'price', 'number')}
+        {createField('Precio final', 'price', 'number')}
         {['Ropa', 'Correas', 'Camas'].includes(formData.category) && createField('Talla', 'size', 'text', sizeOptions, true)}
         {createField('Descripción', 'description', 'text', undefined, false, { multiline: true, rows: 4, width: '700px' })}
       </Grid2>

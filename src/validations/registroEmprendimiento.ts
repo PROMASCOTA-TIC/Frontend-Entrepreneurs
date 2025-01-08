@@ -14,9 +14,6 @@ export const registroEmprendimiento = z.object({
         .length(10, { message: 'El número celular debe tener exactamente 10 dígitos' })
         .regex(/^[0-9]+$/, { message: 'El número celular solo debe contener números' }),
 
-    businessType: z.string()
-        .nonempty({ message: 'Selecciona lo que vende tu emprendimiento' }),
-    
     bankName: z.string()
         .nonempty({ message: 'Selecciona un banco' }),
 
