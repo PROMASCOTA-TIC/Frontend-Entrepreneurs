@@ -15,12 +15,11 @@ const PR_CompartirContenido = () => {
                 gap: '21px'
             }}
         >
-            <h1 className='h1-bold'>¡Comparte contenido con la comunidad!</h1>
+            <h1 className='h1-bold'>¡Promociona tus productos o eventos!</h1>
 
             <p className='n-regular'>
-                ¡Ayuda a otros dueños de mascotas a descubrir contenido útil y emocionante!<br />
-                Comparte tus fotos, videos y consejos sobre el cuidado de mascotas.<br />
-                ¡Tu experiencia puede hacer una gran diferencia!
+                ¿Tienes algo nuevo que ofrecer? ¡Comparte tus últimos productos o eventos con nuestra comunidad!
+                Lleva tu negocio al siguiente nivel.
             </p>
 
             <BotonAzul
