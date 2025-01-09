@@ -8,7 +8,7 @@ export default function EnlacesDeInteres() {
             <BarraDeBusqueda
                 endpoint="http://localhost:3001/api/links/search"
                 seccion="enlaces-interes"
-                placeholder="Buscar enlaces de interés"
+                placeholder="Escribe palabras de búsqueda"
             />
             <h1 className="h1-bold txtcolor-primary flex-center" style={{ padding: '21px 0px 0px 0px' }}>Categorías</h1>
             <EI_Categorias />

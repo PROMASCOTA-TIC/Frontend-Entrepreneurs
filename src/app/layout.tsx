@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import Chatbot from "./(emprendedor)/gestion-contenido/chatbot/Chatbot";
 
 export const metadata: Metadata = {
   title: "Promascota",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="es">
       <body>
             {children}
+            <Chatbot />
       </body>
     </html>
   );

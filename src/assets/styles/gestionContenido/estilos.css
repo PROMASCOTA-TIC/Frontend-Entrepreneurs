@@ -51,43 +51,93 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
+  border-color: #00AA28;
 }
 
 .floatingButton {
   background-color: #00AA28;
   color: #fff;
   border: none;
-  border-radius: 50%;
-  width: 60px;
+  border-radius: 20px;
+  width: 120px;
   height: 60px;
   cursor: pointer;
 }
 
 .chatWindow {
-  position: absolute;
-  bottom: 80px;
-  right: 0;
-  width: 300px;
-  height: 400px;
+  position: fixed;         /* si quieres que toda la ventana del chat sea fija */
+  bottom: 100px;           /* ajusta según tu diseño; ej. 20px if no floating button */
+  right: 20px;
+  
+  display: flex;
+  flex-direction: column;
+  width: 300px;            /* ancho fijo del chat */
+  height: 400px;           /* alto fijo del chat */
+  
   background-color: #f5f5f5;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Cabecera del chat */
+.chatHeader {
+  background-color: #444;  /* Ejemplo */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 8px 8px 0 0;
+  color: white;
+}
+
+/* Contenedor de los mensajes, ocupa el espacio restante */
+.messages {
+  flex: 1;                 /* Importante: Se expande para ocupar el espacio vertical */
+  overflow-y: auto;        /* Scroll si excede el alto */
+  padding: 8px;
   display: flex;
   flex-direction: column;
+  gap: 8px;                /* separa burbujas */
 }
 
-.messages {
-  flex: 1;
+/* Burbujas de chat */
+.bubble {
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  word-break: break-word;
+  font-size: 14px;
+}
+
+.bubble.user {
+  background-color: #b9ffc9;
+  align-self: flex-end;
+}
+
+.bubble.bot {
+  background-color: #f0f0f0;
+  align-self: flex-start;
+}
+
+/* Contenedor de input abajo */
+.chatInputContainer {
   padding: 8px;
-  overflow-y: auto;
-  /* scroll para los mensajes */
+  border: 1px solid #00AA28 !important;
+  border-radius: 0 0 8px 8px;
+  background-color: #fff;
 }
 
-.chatWindow input {
-  border: none;
-  border-top: 1px solid #ccc;
+.chatInputContainer input {
+  width: 100%;
   padding: 8px;
   font-size: 14px;
-  outline: none;
-  border-radius: 0 0 8px 8px;
+  border: 1px solid #00AA28 !important;  /* Borde inicial */
+  border-radius: 4px;
+  outline: none !important;  /* Evita el borde azul estándar */
+  background-color: #fafafa;
+  transition: border-color 0.3s ease-in-out;  /* Suaviza el cambio de borde */
+}
+
+.chatInputContainer input:focus {
+  border-color: #00AA28 !important ;/* Verde cuando está enfocado */
 }

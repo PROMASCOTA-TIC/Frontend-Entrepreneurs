@@ -1,21 +1,38 @@
-"use client";
+'use client';
 
-import { Button, Box } from '@mui/material';
 import React from 'react';
+import { Button, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
 interface BotonCategoriaProps {
   name: string;
-  icon: React.ElementType;
+  icon: React.ReactNode;
   link: string;
 }
 
-const BotonCategoria: React.FC<BotonCategoriaProps> = ({ name, icon: Icon, link }) => {
+export default function BotonCategoria({ name, icon, link }: BotonCategoriaProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(link); // Redirige al link proporcionado
+    router.push(link);
   };
+
+  // 1) Verifica si es un elemento válido de React (por ej. <CleanHands />, <Icon ... />)
+  if (React.isValidElement(icon)) {
+    const typedIcon = icon as React.ReactElement<any>;
+    // Caso 1: si detectas que es MUI icon (por ejemplo typedIcon.type.muiName)
+    if ((typedIcon.type as any).muiName) {
+      // Ok, es MUI => usar sx
+      icon = React.cloneElement(typedIcon, {
+        sx: { fontSize: { xs: '40px', md: '80px' } },
+      });
+    } else {
+      // Caso 2: no es MUI => usar style
+      icon = React.cloneElement(typedIcon, {
+        style: { fontSize: "80px" },
+      });
+    }
+  }
 
   return (
     <Button
@@ -41,21 +58,10 @@ const BotonCategoria: React.FC<BotonCategoriaProps> = ({ name, icon: Icon, link 
       >
         {name}
       </Box>
-      <Box
-        className="flex-center"
-        sx={{
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        <Icon
-          sx={{
-            fontSize: { xs: '40px', md: '80px' },
-          }}
-        />
+      <Box className="flex-center" sx={{ width: '100%', height: '100%' }}>
+        {/* Renderiza el icono, ya clonado con sx */}
+        {icon}
       </Box>
     </Button>
   );
-};
-
-export default BotonCategoria;
+}

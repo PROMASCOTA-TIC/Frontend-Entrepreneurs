@@ -35,7 +35,7 @@ const BarraDeBusqueda: React.FC<BarraDeBusquedaProps> = ({ endpoint, seccion, pl
   };
 
   return (
-    <Box className="bg-tertiary20 p-21 txt-center txtcolor-primary flex-column" sx={{ alignItems: "center", gap: "34px" }}>
+    <Box className="bg-tertiary20 p-34 txt-center txtcolor-primary flex-column" sx={{ alignItems: "center", gap: "34px" }}>
       <h1 className="h1-bold">¿En qué podemos ayudarte?</h1>
       <div style={{ display: "flex", alignItems: "center", gap: "21px" }}>
         <TextField
@@ -61,10 +61,11 @@ const BarraDeBusqueda: React.FC<BarraDeBusquedaProps> = ({ endpoint, seccion, pl
             },
           }}
         />
-        <IconButton onClick={handleSearch} className="bg-secondary" sx={{ borderRadius: "100px" }}>
+        <IconButton onClick={handleSearch} className="bg-secondary" sx={{ borderRadius: "100px", color: "white" }}>
           <Search />
         </IconButton>
       </div>
+      <h2 className="h2-bold txtcolor-primary flex-center">También puedes revisar los siguientes temas para encontrar la información que buscas.</h2>
       {errorMessage && <p className="error-text">{errorMessage}</p>}
     </Box>
   );

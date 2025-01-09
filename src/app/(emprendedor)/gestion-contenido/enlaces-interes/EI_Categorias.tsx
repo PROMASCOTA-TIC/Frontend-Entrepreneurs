@@ -1,17 +1,18 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { CleanHands, FoodBank, Healing, Security, School, SportsGymnastics } from '@mui/icons-material';
+import { Icon } from "@iconify/react";
 
 import BotonCategoria from "@/components/gestionContenido/botones/BotonCategoria";
 
 const EI_Categorias = () => {
   const buttons = [
-    { name: 'Higiene', icon: CleanHands, id: 1 },
-    { name: 'Salud', icon: Healing, id: 2 },
-    { name: 'Adiestramiento', icon: School, id: 3 },
-    { name: 'Nutrición', icon: FoodBank, id: 4 },
-    { name: 'Seguridad', icon: Security, id: 5 },
-    { name: 'Actividades', icon: SportsGymnastics, id: 6 },
+    { name: 'Higiene', icon: <CleanHands />, id: 1 },
+    { name: 'Salud', icon: <Healing />, id: 2 },
+    { name: 'Adiestramiento', icon: <Icon icon="mdi:dog-side" />, id: 3 },
+    { name: 'Nutrición', icon: <Icon icon="material-symbols-light:pet-supplies" />, id: 4 },
+    { name: 'Seguridad', icon: <Security />, id: 5 },
+    { name: 'Actividades', icon: <SportsGymnastics />, id: 6 },
   ];
 
   return (
@@ -22,8 +23,8 @@ const EI_Categorias = () => {
         gap: '30px',
       }}
     >
-      {buttons.map((button, index) => (
-        <Box key={index} sx={{ flex: '0 0 auto' }}>
+      {buttons.map((button) => (
+        <Box key={button.id} sx={{ flex: '0 0 auto' }}>
           <BotonCategoria
             name={button.name}
             icon={button.icon}

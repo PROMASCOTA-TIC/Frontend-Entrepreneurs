@@ -10,7 +10,7 @@ export default function PreguntasFrecuente() {
             <BarraDeBusqueda
                 endpoint="http://localhost:3001/api/faqs/search"
                 seccion="preguntas-frecuentes"
-                placeholder="Buscar preguntas frecuentes"
+                placeholder="Escribe palabras de búsqueda"
             />
             <h1 className="h1-bold txtcolor-primary flex-center" style={{ padding: '21px 0px 0px 0px' }}>Categorías</h1>
             <PF_Categorias />

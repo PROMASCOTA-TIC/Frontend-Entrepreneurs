@@ -68,7 +68,7 @@ const ResultadosPage = () => {
 
   return (
     <div>
-      <h1 className="h2-bold txtcolor-primary txt-center">Resultados de búsqueda para: "{query}"</h1>
+      <h1 className="h2-bold txtcolor-primary txt-center" style={{ paddingTop: '21px'}}>Resultados de búsqueda para: "{query}"</h1>
       {articulos.length === 0 ? (
         <p>No se encontraron resultados.</p>
       ) : (
