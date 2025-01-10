@@ -1,23 +1,57 @@
 "use client";
-import React, { useState } from 'react';
-import { Box, Typography, RadioGroup, FormControlLabel, Radio, Grid2 } from '@mui/material';
-import { Icon } from '@iconify/react';
-import { themePalette } from '@/config/theme.config';
 
-const TipoMascota: React.FC = () => {
-  const [selectedValue, setSelectedValue] = useState<string>(''); // Iniciar con una cadena vacía
+import React, { useEffect, useState } from "react";
+import { Box, Typography, RadioGroup, FormControlLabel, Radio, Grid2 } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { themePalette } from "@/config/theme.config";
+import axios from "axios";
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedValue(event.target.value);
+interface TipoMascotaProps {
+  value: string; // Valor seleccionado (id del tipo de mascota)
+  onChange: (value: string) => void; // Función para actualizar el valor seleccionado
+}
+
+interface PetTypeOption {
+  id: string; // ID del tipo de mascota
+  icon: string; // Icono asociado
+  label: string; // Nombre del tipo de mascota
+}
+
+const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange }) => {
+  const [options, setOptions] = useState<PetTypeOption[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const petTypeIcons: Record<string, string> = {
+    "001P": "mdi:dog",
+    "002G": "mdi:cat",
+    "003A": "mdi:bird",
+    "004PM": "fluent-emoji-high-contrast:hamster",
+    "005O": "mdi:paw",
   };
 
-  const options = [
-    { value: 'Perro', icon: 'mdi:dog', label: 'Perro' },
-    { value: 'Gato', icon: 'mdi:cat', label: 'Gato' },
-    { value: 'Aves', icon: 'mdi:bird', label: 'Aves' },
-    { value: 'Pequeños Mamíferos', icon: 'fluent-emoji-high-contrast:hamster', label: 'Peq. Mamíferos' },
-    { value: 'Otros', icon: 'mdi:paw', label: 'Otros' },
-  ];
+  const fetchPetTypes = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/products/register/pet-types");
+      const data = response.data.map((item: { id: string; name: string }) => ({
+        id: item.id, // Asegurarse de usar el id como value
+        icon: petTypeIcons[item.id] || "mdi:alert",
+        label: item.name, // Mostrar el nombre como etiqueta
+      }));
+      setOptions(data);
+    } catch (error) {
+      console.error("Error fetching pet types:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPetTypes();
+  }, []);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value); // Propaga el id seleccionado al padre
+  };
 
   return (
     <Box
@@ -26,57 +60,101 @@ const TipoMascota: React.FC = () => {
       alignItems="center"
       justifyContent="center"
       sx={{
-        border: '1px solid #004040',
+        border: "1px solid #004040",
         backgroundColor: themePalette.black10,
-        width: '100%',
-        maxWidth: '1358px',
-        height: 'auto',
-        margin: '0 auto',
-        borderRadius: '10px',
-        marginTop: '34px',
-        padding: '16px'
+        width: "100%",
+        maxWidth: "1358px",
+        height: "auto",
+        margin: "0 auto",
+        borderRadius: "10px",
+        marginTop: "34px",
+        padding: "16px",
       }}
     >
-      {/* Título a la izquierda */}
-      <Typography align="left" sx={{ color: themePalette.primary, width: '100%', fontSize: '24px', paddingLeft: '13px', fontWeight:'bold' }}>
+      <Typography
+        align="left"
+        sx={{
+          color: themePalette.primary,
+          width: "100%",
+          fontSize: "24px",
+          paddingLeft: "13px",
+          fontWeight: "bold",
+        }}
+      >
         Tipo de mascota:
       </Typography>
 
-      {/* Opciones circulares */}
-      <RadioGroup value={selectedValue} onChange={handleChange} sx={{ width: '100%' }}>
-        <Grid2 container spacing={2} justifyContent="center">
-          {options.map((option) => (
-            <Grid2 key={option.value} size={{xs:12,sm:6,md:4,lg:2}} display="flex" justifyContent="center">
-              <FormControlLabel
-                value={option.value}
-                control={<Radio sx={{ display: 'none' }} />} // Ocultar el radio, solo se mostrará el contenedor personalizado
-                label={
-                  <Box display="flex" flexDirection="column" alignItems="center" sx={{ cursor: 'pointer' }}>
+      {isLoading ? (
+        <Typography sx={{ color: themePalette.primary, marginTop: "16px" }}>
+          Cargando tipos de mascotas...
+        </Typography>
+      ) : options.length === 0 ? (
+        <Typography sx={{ color: themePalette.primary, marginTop: "16px" }}>
+          No hay tipos de mascotas disponibles.
+        </Typography>
+      ) : (
+        <RadioGroup value={value} onChange={handleChange} sx={{ width: "100%" }}>
+          <Grid2 container spacing={2} justifyContent="center">
+            {options.map((option) => (
+              <Grid2
+                key={option.id}
+                size={{ xs: 12, sm: 6, md: 4, lg: 2 }}
+                display="flex"
+                justifyContent="center"
+              >
+                <FormControlLabel
+                  value={option.id} // El value es ahora el id
+                  control={<Radio sx={{ display: "none" }} />}
+                  label={
                     <Box
-                      sx={{
-                        width: '100px',
-                        height: '100px',
-                        borderRadius: '50%',
-                        backgroundColor: selectedValue === option.value ? themePalette.primary : themePalette.black10,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '8px',
-                      }}
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      sx={{ cursor: "pointer" }}
                     >
-                      <Icon
-                        icon={option.icon}
-                        style={{ fontSize: '60px', color: selectedValue === option.value ? themePalette.cwhite : themePalette.primary }}
-                      />
+                      <Box
+                        sx={{
+                          width: "100px",
+                          height: "100px",
+                          borderRadius: "50%",
+                          backgroundColor:
+                            value === option.id
+                              ? themePalette.primary
+                              : themePalette.black10,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <Icon
+                          icon={option.icon}
+                          style={{
+                            fontSize: "60px",
+                            color:
+                              value === option.id
+                                ? themePalette.cwhite
+                                : themePalette.primary,
+                          }}
+                        />
+                      </Box>
+                      <Typography
+                        sx={{
+                          color: themePalette.primary,
+                          fontSize: "18px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {option.label}
+                      </Typography>
                     </Box>
-                    <Typography sx={{ color: themePalette.primary, fontSize: '18px' }}>{option.label}</Typography>
-                  </Box>
-                }
-              />
-            </Grid2>
-          ))}
-        </Grid2>
-      </RadioGroup>
+                  }
+                />
+              </Grid2>
+            ))}
+          </Grid2>
+        </RadioGroup>
+      )}
     </Box>
   );
 };
