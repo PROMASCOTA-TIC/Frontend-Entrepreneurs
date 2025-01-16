@@ -373,7 +373,7 @@ const Form_EnviarEnlace: React.FC = () => {
                 <Btn_GuardarCancelar
                   linkCancelar="/gestion-contenido/enlaces-interes"
                 />
-                
+
                 <Snackbar
                   open={openSnackbar}
                   autoHideDuration={4000}
