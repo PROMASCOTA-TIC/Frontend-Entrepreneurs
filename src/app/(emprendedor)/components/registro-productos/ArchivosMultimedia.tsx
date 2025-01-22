@@ -1,31 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, Typography, IconButton, Card, CardMedia, CardContent } from "@mui/material";
+import { Box, Button, Typography, IconButton, Card, CardMedia } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { themePalette } from "@/app/config/theme.config";
+import { theme, themePalette } from "@/app/config/theme.config";
 
 interface ArchivosMultimediaProps {
-  value: string; // URL actual del archivo multimedia
-  onChange: (file: string) => void; // Callback para actualizar la URL del archivo multimedia
+  value: string[]; // URLs actuales de los archivos multimedia
+  onChange: (files: string[]) => void; // Callback para actualizar las URLs
 }
 
 const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange }) => {
-  const [previewUrl, setPreviewUrl] = useState<string>(value || ""); // Manejo de la URL temporal para vista previa
+  const [previewUrls, setPreviewUrls] = useState<string[]>(value || []);
 
   const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files && files[0]) {
-      const fileUrl = URL.createObjectURL(files[0]); // Crear URL temporal
-      setPreviewUrl(fileUrl); // Actualizar la vista previa
-      onChange(fileUrl); // Pasar el valor al componente padre
+    if (files) {
+      const newFiles = Array.from(files).slice(0, 4 - previewUrls.length); // Limitar a 4 imágenes
+      const newUrls = newFiles.map((file) => URL.createObjectURL(file)); // Crear URLs temporales
+      const updatedUrls = [...previewUrls, ...newUrls];
+      setPreviewUrls(updatedUrls); // Actualizar vista previa
+      onChange(updatedUrls); // Pasar los valores al componente padre
     }
   };
 
-  const handleRemovePhoto = () => {
-    setPreviewUrl(""); // Limpiar la vista previa
-    onChange(""); // Actualizar en el componente padre
+  const handleRemovePhoto = (index: number) => {
+    const updatedUrls = previewUrls.filter((_, i) => i !== index);
+    URL.revokeObjectURL(previewUrls[index]);
+    setPreviewUrls(updatedUrls);
+    onChange(updatedUrls);
   };
 
   return (
@@ -61,11 +65,12 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
             marginBottom: "16px",
           }}
         >
-          Archivo multimedia
+          Archivos multimedia
         </Typography>
         <input
           accept=".jpg,.png"
           type="file"
+          multiple
           onChange={handleLocalUpload}
           style={{ display: "none" }}
           id="local-upload"
@@ -75,56 +80,84 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
             variant="contained"
             component="span"
             sx={{
-              background: themePalette.primary,
-              color: themePalette.cwhite,
               textTransform: "none",
-              mt: 2,
+              width: "218px",
+              height: "50px",
+              borderRadius: "20px",
+              fontSize: "18px",
+              marginTop: "10px",
+              background: theme.palette.primary.main,
+              "@media (max-width: 600px)": {
+                width: "150px",
+                height: "40px",
+                fontSize: "14px",
+              },
             }}
             startIcon={<FileUploadIcon />}
+            disabled={previewUrls.length >= 4}
           >
-            Seleccionar Archivo
+            Seleccionar Archivos
           </Button>
         </label>
         <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
-          {previewUrl ? (
-            <Card sx={{ width: 200, height: 200 }}>
+          {previewUrls.map((url, index) => (
+            <Box
+              key={index}
+              sx={{
+                position: "relative",
+                width: "200px",
+                height: "200px",
+              }}
+            >
               <CardMedia
                 component="img"
                 sx={{
                   width: "200px",
                   height: "200px",
-                  objectFit: "cover", // Ajustar la imagen al tamaño del contenedor
+                  objectFit: "cover",
+                  borderRadius: "8px",
                 }}
-                image={previewUrl}
-                alt="Vista previa"
+                image={url}
+                alt={`Vista previa ${index + 1}`}
               />
-              <CardContent>
-                <IconButton
-                  aria-label="delete"
-                  onClick={handleRemovePhoto}
-                  color="secondary"
-                  size="small"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </CardContent>
-            </Card>
-          ) : (
-            <Box
-              sx={{
-                width: 200,
-                height: 200,
-                border: "2px dashed #ccc",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#ccc",
-              }}
-            >
-              <Typography variant="body2">No hay archivo seleccionado</Typography>
+              <IconButton
+                aria-label="delete"
+                onClick={() => handleRemovePhoto(index)}
+                sx={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "5px",
+                  backgroundColor: "rgba(255, 0, 0, 0.8)",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "red",
+                  },
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
             </Box>
-          )}
+          ))}
+          {previewUrls.length < 4 &&
+            Array(4 - previewUrls.length)
+              .fill(null)
+              .map((_, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    width: 200,
+                    height: 200,
+                    border: "2px dashed #ccc",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ccc",
+                  }}
+                >
+                  <Typography variant="body2">Subir imagen</Typography>
+                </Box>
+              ))}
         </Box>
       </Box>
     </Box>
