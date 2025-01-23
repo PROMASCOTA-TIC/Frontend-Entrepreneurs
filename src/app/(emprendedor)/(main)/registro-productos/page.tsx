@@ -9,25 +9,24 @@ import ArchivosMultimedia from "../../components/registro-productos/ArchivosMult
 import { theme } from "@/app/config/theme.config";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
-  const firebaseConfig = {
-
-    apiKey: process.env.NEXT_PUBLIC_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_APP_ID,
-  };
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
 
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 interface ProductData {
-  entrepreneurId: string; 
+  entrepreneurId: string;
   publicationType: string;
-  petTypeId: string; 
+  petTypeId: string;
   categoryId: string;
   subcategoryId: string;
   sizeId?: string;
@@ -40,22 +39,25 @@ interface ProductData {
 }
 
 export default function RegistroProducto() {
-  const router = useRouter(); 
+  const router = useRouter();
+  const entrepreneurId = "9d4d342e-aca0-4c88-868e-c86e2fb9b793"; // ID fijo para pruebas
+
   const [productData, setProductData] = useState<ProductData>({
-    entrepreneurId: "9d4d342e-aca0-4c88-868e-c86e2fb9b793", 
+    entrepreneurId,
     publicationType: "",
     petTypeId: "",
     categoryId: "",
     subcategoryId: "",
     sizeId: undefined,
     weight: undefined,
-    stock: undefined, 
+    stock: undefined,
     finalPrice: undefined,
     name: "",
     description: "",
-    multimediaFiles: [], 
+    multimediaFiles: [],
   });
 
+  const [errors, setErrors] = useState<Partial<Record<keyof ProductData, string>>>({});
   const [loading, setLoading] = useState(false);
 
   const updateProductData = (key: keyof ProductData, value: any) => {
@@ -63,8 +65,30 @@ export default function RegistroProducto() {
       ...prev,
       [key]: value,
     }));
+    setErrors((prev) => ({
+      ...prev,
+      [key]: undefined,
+    }));
   };
-  
+
+  const validateForm = () => {
+    const newErrors: Partial<Record<keyof ProductData, string>> = {};
+
+    if (!productData.publicationType) newErrors.publicationType = "Seleccione un tipo de publicación.";
+    if (!productData.petTypeId) newErrors.petTypeId = "Seleccione un tipo de mascota.";
+    if (!productData.categoryId) newErrors.categoryId = "Seleccione una categoría.";
+    if (!productData.subcategoryId) newErrors.subcategoryId = "Seleccione una subcategoría.";
+    if (!productData.name) newErrors.name = "Ingrese el nombre del producto.";
+    if (!productData.description) newErrors.description = "Ingrese una descripción.";
+    if (!productData.stock || productData.stock <= 0) newErrors.stock = "Ingrese un stock válido.";
+    if (!productData.finalPrice || productData.finalPrice <= 0) newErrors.finalPrice = "Ingrese un precio válido.";
+    if (!productData.multimediaFiles.length) newErrors.multimediaFiles = "Suba al menos una imagen.";
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const uploadImagesToFirebase = async (files: string[]) => {
     const urls: string[] = [];
     for (const file of files) {
@@ -81,19 +105,23 @@ export default function RegistroProducto() {
   };
 
   const handleGuardar = async () => {
+    if (!validateForm()) {
+      console.log("Errores de validación:", errors);
+      return;
+    }
+
     setLoading(true);
+    console.log("Datos antes de subir:", productData);
+
     try {
-      // Subir imágenes a Firebase y obtener los enlaces públicos
       const uploadedUrls = await uploadImagesToFirebase(productData.multimediaFiles);
-  
-      // Actualizar los datos con los enlaces generados
       const updatedProductData = {
         ...productData,
         multimediaFiles: uploadedUrls,
       };
-  
-      console.log("Datos que se enviarán al backend:", updatedProductData);
-  
+
+      console.log("Datos preparados para el backend:", updatedProductData);
+
       const response = await fetch("http://localhost:3001/api/products", {
         method: "POST",
         headers: {
@@ -101,18 +129,20 @@ export default function RegistroProducto() {
         },
         body: JSON.stringify(updatedProductData),
       });
-  
+
       if (!response.ok) {
-        throw new Error("Error al guardar el producto.");
+        const errorText = await response.text();
+        console.error("Error del servidor:", errorText);
+        throw new Error(`Error al guardar el producto: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
       alert("Producto guardado exitosamente.");
       console.log("Respuesta del backend:", data);
-  
-      // Restablecer los datos del formulario
-      setProductData({
-        entrepreneurId: "123e4567-e89b-12d3-a456-426614174000",
+
+      setProductData((prev) => ({
+        ...prev,
+        entrepreneurId, // Mantener el ID fijo para pruebas
         publicationType: "",
         petTypeId: "",
         categoryId: "",
@@ -124,19 +154,18 @@ export default function RegistroProducto() {
         name: "",
         description: "",
         multimediaFiles: [],
-      });
+      }));
     } catch (error) {
-      console.error("Error:", error);
-      alert("Ocurrió un error al guardar el producto.");
+      console.error("Error general:", error);
+      alert("Ocurrió un error al guardar el producto. Revisa los logs.");
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleCancelar = () => {
-    console.log("Registro cancelado");
     setProductData({
-      entrepreneurId: "123e4567-e89b-12d3-a456-426614174000",
+      entrepreneurId, // Mantener el ID fijo para pruebas
       publicationType: "",
       petTypeId: "",
       categoryId: "",
@@ -151,7 +180,6 @@ export default function RegistroProducto() {
     });
     router.push("/inicio");
   };
-  
 
   if (loading) {
     return (
@@ -175,10 +203,12 @@ export default function RegistroProducto() {
       <TipoPublicacion
         value={productData.publicationType}
         onChange={(value) => updateProductData("publicationType", value)}
+        error={errors.publicationType}
       />
       <TipoMascota
         value={productData.petTypeId}
         onChange={(value) => updateProductData("petTypeId", value)}
+        error={errors.petTypeId}
       />
       <FormularioRegistroProducto
         data={{
@@ -192,37 +222,41 @@ export default function RegistroProducto() {
           description: productData.description,
         }}
         onChange={(key, value) => updateProductData(key, value)}
+        errors={errors}
       />
       <ArchivosMultimedia
         value={productData.multimediaFiles}
         onChange={(urls) => updateProductData("multimediaFiles", urls)}
+        error={errors.multimediaFiles}
       />
-      <Grid2
-       container spacing={2} justifyContent="space-evenly" alignItems="center"
-       >
-        <Button variant="contained" onClick={handleGuardar}
-        sx={{
-                        textTransform: "none",
-                        width: "213px",
-                        height: "34px",
-                        borderRadius: "20px",
-                        fontSize: "18px",
-                        marginTop: "10px",
-                        background: theme.palette.primary.main,
-                      }}
+      <Grid2 container spacing={2} justifyContent="space-evenly" alignItems="center">
+        <Button
+          variant="contained"
+          onClick={handleGuardar}
+          sx={{
+            textTransform: "none",
+            width: "213px",
+            height: "34px",
+            borderRadius: "20px",
+            fontSize: "18px",
+            marginTop: "10px",
+            background: theme.palette.primary.main,
+          }}
         >
           Guardar
         </Button>
-        <Button variant="contained" onClick={handleCancelar}
-        sx={{
-          textTransform: "none",
-          width: "213px",
-          height: "34px",
-          borderRadius: "20px",
-          fontSize: "18px",
-          marginTop: "10px",
-          background: theme.palette.primary.main,
-        }}
+        <Button
+          variant="contained"
+          onClick={handleCancelar}
+          sx={{
+            textTransform: "none",
+            width: "213px",
+            height: "34px",
+            borderRadius: "20px",
+            fontSize: "18px",
+            marginTop: "10px",
+            background: theme.palette.primary.main,
+          }}
         >
           Cancelar
         </Button>

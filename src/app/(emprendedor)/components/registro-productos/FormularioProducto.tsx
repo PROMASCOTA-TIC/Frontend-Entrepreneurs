@@ -17,9 +17,14 @@ interface FormularioRegistroProductoProps {
     description: string;
   };
   onChange: (key: keyof FormularioRegistroProductoProps["data"], value: any) => void;
+  errors?: Partial<Record<keyof FormularioRegistroProductoProps["data"], string>>; // Manejo de errores
 }
 
-const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({ data, onChange }) => {
+const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
+  data,
+  onChange,
+  errors = {}, // Manejo de errores
+}) => {
   const [sizes, setSizes] = useState<{ id: string; name: string }[]>([]);
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
   const [subcategories, setSubcategories] = useState<{ id: string; name: string; categoryId: string }[]>([]);
@@ -31,19 +36,9 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
     subcategories: `${API_BASE_URL}/sub-categories`,
   };
 
-  const validateDecimalInput = (value: string): string => {
-    return value.replace(/,/g, "").replace(/[^0-9.]/g, "");
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
-    if (name === "weight" || name === "finalPrice") {
-      const validatedValue = validateDecimalInput(value);
-      onChange(name as keyof FormularioRegistroProductoProps["data"], validatedValue);
-    } else {
-      onChange(name as keyof FormularioRegistroProductoProps["data"], value);
-    }
+    onChange(name as keyof FormularioRegistroProductoProps["data"], value);
   };
 
   const loadData = async () => {
@@ -54,7 +49,7 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
         axios.get(endpoints.subcategories),
       ]);
 
-      setSizes(sizeResponse.data); // Suponemos que el backend siempre devuelve objetos con `id` y `name`
+      setSizes(sizeResponse.data);
       setCategories(
         categoryResponse.data.map((cat: { id: string; name: string }) => ({
           value: cat.id,
@@ -81,7 +76,7 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
   ) => (
     <>
       <Grid2 size={{ xs: 12, sm: 4, lg: 3 }} sx={{ display: "flex", alignItems: "center" }}>
-        <Typography sx={{ fontWeight: "600", fontSize: "18px", mb: "5px", minWidth: "50px" }}>
+        <Typography sx={{ fontWeight: "600", fontSize: "26px", mb: "5px", minWidth: "50px" }}>
           {label}:
         </Typography>
       </Grid2>
@@ -96,7 +91,8 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
             fullWidth
             margin="normal"
             variant="outlined"
-            required
+            error={Boolean(errors[name as keyof FormularioRegistroProductoProps["data"]])} // Error visual
+            helperText={errors[name as keyof FormularioRegistroProductoProps["data"]] || ""} // Mensaje de error
             sx={{ maxWidth: "400px", textAlign: "left", "& .MuiSelect-select": { textAlign: "left" } }}
             {...textFieldProps}
           >
@@ -129,8 +125,9 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
             fullWidth
             margin="normal"
             variant="outlined"
-            required
             type={type}
+            error={Boolean(errors[name as keyof FormularioRegistroProductoProps["data"]])} // Error visual
+            helperText={errors[name as keyof FormularioRegistroProductoProps["data"]] || ""} // Mensaje de error
             sx={{ maxWidth: "400px" }}
             {...textFieldProps}
           />
@@ -182,6 +179,7 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
         spacing={2}
         sx={{
           marginTop: "13px",
+          paddingLeft: "200px",
           display: "flex",
           justifyContent: "center",
         }}
@@ -195,9 +193,28 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
         ) && createField("Talla", "sizeId", "text", sizes, true)}
         {["Comida", "Medicamentos"].includes(
           categories.find((cat) => cat.value === data.categoryId)?.label || ""
-        ) && createField("Peso (kg)", "weight", "number")}
-        {createField("Stock", "stock", "number")}
-        {createField("Precio final", "finalPrice", "number")}
+        ) && createField("Peso (gr)", "weight", "number", undefined, false, {
+          onKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (!/^[0-9]*$/.test(event.key)) {
+              event.preventDefault();
+            }
+          },
+        })}
+        {createField("Stock", "stock", "number", undefined, false, {
+          onKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (!/^[0-9]*$/.test(event.key)) {
+              event.preventDefault();
+            }
+          },
+        })}
+        {createField("Precio final", "finalPrice", "number", undefined, false, {
+          onKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            const currentValue = data.finalPrice?.toString() || "";
+            if (!/^[0-9.]$/.test(event.key) || (event.key === "." && currentValue.includes("."))) {
+              event.preventDefault();
+            }
+          },
+        })}
         {createField("Descripción", "description", "text", undefined, false, {
           multiline: true,
           rows: 4,

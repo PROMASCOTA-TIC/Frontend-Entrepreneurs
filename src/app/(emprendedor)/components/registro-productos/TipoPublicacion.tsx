@@ -1,15 +1,15 @@
-
-import React, { useState } from 'react';
-import { Box, Button, Typography, Grid2 } from '@mui/material';
-import { Icon } from '@iconify/react';
-import { themePalette } from '@/config/theme.config';
+import React from "react";
+import { Box, Button, Typography, Grid2 } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { themePalette } from "@/config/theme.config";
 
 interface TipoPublicacionProps {
   value: string; // Valor actual del tipo de publicación
   onChange: (value: string) => void; // Función para actualizar el valor
+  error?: string; // Mensaje de error opcional
 }
 
-const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange }) => {
+const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange, error }) => {
   const handleSelect = (option: string) => {
     onChange(option); // Notifica al padre sobre el cambio
   };
@@ -57,7 +57,6 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange }) =>
         </Typography>
 
         <Grid2 container spacing={2} justifyContent="space-evenly" alignItems="center">
-          {/* Botón Producto con icono arriba */}
           <Grid2
             size={{ xs: 12, sm: 6, md: 3 }}
             display="flex"
@@ -72,8 +71,8 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange }) =>
             <Button
               onClick={() => handleSelect("1")} // Cambiar a "1" para Producto
               sx={{
-                background: value === "1" ? themePalette.primary : themePalette.black10,
-                color: value === "1" ? themePalette.cwhite : themePalette.primary,
+                background: value === "1" ? themePalette.secondary: themePalette.primary,
+                color: value === "1" ? themePalette.cwhite : themePalette.cwhite,
                 textTransform: "none",
                 width: "213px",
                 height: "34px",
@@ -101,8 +100,8 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange }) =>
             <Button
               onClick={() => handleSelect("0")} // Cambiar a "0" para Servicio
               sx={{
-                background: value === "0" ? themePalette.primary : themePalette.black10,
-                color: value === "0" ? themePalette.cwhite : themePalette.primary,
+                background: value === "0" ? themePalette.secondary : themePalette.primary,
+                color: value === "0" ? themePalette.cwhite : themePalette.cwhite,
                 textTransform: "none",
                 width: "213px",
                 height: "34px",
@@ -115,6 +114,21 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange }) =>
             </Button>
           </Grid2>
         </Grid2>
+
+        {/* Mostrar mensaje de error si existe */}
+        {error && (
+          <Typography
+            color="error"
+            sx={{
+              textAlign: "left",
+              marginTop: "10px",
+              marginLeft: "30px",
+              fontSize: "14px",
+            }}
+          >
+            {error}
+          </Typography>
+        )}
       </Box>
     </>
   );

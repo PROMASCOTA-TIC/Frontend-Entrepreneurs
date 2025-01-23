@@ -9,6 +9,7 @@ import axios from "axios";
 interface TipoMascotaProps {
   value: string; // Valor seleccionado (id del tipo de mascota)
   onChange: (value: string) => void; // Función para actualizar el valor seleccionado
+  error?: string; // Mensaje de error opcional
 }
 
 interface PetTypeOption {
@@ -17,7 +18,7 @@ interface PetTypeOption {
   label: string; // Nombre del tipo de mascota
 }
 
-const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange }) => {
+const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange, error }) => {
   const [options, setOptions] = useState<PetTypeOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -93,67 +94,83 @@ const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange }) => {
           No hay tipos de mascotas disponibles.
         </Typography>
       ) : (
-        <RadioGroup value={value} onChange={handleChange} sx={{ width: "100%" }}>
-          <Grid2 container spacing={2} justifyContent="center">
-            {options.map((option) => (
-              <Grid2
-                key={option.id}
-                size={{ xs: 12, sm: 6, md: 4, lg: 2 }}
-                display="flex"
-                justifyContent="center"
-              >
-                <FormControlLabel
-                  value={option.id} // El value es ahora el id
-                  control={<Radio sx={{ display: "none" }} />}
-                  label={
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                      sx={{ cursor: "pointer" }}
-                    >
+        <>
+          <RadioGroup value={value} onChange={handleChange} sx={{ width: "100%" }}>
+            <Grid2 container spacing={2} justifyContent="center">
+              {options.map((option) => (
+                <Grid2
+                  key={option.id}
+                  size={{ xs: 12, sm: 6, md: 4, lg: 2 }}
+                  display="flex"
+                  justifyContent="center"
+                >
+                  <FormControlLabel
+                    value={option.id} // El value es ahora el id
+                    control={<Radio sx={{ display: "none" }} />}
+                    label={
                       <Box
-                        sx={{
-                          width: "100px",
-                          height: "100px",
-                          borderRadius: "50%",
-                          backgroundColor:
-                            value === option.id
-                              ? themePalette.primary
-                              : themePalette.black10,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginBottom: "8px",
-                        }}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                        sx={{ cursor: "pointer" }}
                       >
-                        <Icon
-                          icon={option.icon}
-                          style={{
-                            fontSize: "60px",
-                            color:
+                        <Box
+                          sx={{
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "50%",
+                            backgroundColor:
                               value === option.id
-                                ? themePalette.cwhite
-                                : themePalette.primary,
+                                ? themePalette.secondary
+                                : themePalette.black10,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent:"center",
+                            marginBottom: "8px",
                           }}
-                        />
+                        >
+                          <Icon
+                            icon={option.icon}
+                            style={{
+                              fontSize: "60px",
+                              color:
+                                value === option.id
+                                  ? themePalette.cwhite
+                                  : themePalette.primary,
+                            }}
+                          />
+                        </Box>
+                        <Typography
+                          sx={{
+                            color: themePalette.primary,
+                            fontSize: "18px",
+                            textAlign: "center",
+                          }}
+                        >
+                          {option.label}
+                        </Typography>
                       </Box>
-                      <Typography
-                        sx={{
-                          color: themePalette.primary,
-                          fontSize: "18px",
-                          textAlign: "center",
-                        }}
-                      >
-                        {option.label}
-                      </Typography>
-                    </Box>
-                  }
-                />
-              </Grid2>
-            ))}
-          </Grid2>
-        </RadioGroup>
+                    }
+                  />
+                </Grid2>
+              ))}
+            </Grid2>
+          </RadioGroup>
+          {/* Mostrar mensaje de error si existe */}
+          {error && (
+            <Typography
+              color="error"
+              sx={{
+                textAlign: "left",
+                marginTop: "10px",
+                marginLeft: "13px",
+                fontSize: "14px",
+              }}
+            >
+              {error}
+            </Typography>
+          )}
+        </>
       )}
     </Box>
   );

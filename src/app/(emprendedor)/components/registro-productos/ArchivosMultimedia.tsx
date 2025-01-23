@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, Typography, IconButton, Card, CardMedia } from "@mui/material";
+import { Box, Button, Typography, IconButton, CardMedia } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { theme, themePalette } from "@/app/config/theme.config";
@@ -9,27 +9,38 @@ import { theme, themePalette } from "@/app/config/theme.config";
 interface ArchivosMultimediaProps {
   value: string[]; // URLs actuales de los archivos multimedia
   onChange: (files: string[]) => void; // Callback para actualizar las URLs
+  error?: string; // Mensaje de error opcional
 }
 
-const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange }) => {
-  const [previewUrls, setPreviewUrls] = useState<string[]>(value || []);
+interface PreviewFile {
+  url: string;
+  isVideo: boolean;
+}
+
+const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange, error }) => {
+  const [previewFiles, setPreviewFiles] = useState<PreviewFile[]>(
+    value.map((url) => ({ url, isVideo: false }))
+  );
 
   const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const newFiles = Array.from(files).slice(0, 4 - previewUrls.length); // Limitar a 4 imágenes
-      const newUrls = newFiles.map((file) => URL.createObjectURL(file)); // Crear URLs temporales
-      const updatedUrls = [...previewUrls, ...newUrls];
-      setPreviewUrls(updatedUrls); // Actualizar vista previa
-      onChange(updatedUrls); // Pasar los valores al componente padre
+      const newFiles = Array.from(files).slice(0, 4 - previewFiles.length); // Limitar a 4 archivos
+      const newPreviews = newFiles.map((file) => ({
+        url: URL.createObjectURL(file),
+        isVideo: file.type.startsWith("video/"),
+      }));
+      const updatedFiles = [...previewFiles, ...newPreviews];
+      setPreviewFiles(updatedFiles); // Actualizar vista previa
+      onChange(updatedFiles.map((file) => file.url)); // Pasar los valores al componente padre
     }
   };
 
-  const handleRemovePhoto = (index: number) => {
-    const updatedUrls = previewUrls.filter((_, i) => i !== index);
-    URL.revokeObjectURL(previewUrls[index]);
-    setPreviewUrls(updatedUrls);
-    onChange(updatedUrls);
+  const handleRemoveFile = (index: number) => {
+    const updatedFiles = previewFiles.filter((_, i) => i !== index);
+    URL.revokeObjectURL(previewFiles[index].url);
+    setPreviewFiles(updatedFiles);
+    onChange(updatedFiles.map((file) => file.url));
   };
 
   return (
@@ -51,7 +62,7 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
           width: "100%",
           textAlign: "center",
           background: themePalette.black10,
-          border: "1px solid #004040",
+          border: error ? "2px solid red" : "1px solid #004040",
         }}
       >
         <Typography
@@ -62,13 +73,27 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
             fontSize: "24px",
             paddingLeft: "30px",
             fontWeight: "bold",
-            marginBottom: "16px",
+            marginBottom: "8px",
           }}
         >
           Archivos multimedia
         </Typography>
+
+        <Typography
+          align="left"
+          sx={{
+            color: themePalette.black,
+            width: "100%",
+            fontSize: "16px",
+            paddingLeft: "30px",
+            marginBottom: "16px",
+          }}
+        >
+          Nota: El material multimedia debe ser de su propia autoría.
+        </Typography>
+
         <input
-          accept=".jpg,.png"
+          accept=".jpg,.png,.mp4"
           type="file"
           multiple
           onChange={handleLocalUpload}
@@ -94,52 +119,90 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
               },
             }}
             startIcon={<FileUploadIcon />}
-            disabled={previewUrls.length >= 4}
+            disabled={previewFiles.length >= 4}
           >
             Seleccionar Archivos
           </Button>
         </label>
         <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
-          {previewUrls.map((url, index) => (
-            <Box
-              key={index}
-              sx={{
-                position: "relative",
-                width: "200px",
-                height: "200px",
-              }}
-            >
-              <CardMedia
-                component="img"
+          {previewFiles.map((file, index) =>
+            file.isVideo ? (
+              <Box
+                key={index}
                 sx={{
+                  position: "relative",
                   width: "200px",
                   height: "200px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-                image={url}
-                alt={`Vista previa ${index + 1}`}
-              />
-              <IconButton
-                aria-label="delete"
-                onClick={() => handleRemovePhoto(index)}
-                sx={{
-                  position: "absolute",
-                  top: "5px",
-                  right: "5px",
-                  backgroundColor: "rgba(255, 0, 0, 0.8)",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "red",
-                  },
                 }}
               >
-                <DeleteIcon />
-              </IconButton>
-            </Box>
-          ))}
-          {previewUrls.length < 4 &&
-            Array(4 - previewUrls.length)
+                <video
+                  style={{
+                    width: "200px",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                  src={file.url}
+                  controls
+                />
+                <IconButton
+                  aria-label="delete"
+                  onClick={() => handleRemoveFile(index)}
+                  sx={{
+                    position: "absolute",
+                    top: "5px",
+                    right: "5px",
+                    backgroundColor: "rgba(255, 0, 0, 0.8)",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "red",
+                    },
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ) : (
+              <Box
+                key={index}
+                sx={{
+                  position: "relative",
+                  width: "200px",
+                  height: "200px",
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  sx={{
+                    width: "200px",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                  image={file.url}
+                  alt={`Vista previa ${index + 1}`}
+                />
+                <IconButton
+                  aria-label="delete"
+                  onClick={() => handleRemoveFile(index)}
+                  sx={{
+                    position: "absolute",
+                    top: "5px",
+                    right: "5px",
+                    backgroundColor: "rgba(255, 0, 0, 0.8)",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "red",
+                    },
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            )
+          )}
+          {previewFiles.length < 4 &&
+            Array(4 - previewFiles.length)
               .fill(null)
               .map((_, index) => (
                 <Box
@@ -155,10 +218,22 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
                     color: "#ccc",
                   }}
                 >
-                  <Typography variant="body2">Subir imagen</Typography>
+                  <Typography variant="body2">Subir archivo</Typography>
                 </Box>
               ))}
         </Box>
+        {error && (
+          <Typography
+            sx={{
+              color: "red",
+              fontSize: "14px",
+              marginTop: "10px",
+              textAlign: "left",
+            }}
+          >
+            {error}
+          </Typography>
+        )}
       </Box>
     </Box>
   );
