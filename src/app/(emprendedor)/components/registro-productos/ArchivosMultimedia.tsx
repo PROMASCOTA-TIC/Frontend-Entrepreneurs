@@ -121,7 +121,7 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
             startIcon={<FileUploadIcon />}
             disabled={previewFiles.length >= 4}
           >
-            Seleccionar Archivos
+            Seleccionar archivos
           </Button>
         </label>
         <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
