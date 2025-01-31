@@ -18,7 +18,21 @@ import TipoPublicacion from "../registro-productos/TipoPublicacion";
 import TipoMascota from "../registro-productos/TipoMascota";
 import FormularioRegistroProducto from "../registro-productos/FormularioProducto";
 import ArchivosMultimedia from "../registro-productos/ArchivosMultimedia";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { initializeApp } from "firebase/app";
 
+// 🔥 Configuración de Firebase
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
 
 interface EditarProductoProps {
   open: boolean;
@@ -45,21 +59,21 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
 
       setFetching(true);
       try {
-        console.log("📌 Obteniendo datos del producto desde el backend:", product.id);
+        console.log("Obteniendo datos del producto desde el backend:", product.id);
         const response = await axios.get(`http://localhost:3001/api/products/edit/${product.id}`);
         const updatedProduct = response.data;
 
-        console.log("📌 Datos obtenidos para edición:", updatedProduct);
+        console.log("Datos obtenidos para edición:", updatedProduct);
 
         setFormData({
           ...updatedProduct,
-          finalPrice: updatedProduct.finalPrice.toString(), // Convertir a string si es número
+          finalPrice: updatedProduct.finalPrice.toString(),
           multimediaFiles: Array.isArray(updatedProduct.multimediaFiles)
             ? updatedProduct.multimediaFiles
             : updatedProduct.multimediaFiles?.split(",").map((url: string) => url.trim()) || [],
         });
       } catch (error) {
-        console.error("❌ Error al obtener los datos del producto:", error);
+        console.error("Error al obtener los datos del producto:", error);
         alert("No se pudo obtener la información actualizada del producto.");
       } finally {
         setFetching(false);
@@ -98,25 +112,63 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  const uploadImagesToFirebase = async (files: string[]) => {
+    const urls: string[] = [];
+    for (const file of files) {
+      if (file.startsWith("https://")) {
+
+        urls.push(file);
+      } else {
+        const blob = await fetch(file).then((res) => res.blob());
+        const storageRef = ref(
+          storage,
+          `products/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`
+        );
+        await uploadBytes(storageRef, blob);
+        const downloadURL = await getDownloadURL(storageRef);
+        urls.push(downloadURL);
+      }
+    }
+    return urls;
+  };
+
   const handleUpdate = async () => {
     if (!validateForm()) return;
-
+  
     setLoading(true);
     try {
-      console.log("📌 Enviando datos actualizados al backend:", formData);
-      const response = await axios.patch(`http://localhost:3001/api/products/${formData.id}`, formData);
-      console.log("✅ Producto actualizado:", response.data);
+      const uploadedUrls = await uploadImagesToFirebase(formData.multimediaFiles);
+  
+      const formattedData = {
+        entrepreneurId: formData.entrepreneurId,
+        publicationType: formData.publicationType,
+        petTypeId: formData.petTypeId,
+        categoryId: formData.categoryId,
+        subcategoryId: formData.subcategoryId,
+        sizeId: formData.sizeId,
+        finalPrice: parseFloat(formData.finalPrice),
+        stock: parseInt(formData.stock, 10),
+        name: formData.name,
+        description: formData.description,
+        multimediaFiles: uploadedUrls,
+      };
+      console.log("Enviando datos limpios al backend:", formattedData);
+      const response = await axios.patch(
+        `http://localhost:3001/api/products/${formData.id}`,
+        formattedData
+      );
+  
+      console.log("Producto actualizado:", response.data);
       alert("Producto actualizado exitosamente.");
       onUpdateSuccess();
       onClose();
     } catch (error) {
-      console.error("❌ Error al actualizar el producto:", error);
+      console.error("Error al actualizar el producto:", error);
       alert("Error al actualizar el producto.");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle
@@ -132,10 +184,7 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
         <Typography sx={{ fontWeight: "bold", fontSize: "32px", textAlign: "center" }}>
           Editar Producto
         </Typography>
-        <IconButton
-          onClick={onClose}
-          sx={{ color: themePalette.cwhite, position: "absolute", right: 8 }}
-        >
+        <IconButton onClick={onClose} sx={{ color: themePalette.cwhite, position: "absolute", right: 8 }}>
           <Close />
         </IconButton>
       </DialogTitle>
@@ -147,66 +196,34 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
           </Typography>
         ) : formData ? (
           <>
-            {/* Tipo de Publicación */}
-            <TipoPublicacion
-              value={formData.publicationType}
-              onChange={(value) => handleChange("publicationType", value)}
-              error={errors.publicationType}
-            />
-
-            {/* Tipo de Mascota */}
-            <TipoMascota
-              value={formData.petTypeId}
-              onChange={(value) => handleChange("petTypeId", value)}
-              error={errors.petTypeId}
-            />
-
-            {/* Formulario General */}
+            <TipoPublicacion value={formData.publicationType} onChange={(value) => handleChange("publicationType", value)} error={errors.publicationType} />
+            <TipoMascota value={formData.petTypeId} onChange={(value) => handleChange("petTypeId", value)} error={errors.petTypeId} />
             <FormularioRegistroProducto data={formData} onChange={handleChange} errors={errors} />
-
-            {/* Archivos Multimedia */}
-            <ArchivosMultimedia
-              value={formData.multimediaFiles}
-              onChange={(files) => handleChange("multimediaFiles", files)}
-              error={errors.multimediaFiles}
-            />
-
-            {/* Botones dentro del formulario */}
+            <ArchivosMultimedia value={formData.multimediaFiles} onChange={(files) => handleChange("multimediaFiles", files)} error={errors.multimediaFiles} />
             <Grid2 container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
-              <Button
-                variant="contained"
-                onClick={handleUpdate}
-                disabled={loading}
-                sx={{
+              <Button variant="contained" onClick={handleUpdate} disabled={loading} sx={{
                   textTransform: "none",
                   width: "213px",
                   height: "34px",
                   borderRadius: "20px",
                   fontSize: "18px",
                   background: themePalette.primary,
-                }}
-              >
+                }}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Guardar cambios"}
               </Button>
-              <Button
-                variant="contained"
-                onClick={onClose}
-                sx={{
+              <Button variant="contained" onClick={onClose} sx={{
                   textTransform: "none",
                   width: "213px",
                   height: "34px",
                   borderRadius: "20px",
                   fontSize: "18px",
                   background: themePalette.primary,
-                }}
-              >
+                }}>
                 Cancelar
               </Button>
             </Grid2>
           </>
-        ) : (
-          <Typography sx={{ textAlign: "center", my: 3 }}>No se pudo cargar el producto.</Typography>
-        )}
+        ) : <Typography sx={{ textAlign: "center", my: 3 }}>No se pudo cargar el producto.</Typography>}
       </DialogContent>
     </Dialog>
   );
