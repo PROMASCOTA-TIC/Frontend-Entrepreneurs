@@ -20,6 +20,8 @@ import OfertaProducto from "../oferta-producto/OfertaProducto";
 import DetallesProducto from "../detalles-producto/DetallesProducto";
 import EditarProducto from "../actualizar-producto/EditarProducto";
 import axios from "axios";
+import { useGridApiRef } from "@mui/x-data-grid";
+
 
 interface ProductDetails {
   id: string;
@@ -44,7 +46,7 @@ const ListaProductos: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProductDetails | null>(null);
   const [rows, setRows] = useState<ProductDetails[]>([]);
   const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
-
+  const apiRef = useGridApiRef();
   const handleViewProduct = (product: ProductDetails) => {
     setSelectedProduct(product);
     setOpenDetailsDialog(true);
@@ -66,15 +68,20 @@ const ListaProductos: React.FC = () => {
     }
   };
 
-  // ✅ Función para eliminar un producto
   const handleDeleteProduct = async (productId: string) => {
     const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este producto?");
     if (!confirmDelete) return;
-
+  
     try {
       const response = await axios.delete(`http://localhost:3001/api/products/${productId}`);
       alert(response.data.message);
-      setRows((prevRows) => prevRows.filter((row) => row.id !== productId));
+  
+      apiRef.current.setRowSelectionModel([]); // Limpia la selección antes de actualizar
+  
+      setRows((prevRows) => {
+        const updatedRows = prevRows.filter((row) => row.id !== productId);
+        return updatedRows.length > 0 ? updatedRows : []; // Asegura que DataGrid nunca tenga `undefined`
+      });
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
       alert("Ocurrió un error al eliminar el producto.");
@@ -166,8 +173,10 @@ const ListaProductos: React.FC = () => {
 
       <Paper sx={{ height: 500, width: "100%", marginTop: 2 }}>
         <DataGrid
-          localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-          rows={rows}
+        key={rows.length} // Clave dinámica para forzar la actualización cuando la tabla quede vacía
+        apiRef={apiRef}
+        localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+        rows={rows.length > 0 ? rows : []} // Evita errores cuando no hay datos
           columns={[
             { field: "name", headerName: "Nombre", minWidth: 150, flex: 1 },
             { field: "petType", headerName: "Tipo de Mascota", minWidth: 130, flex: 1 },

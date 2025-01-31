@@ -10,9 +10,10 @@ import 'dayjs/locale/es';
 import { themePalette } from '@/config/theme.config';
 import axios from 'axios';
 import Autocomplete from '@mui/material/Autocomplete';
-import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter,useGridApiRef } from '@mui/x-data-grid';
 import { esES } from '@mui/x-data-grid/locales';
 import { Edit, Delete } from '@mui/icons-material';
+import { red } from '@mui/material/colors';
 
 
 dayjs.locale('es'); 
@@ -53,8 +54,9 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   const startDate = watch('startDate');  
   const [ofertas, setOfertas] = useState<Oferta[]>([]);
   const [loadingOfertas, setLoadingOfertas] = useState<boolean>(true);
-
-
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
+  const apiRef = useGridApiRef(); 
   const entrepreneurId = '9d4d342e-aca0-4c88-868e-c86e2fb9b793';
 
   useEffect(() => {
@@ -86,7 +88,32 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     }
   }, [open]);
 
+  const handleDeleteOffer = (offerId: string) => {
+    setOfferToDelete(offerId);
+    setOpenDeleteDialog(true);
+  };
   
+  const confirmDeleteOffer = async () => {
+    if (!offerToDelete) return;
+  
+    try {
+      const response = await axios.delete(`http://localhost:3001/api/offers/${offerToDelete}`);
+  
+      if (response.data.status === 'success') {
+        apiRef.current.setRowSelectionModel([]); // Limpia la selección de la tabla
+  
+        setOfertas((prevOfertas) => prevOfertas.filter((oferta) => oferta.id !== offerToDelete));
+        console.log('Oferta eliminada:', response.data);
+      }
+    } catch (error) {
+      console.error('Error al eliminar la oferta:', error);
+    } finally {
+      setOpenDeleteDialog(false);
+      setOfferToDelete(null);
+    }
+  };
+  
+
   const traducirEstatus = (status: string) => {
     switch (status) {
       case 'PENDING': return 'Pendiente';
@@ -137,13 +164,21 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
       minWidth: 120, 
       flex: 0.75,
       renderCell: (params) => (
-        <Typography 
+        <Box 
           sx={{  
-            color: obtenerColorEstatus(params.value) 
+            fontSize: '14px', // Mismo tamaño que otras columnas
+            fontFamily: 'inherit', // Hereda la tipografía general
+            fontWeight: 'normal', // Evita que sea más gruesa
+            color: obtenerColorEstatus(params.value),
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%', // Asegura que ocupe toda la celda
+            height: '100%',
           }}
         >
           {traducirEstatus(params.value)}
-        </Typography>
+        </Box>
       ),
     },
     {
@@ -162,12 +197,13 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
       headerName: 'Eliminar',
       minWidth: 100,
       flex: 0.5,
-      renderCell: () => (
-        <IconButton color="error">
+      renderCell: (params) => (
+        <IconButton color="error" onClick={() => handleDeleteOffer(params.row.id)}>
           <Delete />
         </IconButton>
       ),
     },
+    
   ];
 
   useEffect(() => {
@@ -179,7 +215,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
 
   const onSubmit = async (data: any) => {
     setLoading(true);  // Iniciar la carga
-
+  
     const formattedStartDate = dayjs(data.startDate).toISOString();
     const formattedEndDate = dayjs(data.endDate).toISOString();
     const ofertaData = {
@@ -189,30 +225,49 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
       discountPercentage: Number(data.porcentajeDescuento),
       entrepreneurId,
     };
-
+  
     try {
       const response = await axios.post('http://localhost:3001/api/offers/', ofertaData);
-      console.log('Oferta creada con éxito:', response.data);
-
-      setSuccessMessage('¡Oferta guardada exitosamente!');  // Mostrar mensaje de éxito
-
-      // Limpiar los campos después de guardar la oferta
-      reset({
-        startDate: null,
-        endDate: null,
-        porcentajeDescuento: '',
-      });
-      setSelectedProduct(null);  // Limpiar la selección del producto
-      setPrecioActual(0);
-      setPrecioConDescuento(0);
+      
+      if (response.data.status === 'success') {
+        console.log('Oferta creada con éxito:', response.data);
+  
+        // Agregar la nueva oferta a la tabla sin recargar
+        setOfertas((prevOfertas) => [
+          ...prevOfertas, 
+          {
+            id: response.data.data.id,
+            productName: selectedProduct?.name || 'Desconocido',
+            originalPrice: precioActual.toFixed(2),
+            discountedPrice: precioConDescuento.toFixed(2),
+            discountPercentage: data.porcentajeDescuento,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate,
+            status: 'PENDING' // Estado inicial
+          }
+        ]);
+  
+        setSuccessMessage('¡Oferta guardada exitosamente!');
+  
+        // Limpiar los campos después de guardar la oferta
+        reset({
+          startDate: null,
+          endDate: null,
+          porcentajeDescuento: '',
+        });
+        setSelectedProduct(null);
+        setPrecioActual(0);
+        setPrecioConDescuento(0);
+      }
     } catch (error) {
       console.error('Error al crear la oferta:', error);
-      setSuccessMessage('Hubo un error al guardar la oferta.');  // Mensaje de error
+      setSuccessMessage('Hubo un error al guardar la oferta.');
     } finally {
-      setLoading(false);  // Finalizar la carga
+      setLoading(false);
     }
   };
 
+  
   const handleCancel = () => {
     // Limpiar los campos al cancelar
     reset({
@@ -237,8 +292,62 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     </GridToolbarContainer>
   );
 
-
   return (
+    <>
+    
+<Dialog
+  open={openDeleteDialog}
+  onClose={() => setOpenDeleteDialog(false)}
+  maxWidth="xs"
+  fullWidth
+>
+  <DialogTitle
+    sx={{
+      backgroundColor: themePalette.primary,
+      color: themePalette.cwhite,
+      textAlign: 'center',
+      fontWeight: 'bold',
+    }}
+  >
+    Confirmar Eliminación
+  </DialogTitle>
+  <DialogContent dividers>
+    <Typography sx={{ fontSize: '18px', textAlign: 'center', color: themePalette.black }}>
+      ¿Estás seguro de que deseas eliminar esta oferta? Esta acción no se puede deshacer.
+    </Typography>
+    <Box display="flex" justifyContent="center" gap={2} mt={3}>
+      <Button
+        onClick={() => setOpenDeleteDialog(false)}
+        variant="contained"
+        sx={{
+          textTransform: "none",
+          width: "120px",
+          background: themePalette.black10,
+          color: themePalette.black,
+          "&:hover": { background: themePalette.secondary },
+        }}
+      >
+        Cancelar
+      </Button>
+      <Button
+        onClick={confirmDeleteOffer}
+        variant="contained"
+        color="error"
+        sx={{
+          textTransform: "none",
+          width: "120px",
+          background: themePalette.black10,
+          color: themePalette.black,
+          "&:hover": { background: "red" },
+        }}
+      >
+        Eliminar
+      </Button>
+    </Box>
+  </DialogContent>
+</Dialog>
+
+   
     <Dialog open={open} onClose={handleCancel} maxWidth="xl" fullWidth>
       <DialogTitle
         sx={{
@@ -416,13 +525,28 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
               <Button 
                 variant="contained" 
                 type="submit" 
-                sx={{ textTransform: 'none', background: themePalette.primary, color: themePalette.cwhite }}>
+                sx={{
+                                  textTransform: "none",
+                                  width: "213px",
+                                  height: "34px",
+                                  borderRadius: "20px",
+                                  fontSize: "18px",
+                                  background: themePalette.primary,
+                                }}>
                 {loading ? <CircularProgress size={24} sx={{ color: themePalette.cwhite }} /> : 'Guardar'}
               </Button>
               <Button 
                 onClick={handleCancel} 
-                variant="outlined" 
-                sx={{ textTransform: 'none', background: themePalette.primary, color: themePalette.cwhite }}>
+                variant="contained" 
+                sx={{
+                  textTransform: "none",
+                  width: "213px",
+                  height: "34px",
+                  borderRadius: "20px",
+                  fontSize: "18px",
+                  background: themePalette.primary,
+                }}
+              >
                 Cancelar
               </Button>
             </Box>
@@ -440,28 +564,45 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
             </Box>
           ) : (
             <DataGrid
-              localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-              columns={columns}
-              rows={ofertas}
-              getRowId={(row) => row.id}
-              initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
-              pageSizeOptions={[5, 10, 25]}
-              slots={{ toolbar: CustomToolbar }}
-              sx={{
-                '& .MuiDataGrid-toolbarContainer': {
-                  backgroundColor: themePalette.cwhite,
-                  padding: '0.20rem',
-                },
-                '& .MuiDataGrid-columnHeader': {
-                  backgroundColor: themePalette.black10,
-                  fontWeight: 'bold',
-                },
-                '& .MuiDataGrid-footerContainer': {
-                  backgroundColor: themePalette.black10,
-                  fontWeight: 'bold',
-                }
-              }}
-            />
+            key={ofertas.length} // Clave dinámica para forzar re-render cuando se quede vacío
+            apiRef={apiRef}
+            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+            columns={columns}
+            rows={ofertas.length > 0 ? ofertas : []} // Garantiza que nunca sea undefined
+            getRowId={(row) => row.id}
+            initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
+            pageSizeOptions={[5, 10, 25]}
+            slots={{ toolbar: CustomToolbar }}
+            sx={{
+              '& .MuiDataGrid-toolbarContainer': {
+                backgroundColor: themePalette.cwhite,
+                padding: '0.20rem',
+              },
+              '& .MuiDataGrid-columnHeader': {
+                backgroundColor: themePalette.black10,
+                fontWeight: 'bold',
+                fontSize: '16px', 
+                textAlign: 'center',
+              },
+              '& .MuiDataGrid-cell': {
+                fontSize: '14px',  
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                backgroundColor: themePalette.black10,
+                fontWeight: 'bold',
+                fontSize: '14px',  
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+              '& .MuiDataGrid-columnHeaders': {
+                textAlign: 'center',
+              },
+            }}
+          />
+          
+          
           )}
         </Box>
       </DialogContent>
@@ -469,6 +610,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
         </LocalizationProvider>
       </DialogContent>
     </Dialog>
+    </>
   );
 };
 
