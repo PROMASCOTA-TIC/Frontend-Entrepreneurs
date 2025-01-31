@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, CircularProgress, Grid2 } from "@mui/material";
+import { Box, Button, CircularProgress, DialogContent, DialogTitle, Grid2, Typography,Dialog } from "@mui/material";
 import TipoPublicacion from "../../components/registro-productos/TipoPublicacion";
 import TipoMascota from "../../components/registro-productos/TipoMascota";
 import FormularioRegistroProducto from "../../components/registro-productos/FormularioProducto";
@@ -10,6 +10,7 @@ import { theme } from "@/app/config/theme.config";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import { useRouter } from "next/navigation";
+import { themePalette } from "@/config/theme.config";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -59,7 +60,10 @@ export default function RegistroProducto() {
 
   const [errors, setErrors] = useState<Partial<Record<keyof ProductData, string>>>({});
   const [loading, setLoading] = useState(false);
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
+  
   const updateProductData = (key: keyof ProductData, value: any) => {
     setProductData((prev) => ({
       ...prev,
@@ -119,9 +123,7 @@ export default function RegistroProducto() {
         ...productData,
         multimediaFiles: uploadedUrls,
       };
-
-      console.log("Datos preparados para el backend:", updatedProductData);
-
+    
       const response = await fetch("http://localhost:3001/api/products", {
         method: "POST",
         headers: {
@@ -129,20 +131,22 @@ export default function RegistroProducto() {
         },
         body: JSON.stringify(updatedProductData),
       });
-
+    
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Error del servidor:", errorText);
         throw new Error(`Error al guardar el producto: ${response.statusText}`);
       }
-
+    
       const data = await response.json();
-      alert("Producto guardado exitosamente.");
-      console.log("Respuesta del backend:", data);
-
+    
+      // ✅ Mensaje con el nombre del producto guardado
+      setSuccessMessage(`"${productData.name}" se guardó exitosamente.`);
+      setOpenSuccessDialog(true);
+    
       setProductData((prev) => ({
         ...prev,
-        entrepreneurId, // Mantener el ID fijo para pruebas
+        entrepreneurId,
         publicationType: "",
         petTypeId: "",
         categoryId: "",
@@ -157,11 +161,12 @@ export default function RegistroProducto() {
       }));
     } catch (error) {
       console.error("Error general:", error);
-      alert("Ocurrió un error al guardar el producto. Revisa los logs.");
+      setSuccessMessage("Ocurrió un error al guardar el producto.");
+      setOpenSuccessDialog(true);
     } finally {
       setLoading(false);
     }
-  };
+  }    
 
   const handleCancelar = () => {
     setProductData({
@@ -245,6 +250,45 @@ export default function RegistroProducto() {
         >
           Guardar
         </Button>
+
+        <Dialog
+  open={openSuccessDialog}
+  onClose={() => setOpenSuccessDialog(false)}
+  maxWidth="xs"
+  fullWidth
+>
+  <DialogTitle
+    sx={{
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
+      textAlign: "center",
+      fontWeight: "bold",
+    }}
+  >
+    Confirmación
+  </DialogTitle>
+  <DialogContent dividers>
+    <Typography sx={{ fontSize: "18px", textAlign: "center", color: theme.palette.text.primary }}>
+      {successMessage}
+    </Typography>
+    <Box display="flex" justifyContent="center" gap={2} mt={3}>
+      <Button
+        onClick={() => setOpenSuccessDialog(false)}
+        variant="contained"
+         sx={{
+                        textTransform: "none",
+                        width: "120px",
+                        background: themePalette.primary,
+                        color: themePalette.cwhite,
+                        "&:hover": { background: themePalette.secondary },
+                      }}
+      >
+        Aceptar
+      </Button>
+    </Box>
+  </DialogContent>
+</Dialog>
+
         <Button
           variant="contained"
           onClick={handleCancelar}

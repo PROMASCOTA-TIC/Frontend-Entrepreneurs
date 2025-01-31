@@ -1,15 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Button, Paper, IconButton } from "@mui/material";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarExport,
-  GridToolbarFilterButton,
-  GridToolbarQuickFilter,
-  GridColDef,
-} from "@mui/x-data-grid";
+import { Box, Typography, Button, Paper, IconButton, Dialog, DialogTitle, DialogContent, Snackbar } from "@mui/material";
+import {DataGrid,GridToolbarContainer,GridToolbarExport,GridToolbarFilterButton,GridToolbarQuickFilter,GridColDef,} from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import Delete from "@mui/icons-material/Delete";
@@ -46,12 +39,17 @@ const ListaProductos: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProductDetails | null>(null);
   const [rows, setRows] = useState<ProductDetails[]>([]);
   const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+  const [productToDeleteName, setProductToDeleteName] = useState<string | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const apiRef = useGridApiRef();
   const handleViewProduct = (product: ProductDetails) => {
     setSelectedProduct(product);
     setOpenDetailsDialog(true);
   };
-
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  
   const handleEditProduct = async (productId: string) => {
     try {
       console.log("Obteniendo datos actualizados del producto:", productId);
@@ -68,26 +66,38 @@ const ListaProductos: React.FC = () => {
     }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
-    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este producto?");
-    if (!confirmDelete) return;
+  const handleDeleteProduct = (productId: string) => {
+    const product = rows.find((row) => row.id === productId); 
+    setProductToDelete(productId);
+    setProductToDeleteName(product ? product.name : "Producto desconocido"); 
+    setOpenDeleteDialog(true);
+  };
+  
+
+  const confirmDeleteProduct = async () => {
+    if (!productToDelete) return;
   
     try {
-      const response = await axios.delete(`http://localhost:3001/api/products/${productId}`);
-      alert(response.data.message);
+      const response = await axios.delete(`http://localhost:3001/api/products/${productToDelete}`);
   
-      apiRef.current.setRowSelectionModel([]); // Limpia la selección antes de actualizar
+      setSnackbarMessage(`"${productToDeleteName}" eliminado correctamente.`);
+      setSnackbarOpen(true);
   
-      setRows((prevRows) => {
-        const updatedRows = prevRows.filter((row) => row.id !== productId);
-        return updatedRows.length > 0 ? updatedRows : []; // Asegura que DataGrid nunca tenga `undefined`
-      });
+      apiRef.current.setRowSelectionModel([]);
+      setRows((prevRows) => prevRows.filter((row) => row.id !== productToDelete));
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
-      alert("Ocurrió un error al eliminar el producto.");
+      setSnackbarMessage("Ocurrió un error al eliminar el producto.");
+      setSnackbarOpen(true);
+    } finally {
+      setOpenDeleteDialog(false);
+      setProductToDelete(null);
+      setProductToDeleteName(null);
     }
   };
-
+  
+  
+  
   const fetchProducts = async () => {
     if (!entrepreneurId) {
       console.error("No se encontró el ID del emprendedor.");
@@ -173,10 +183,10 @@ const ListaProductos: React.FC = () => {
 
       <Paper sx={{ height: 500, width: "100%", marginTop: 2 }}>
         <DataGrid
-        key={rows.length} // Clave dinámica para forzar la actualización cuando la tabla quede vacía
+        key={rows.length}
         apiRef={apiRef}
         localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-        rows={rows.length > 0 ? rows : []} // Evita errores cuando no hay datos
+        rows={rows.length > 0 ? rows : []} 
           columns={[
             { field: "name", headerName: "Nombre", minWidth: 150, flex: 1 },
             { field: "petType", headerName: "Tipo de Mascota", minWidth: 130, flex: 1 },
@@ -239,6 +249,65 @@ const ListaProductos: React.FC = () => {
           }}
         />
       </Paper>
+      <Dialog
+  open={openDeleteDialog}
+  onClose={() => setOpenDeleteDialog(false)}
+  maxWidth="xs"
+  fullWidth
+>
+  <DialogTitle
+    sx={{
+      backgroundColor: themePalette.primary,
+      color: themePalette.cwhite,
+      textAlign: 'center',
+      fontWeight: 'bold',
+    }}
+  >
+    Confirmar Eliminación
+  </DialogTitle>
+  <DialogContent dividers>
+    <Typography sx={{ fontSize: '18px', textAlign: 'center', color: themePalette.black }}>
+      ¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.
+    </Typography>
+    <Box display="flex" justifyContent="center" gap={2} mt={3}>
+      <Button
+        onClick={() => setOpenDeleteDialog(false)}
+        variant="contained"
+         sx={{
+                  textTransform: "none",
+                  width: "120px",
+                  background: themePalette.primary,
+                  color: themePalette.cwhite,
+                  "&:hover": { background: themePalette.secondary },
+                }}
+      >
+        Cancelar
+      </Button>
+      <Button
+        onClick={confirmDeleteProduct}
+        variant="contained"
+        color="error"
+        sx={{
+                  textTransform: "none",
+                  width: "120px",
+                  background: themePalette.primary,
+                  color: themePalette.cwhite,
+                  "&:hover": { background: "red" },
+                }}
+      >
+        Eliminar
+      </Button>
+    </Box>
+  </DialogContent>
+</Dialog>
+
+<Snackbar
+  open={snackbarOpen}
+  autoHideDuration={3000} 
+  onClose={() => setSnackbarOpen(false)}
+  message={snackbarMessage}
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+/>
 
       <OfertaProducto open={openDialog} onClose={() => setOpenDialog(false)} />
       {selectedProduct && <DetallesProducto product={selectedProduct} open={openDetailsDialog} onClose={() => setOpenDetailsDialog(false)} />}
