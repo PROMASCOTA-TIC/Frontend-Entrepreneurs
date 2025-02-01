@@ -80,7 +80,7 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
           {label}:
         </Typography>
       </Grid2>
-      <Grid2 size={{ xs: 12, sm: 8, lg: 9 }}>
+      <Grid2 size={{ xs: 12, sm: 7, }}>
         {isSelect ? (
           <TextField
             select
@@ -175,14 +175,14 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
         Información:
       </Typography>
       <Grid2
-        container
-        spacing={2}
-        sx={{
-          marginTop: "13px",
-          paddingLeft: "200px",
-          display: "flex",
-          justifyContent: "center",
-        }}
+         container
+  rowSpacing={1}
+  columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+  sx={{
+    marginTop: "13px",
+    display: "flex",
+    justifyContent: "center",
+  }}
       >
         {createField("Nombre", "name")}
         {createField("Categoría", "categoryId", "text", categories, true)}
