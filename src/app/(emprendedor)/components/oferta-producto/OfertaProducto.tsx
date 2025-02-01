@@ -47,8 +47,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   const [selectedProduct, setSelectedProduct] = useState<Producto | null>(null);
   const [precioActual, setPrecioActual] = useState<number>(0);
   const [precioConDescuento, setPrecioConDescuento] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);  // Nuevo estado para carga
-  const [successMessage, setSuccessMessage] = useState<string>('');  // Nuevo estado para el mensaje de éxito
+  const [loading, setLoading] = useState<boolean>(false);
   const { control, handleSubmit, watch, reset, formState: { errors } } = useForm();
   const porcentajeDescuento = watch('porcentajeDescuento');
   const startDate = watch('startDate');  
@@ -58,6 +57,22 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
   const apiRef = useGridApiRef(); 
   const entrepreneurId = '9d4d342e-aca0-4c88-868e-c86e2fb9b793';
+  const [offerToEdit, setOfferToEdit] = useState<Oferta | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const resetForm = () => {
+    reset({
+      startDate: null,
+      endDate: null,
+      porcentajeDescuento: '',
+    });
+  
+    setSelectedProduct(null);
+    setPrecioActual(0);
+    setPrecioConDescuento(0);
+    setOfferToEdit(null);
+  };
+  
 
   useEffect(() => {
     axios.get(`http://localhost:3001/api/products/entrepreneur/${entrepreneurId}`)
@@ -88,10 +103,26 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     }
   }, [open]);
 
+
+
+  
   const handleDeleteOffer = (offerId: string) => {
     setOfferToDelete(offerId);
     setOpenDeleteDialog(true);
   };
+  
+  const handleEditOffer = (oferta: Oferta) => {
+    setOfferToEdit(oferta);
+    reset({
+      startDate: dayjs(oferta.startDate),
+      endDate: dayjs(oferta.endDate),
+      porcentajeDescuento: oferta.discountPercentage,
+    });
+    setSelectedProduct(productos.find(p => p.name === oferta.productName) || null);
+    setPrecioActual(Number(oferta.originalPrice));
+    setPrecioConDescuento(Number(oferta.discountedPrice));
+  };
+
   
   const confirmDeleteOffer = async () => {
     if (!offerToDelete) return;
@@ -184,14 +215,14 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     {
       field: 'editar',
       headerName: 'Editar',
-      minWidth: 90,
       flex: 0.5,
-      renderCell: () => (
-        <IconButton sx={{ color: themePalette.primary }}>
+      renderCell: (params) => (
+        <IconButton onClick={() => handleEditOffer(params.row)} sx={{ color: themePalette.primary }}>
           <Edit />
         </IconButton>
       ),
     },
+    
     {
       field: 'eliminar',
       headerName: 'Eliminar',
@@ -205,7 +236,36 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     },
     
   ];
-
+  const updateOffer = async (data: any) => {
+    if (!offerToEdit) return;
+ 
+    setLoading(true);
+    try {
+       const response = await axios.patch(`http://localhost:3001/api/offers/${offerToEdit.id}`, {
+          discountPercentage: Number(data.porcentajeDescuento),
+          startDate: dayjs(data.startDate).toISOString(),
+          endDate: dayjs(data.endDate).toISOString(),
+       });
+ 
+       if (response.data.status === 'success') {
+          setOfertas(prev => prev.map(oferta =>
+             oferta.id === offerToEdit.id
+                ? { ...oferta, discountPercentage: data.porcentajeDescuento }
+                : oferta
+          ));
+          setOfferToEdit(null);
+          reset();
+          setMessage('¡Oferta actualizada con éxito!'); 
+          resetForm();
+       }
+    } catch (error) {
+       console.error('Error al actualizar la oferta:', error);
+       resetForm();
+    } finally {
+       setLoading(false);
+    }
+ };
+ 
   useEffect(() => {
     if (porcentajeDescuento && precioActual) {
       const descuento = (precioActual * porcentajeDescuento) / 100;
@@ -214,8 +274,12 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   }, [porcentajeDescuento, precioActual]);
 
   const onSubmit = async (data: any) => {
-    setLoading(true);  // Iniciar la carga
+    if (offerToEdit) {
+      await updateOffer(data); // Si hay una oferta en edición, la actualiza en vez de crear una nueva
+      return;
+    }
   
+    setLoading(true);
     const formattedStartDate = dayjs(data.startDate).toISOString();
     const formattedEndDate = dayjs(data.endDate).toISOString();
     const ofertaData = {
@@ -228,59 +292,48 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   
     try {
       const response = await axios.post('http://localhost:3001/api/offers/', ofertaData);
-      
+  
       if (response.data.status === 'success') {
-        console.log('Oferta creada con éxito:', response.data);
-  
-        // Agregar la nueva oferta a la tabla sin recargar
-        setOfertas((prevOfertas) => [
-          ...prevOfertas, 
-          {
-            id: response.data.data.id,
-            productName: selectedProduct?.name || 'Desconocido',
-            originalPrice: precioActual.toFixed(2),
-            discountedPrice: precioConDescuento.toFixed(2),
-            discountPercentage: data.porcentajeDescuento,
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-            status: 'PENDING' // Estado inicial
-          }
-        ]);
-  
-        setSuccessMessage('¡Oferta guardada exitosamente!');
-  
-        // Limpiar los campos después de guardar la oferta
-        reset({
-          startDate: null,
-          endDate: null,
-          porcentajeDescuento: '',
-        });
+        setOfertas([...ofertas, {
+          id: response.data.data.id,
+          productName: selectedProduct?.name || 'Desconocido',
+          originalPrice: precioActual.toFixed(2),
+          discountedPrice: precioConDescuento.toFixed(2),
+          discountPercentage: data.porcentajeDescuento,
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+          status: 'PENDING'
+        }]);
+        reset();
         setSelectedProduct(null);
         setPrecioActual(0);
         setPrecioConDescuento(0);
+        setMessage('¡Oferta creada con éxito!');
       }
     } catch (error) {
       console.error('Error al crear la oferta:', error);
-      setSuccessMessage('Hubo un error al guardar la oferta.');
     } finally {
       setLoading(false);
     }
   };
-
+  
   
   const handleCancel = () => {
-    // Limpiar los campos al cancelar
     reset({
-      startDate: null,
-      endDate: null,
-      porcentajeDescuento: '',
+       startDate: null,
+       endDate: null,
+       porcentajeDescuento: '',
     });
-    setSelectedProduct(null);  // Limpiar la selección del producto
+ 
+    setSelectedProduct(null);
     setPrecioActual(0);
     setPrecioConDescuento(0);
-    setSuccessMessage('');  // Limpiar el mensaje de éxito o error
+    setMessage(null);
+    setOfferToEdit(null);
     onClose();
-  };
+ };
+ 
+  
 
   const CustomToolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -522,19 +575,21 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
               </Grid2>
             </Grid2>
             <Box display="flex" justifyContent="space-between" gap={2} mt={2} paddingBottom={5}>
-              <Button 
-                variant="contained" 
-                type="submit" 
-                sx={{
-                                  textTransform: "none",
-                                  width: "213px",
-                                  height: "34px",
-                                  borderRadius: "20px",
-                                  fontSize: "18px",
-                                  background: themePalette.primary,
-                                }}>
-                {loading ? <CircularProgress size={24} sx={{ color: themePalette.cwhite }} /> : 'Guardar'}
-              </Button>
+          
+            <Button 
+  variant="contained" 
+  type="submit" 
+  sx={{
+    textTransform: "none",
+    width: "213px",
+    height: "34px",
+    borderRadius: "20px",
+    fontSize: "18px",
+    background: themePalette.primary,
+  }}>
+  {loading ? <CircularProgress size={24} /> : (offerToEdit ? "Actualizar" : "Guardar")}
+</Button>
+
               <Button 
                 onClick={handleCancel} 
                 variant="contained" 
@@ -546,15 +601,17 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
                   fontSize: "18px",
                   background: themePalette.primary,
                 }}
+                
               >
                 Cancelar
               </Button>
             </Box>
-            {successMessage && (
-              <Typography sx={{ marginTop: '16px', textAlign: 'center', color: 'green', fontWeight: 'bold' }}>
-                {successMessage}
-              </Typography>
-            )}
+            {message && (
+    <Typography sx={{ marginTop: '16px', textAlign: 'center', color: 'green', fontWeight: 'bold' }}>
+        {message}
+    </Typography>
+)}
+
           </Box>
           <DialogContent dividers>
         <Box sx={{ height: 400, width: '100%', paddingTop:'10px' }}>
