@@ -1,40 +1,107 @@
 "use client";
 import { useState } from "react";
-import { Box, Grid2, Typography, Button } from "@mui/material";
+import { Box, Grid2, Typography } from "@mui/material";
 import Image from "next/image";
 import { icon, fondoDuenos } from "@/assets/images";
 import { themePalette } from "@/config/theme.config";
-
-// Importa los componentes del formulario
 import { RegisterForm } from "./registerForm";
-import  {BusinessDataForm}from "./registroDatosEmprendimiento";
+import { BusinessDataForm } from "./registroDatosEmprendimiento";
 import { ShippingDetailsForm } from "./registroEnvios";
 import { RegistroHorarioAtencion } from "./registroHorarios";
 import { CompletionMessage } from "./mensajeRegistro";
 
+type FormDataType = {
+  email: string;
+  password: string;
+  name: string;
+  aceptoTerminos: string;
+  nombreEmprendimiento?: string;
+  ruc?: string;
+  numeroCelular?: string;
+  bancoNombre?: string;
+  bancoTipoCuenta?: string;
+  bancoNumeroCuenta?: string;
+  bancoNombreDuenoCuenta?: string;
+  realizaEnvios?: string;
+  soloRetiraEnTienda?: string;
+  callePrincipal?: string;
+  calleSecundaria?: string;
+  numeracion?: string;
+  referencia?: string;
+  sectorLocal?: string;
+  horario?: Array<{
+    dia: string;
+    horaApertura?: string;
+    horaCierre?: string;
+    cerrado?: string;
+  }>;
+  fotosLocal?: string[];
+  fotosLogotipo?: string[];
+};
 
-export default function Login() {
+
+export default function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Funciones para manejar la navegación
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
+  
+  const [formData, setFormData] = useState<FormDataType>({
+    email: "",
+    password: "",
+    name: "",
+    aceptoTerminos: "0",
+    nombreEmprendimiento: "",
+    ruc: "",
+    numeroCelular: "",
+    bancoNombre: "",
+    bancoTipoCuenta: "",
+    bancoNumeroCuenta: "",
+    bancoNombreDuenoCuenta: "",
+    realizaEnvios: "0",
+    soloRetiraEnTienda: "0",
+    callePrincipal: "",
+    calleSecundaria: "",
+    numeracion: "",
+    referencia: "",
+    sectorLocal: ""
+  });
+
+  const updateFormData = (data: Partial<FormDataType>) => {
+    setFormData((prev) => {
+      const updatedData = { ...prev, ...data };
+      console.log("🔹 Datos actualizados en formData:", updatedData);
+      return updatedData;  // ⚠️ No es necesario retornar el estado en `setFormData`
+    });
+  };
+
+  const nextStep = () => {
+    console.log("🔄 Avanzando al siguiente paso...");
+    setCurrentStep((prev) => prev + 1);
+};
+
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
   // Función para renderizar el componente correspondiente según el paso actual
   const renderFormComponent = () => {
     switch (currentStep) {
       case 1:
-        return <RegisterForm nextStep={nextStep} />;
+        return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} formData={formData} />;
       case 2:
-        return <BusinessDataForm nextStep={nextStep} prevStep={prevStep} />;
+        case 2:
+          return <BusinessDataForm 
+              nextStep={nextStep} 
+              prevStep={prevStep} 
+              updateFormData={updateFormData} 
+              formData={formData} 
+          />;
       case 3:
-        return <ShippingDetailsForm nextStep={nextStep} prevStep={prevStep} />;
+
+      return <ShippingDetailsForm nextStep={nextStep} prevStep={prevStep} updateFormData={updateFormData} formData={formData} />;
       case 4:
-        return <RegistroHorarioAtencion nextStep={nextStep} prevStep={prevStep} />;
-        case 5: 
-        return <CompletionMessage />;
+     //   return <RegistroHorarioAtencion nextStep={nextStep} prevStep={prevStep} updateFormData={updateFormData} />;
+      case 5:
+      //  return <CompletionMessage formData={formData} />;
       default:
-        return <RegisterForm  nextStep={nextStep} />;
+    //    return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} />;
     }
   };
 

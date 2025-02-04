@@ -1,28 +1,28 @@
 "use client";
-import React from 'react';
-import { Box, Button, FormLabel, Checkbox, TextField, MenuItem, FormControlLabel } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { registroEnvios } from '@/validations/registroEnvios';
-import { themePalette } from '@/config/theme.config';
-import { GoogleMap, LoadScript, Polygon } from '@react-google-maps/api';
+import React, { useState, useEffect } from "react";
+import { Box, Button, FormLabel, Checkbox, TextField, MenuItem, FormControlLabel } from "@mui/material";
+import { themePalette } from "@/config/theme.config";
+import { GoogleMap, LoadScript, Polygon } from "@react-google-maps/api";
+
 const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 type Inputs = {
-    deliveryOptions: string[];
-    mainStreet: string;
-    secondaryStreet: string;
-    addressNumber: string;
-    reference: string;
-    sector: string;
+  realizaEnvios: string;
+  soloRetiraEnTienda: string;
+  callePrincipal: string;
+  calleSecundaria: string;
+  numeracion: string;
+  referencia: string;
+  sectorLocal: string;
 };
 
 type ShippingDetailsFormProps = {
-    nextStep: () => void;
-    prevStep: () => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  updateFormData: (data: Partial<Inputs>) => void;
+  formData: Partial<Inputs>;
 };
 
-// Definición de las zonas con colores únicos
 const zonas = [
     {
         nombre: "Norte-1",
@@ -132,171 +132,175 @@ const zonas = [
     }
 ];
 
-const containerStyle = {
-    width: '100%',
-    height: '300px',
-};
+const containerStyle = { width: "100%", height: "300px" };
+const center = { lat: -0.180653, lng: -78.467834 };
 
-const center = {
-    lat: -0.180653,
-    lng: -78.467834,
-};
+export const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
+  nextStep,
+  prevStep,
+  updateFormData,
+  formData
+}) => {
+  const [formValues, setFormValues] = useState<Inputs>({
+    realizaEnvios: formData.realizaEnvios || "0",
+    soloRetiraEnTienda: formData.soloRetiraEnTienda || "0",
+    callePrincipal: formData.callePrincipal || "",
+    calleSecundaria: formData.calleSecundaria || "",
+    numeracion: formData.numeracion || "",
+    referencia: formData.referencia || "",
+    sectorLocal: formData.sectorLocal || "",
+  });
 
-export const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({ nextStep, prevStep }) => {
-    const { register, handleSubmit, control, formState: { errors } } = useForm<Inputs>({
-        resolver: zodResolver(registroEnvios),
-        mode: 'onChange',
-    });
+  useEffect(() => {
+    setFormValues((prev) => ({ ...prev, ...formData }));
+  }, [formData]);
 
-    const onSubmit = (data: Inputs) => {
-        console.log(data);
-        nextStep();
-    };
+  const handleChange = (field: keyof Inputs, value: string) => {
+    setFormValues((prev) => ({ ...prev, [field]: value }));
+  };
 
-    return (
-        <form className="form-group" onSubmit={handleSubmit(onSubmit)}>
-            <FormLabel sx={{ color: 'black' }}>Opciones de Entrega</FormLabel>
-            <Box>
-                <Controller
-                    name="deliveryOptions"
-                    control={control}
-                    defaultValue={[]}
-                    render={({ field }) => (
-                        <>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        {...field}
-                                        value="Domicilio"
-                                        checked={field.value.includes("Domicilio")}
-                                        onChange={(e) => {
-                                            const checked = e.target.checked;
-                                            const newValue = checked
-                                                ? [...field.value, "Domicilio"]
-                                                : field.value.filter((option) => option !== "Domicilio");
-                                            field.onChange(newValue);
-                                        }}
-                                        sx={{ color: errors.deliveryOptions ? 'red' : 'blue' }}
-                                    />
-                                }
-                                label="Domicilio"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        {...field}
-                                        value="Retiro en tienda"
-                                        checked={field.value.includes("Retiro en tienda")}
-                                        onChange={(e) => {
-                                            const checked = e.target.checked;
-                                            const newValue = checked
-                                                ? [...field.value, "Retiro en tienda"]
-                                                : field.value.filter((option) => option !== "Retiro en tienda");
-                                            field.onChange(newValue);
-                                        }}
-                                        sx={{ color: errors.deliveryOptions ? 'red' : 'blue' }}
-                                    />
-                                }
-                                label="Retiro en tienda"
-                            />
-                        </>
-                    )}
-                />
-            </Box>
-            {errors.deliveryOptions && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.deliveryOptions.message}</p>}
+  const handleCheckboxChange = (field: keyof Inputs, checked: boolean) => {
+    setFormValues((prev) => ({ ...prev, [field]: checked ? "1" : "0" }));
+  };
 
-            {['mainStreet', 'secondaryStreet', 'addressNumber', 'reference'].map((field) => (
-                <React.Fragment key={field}>
-                    <FormLabel htmlFor={field} sx={{ color: 'black' }}>
-                        {field === 'mainStreet' && 'Calle Principal'}
-                        {field === 'secondaryStreet' && 'Calle Secundaria'}
-                        {field === 'addressNumber' && 'Numeración'}
-                        {field === 'reference' && 'Referencia'}
-                    </FormLabel>
-                    <TextField
-                        id={field}
-                        error={!!errors[field as keyof Inputs]}
-                        placeholder={`Ingrese ${field === 'addressNumber' ? 'la numeración' : `la ${field === 'reference' ? 'referencia' : 'calle'}`}`}
-                        {...register(field as keyof Inputs)}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': { borderColor: 'gray' },
-                                '&:hover fieldset': { borderColor: 'blue' },
-                                '&.Mui-focused fieldset': { borderColor: 'blue' },
-                            },
-                            mb: 2,
-                        }}
-                    />
-                    {errors[field as keyof Inputs] && (
-                        <p className="text-red-500" style={{ textAlign: 'left' }}>
-                            {errors[field as keyof Inputs]?.message}
-                        </p>
-                    )}
-                </React.Fragment>
-            ))}
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("✅ Datos enviados:", formValues);
+    updateFormData(formValues);
+    nextStep();
+  };
 
-            <FormLabel htmlFor="sector" sx={{ color: 'black' }}>Sector</FormLabel>
-            <TextField
-                id="sector"
-                select
-                error={!!errors.sector}
-                {...register('sector')}
-                defaultValue=""
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: 'gray' },
-                        '&:hover fieldset': { borderColor: 'blue' },
-                        '&.Mui-focused fieldset': { borderColor: 'blue' },
-                    },
-                    mb: 2,
-                }}
-            >
-                <MenuItem value="" disabled>Seleccione el sector</MenuItem>
-                {["Norte - Verde", "Sur - Rojo", "Centro - Naranja", "Valle Cumbayá - Morado", "Valle Chillos - Amarillo"].map((sector) => (
-                    <MenuItem key={sector} value={sector}>{sector}</MenuItem>
-                ))}
-            </TextField>
-            {errors.sector && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.sector.message}</p>}
+  return (
+    <form className="form-group" onSubmit={handleSubmit}>
+      {/* Opciones de Entrega */}
+      <FormLabel sx={{ color: "black" }}>Opciones de Entrega</FormLabel>
+      <Box>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formValues.realizaEnvios === "1"}
+              onChange={(e) => handleCheckboxChange("realizaEnvios", e.target.checked)}
+              color="primary"
+            />
+          }
+          label="Realiza envíos a domicilio"
+          sx={{ color: "black" }}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={formValues.soloRetiraEnTienda === "1"}
+              onChange={(e) => handleCheckboxChange("soloRetiraEnTienda", e.target.checked)}
+              color="primary"
+            />
+          }
+          label="Solo retiro en tienda"
+          sx={{ color: "black" }}
+        />
+      </Box>
 
-            <FormLabel sx={{ color: 'black' }}>Mapa de sectorización</FormLabel>
-            <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
-                <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-                    {zonas.map((zona, index) => (
-                        <Polygon
-                            key={index}
-                            paths={zona.path}
-                            options={{
-                                fillColor: zona.color,
-                                fillOpacity: 0.2,
-                                strokeColor: zona.color,
-                                strokeOpacity: 0.5,
-                                strokeWeight: 2,
-                            }}
-                        />
-                    ))}
-                </GoogleMap>
-            </LoadScript>
+      {/* Campos de Dirección */}
+      {[
+  { field: "callePrincipal", label: "Calle Principal" },
+  { field: "calleSecundaria", label: "Calle Secundaria" },
+  { field: "numeracion", label: "Numeración" },
+  { field: "referencia", label: "Referencia" }
+].map(({ field, label }) => (
+  <Box 
+    key={field} 
+    sx={{ 
+      display: "flex", 
+      flexDirection: "column", 
+      mb: 2, 
+      width: "100%" 
+    }}
+  >
+    <FormLabel htmlFor={field} sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+      {label}
+    </FormLabel>
+    <TextField
+      id={field}
+      value={formValues[field as keyof Inputs]}
+      onChange={(e) => handleChange(field as keyof Inputs, e.target.value)}
+      placeholder={`Ingrese ${label.toLowerCase()}`}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+          "&:hover fieldset": { borderColor: "blue" },
+          "&.Mui-focused fieldset": { borderColor: "blue" }
+        },
+        backgroundColor: "white",
+        borderRadius: "10px"
+      }}
+    />
+  </Box>
+))}
 
-            <Box style={{ margin: '20px 0' }} className="button-is space-x-4">
-                <Button
-                    variant="outlined"
-                    onClick={prevStep}
-                    className="h-e34 text-white rounded-[20px] normal-case"
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
-                >
-                    Regresar
-                </Button>
-                <Button
-                    variant="contained"
-                    type="submit"
-                    className="h-e34 text-white rounded-[20px] normal-case"
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
-                >
-                    Siguiente
-                </Button>
-            </Box>
-        </form>
-    );
+      {/* Selector de Sector */}
+      <FormLabel htmlFor="sectorLocal" sx={{ color: "black" }}>Sector</FormLabel>
+      <TextField
+        id="sectorLocal"
+        select
+        value={formValues.sectorLocal}
+        onChange={(e) => handleChange("sectorLocal", e.target.value)}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": { borderColor: "gray" },
+            "&:hover fieldset": { borderColor: "blue" },
+            "&.Mui-focused fieldset": { borderColor: "blue" }
+          },
+          mb: 2
+        }}
+      >
+        <MenuItem value="" disabled>Seleccione el sector</MenuItem>
+        {zonas.map((zona) => (
+          <MenuItem key={zona.nombre} value={zona.nombre}>
+            {zona.nombre}
+          </MenuItem>
+        ))}
+      </TextField>
+
+      {/* Mapa */}
+      <FormLabel sx={{ color: "black" }}>Mapa de sectorización</FormLabel>
+      <LoadScript googleMapsApiKey={apiKey || ""}>
+        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
+          {zonas.map((zona, index) => (
+            <Polygon
+              key={index}
+              paths={zona.path}
+              options={{
+                fillColor: zona.color,
+                fillOpacity: 0.2,
+                strokeColor: zona.color,
+                strokeOpacity: 0.5,
+                strokeWeight: 2
+              }}
+            />
+          ))}
+        </GoogleMap>
+      </LoadScript>
+
+      {/* Botones */}
+      <Box style={{ margin: "20px 0" }} className="button-is space-x-4">
+        <Button
+          variant="outlined"
+          onClick={prevStep}
+          className="h-e34 text-white rounded-[20px] normal-case"
+          sx={{ backgroundColor: themePalette.primary, width: "171px", height: "50px", fontSize: "18px" }}
+        >
+          Regresar
+        </Button>
+        <Button
+          variant="contained"
+          type="submit"
+          className="h-e34 text-white rounded-[20px] normal-case"
+          sx={{ backgroundColor: themePalette.primary, width: "171px", height: "50px", fontSize: "18px" }}
+        >
+          Siguiente
+        </Button>
+      </Box>
+    </form>
+  );
 };
 
 export default ShippingDetailsForm;
