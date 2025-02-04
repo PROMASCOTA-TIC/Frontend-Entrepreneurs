@@ -204,7 +204,7 @@ export default function RegisterPage() {
               flexDirection: "column",
               backgroundColor: "rgba(70, 218, 105, 0.08)",
               padding: { xs: "10px 20px", md: "5px 30px" },
-              width: { xs: "90%", sm: "80%", lg: "60%" },
+              width: { xs: "90%", sm: "80%", lg: "75%" },
               borderRadius: "20px",
             }}
           >
