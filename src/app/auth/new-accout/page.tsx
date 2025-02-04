@@ -9,7 +9,9 @@ import { BusinessDataForm } from "./registroDatosEmprendimiento";
 import { ShippingDetailsForm } from "./registroEnvios";
 import { RegistroHorarioAtencion } from "./registroHorarios";
 import { CompletionMessage } from "./mensajeRegistro";
-import { UploadImagesForm } from "./subirImagenes";
+import UploadImagesForm from "./subirImagenes";
+
+
 
 type FormDataType = {
   email: string;
