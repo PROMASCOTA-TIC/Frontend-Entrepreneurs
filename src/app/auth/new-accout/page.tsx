@@ -9,6 +9,7 @@ import { BusinessDataForm } from "./registroDatosEmprendimiento";
 import { ShippingDetailsForm } from "./registroEnvios";
 import { RegistroHorarioAtencion } from "./registroHorarios";
 import { CompletionMessage } from "./mensajeRegistro";
+import { UploadImagesForm } from "./subirImagenes";
 
 type FormDataType = {
   email: string;
@@ -39,11 +40,11 @@ type FormDataType = {
   fotosLogotipo?: string[];
 };
 
+const diasDeLaSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
 
 export default function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
-
-  
   const [formData, setFormData] = useState<FormDataType>({
     email: "",
     password: "",
@@ -62,16 +63,32 @@ export default function RegisterPage() {
     calleSecundaria: "",
     numeracion: "",
     referencia: "",
-    sectorLocal: ""
+    sectorLocal: "",
+    horario: diasDeLaSemana.map((dia) => ({ dia, cerrado: "0", horaApertura: "", horaCierre: "" })), // Inicialización de horarios
+    fotosLocal: [],
+    fotosLogotipo: [],
   });
+
 
   const updateFormData = (data: Partial<FormDataType>) => {
     setFormData((prev) => {
-      const updatedData = { ...prev, ...data };
+      let updatedData = { ...prev, ...data };
+
+      if (data.horario) {
+        updatedData.horario = data.horario.map((dia) => ({
+          dia: dia.dia,
+          cerrado: dia.cerrado,
+          ...(dia.cerrado === "0" ? { horaApertura: dia.horaApertura, horaCierre: dia.horaCierre } : {}),
+        }));
+      }
+
       console.log("🔹 Datos actualizados en formData:", updatedData);
-      return updatedData;  // ⚠️ No es necesario retornar el estado en `setFormData`
+      return updatedData;
     });
   };
+
+
+
 
   const nextStep = () => {
     console.log("🔄 Avanzando al siguiente paso...");
@@ -79,6 +96,14 @@ export default function RegisterPage() {
 };
 
   const prevStep = () => setCurrentStep((prev) => prev - 1);
+
+  // Enviar datos al backend
+  // Enviar datos al backend
+  const handleSuccessfulSubmit = () => {
+    console.log("✅ Registro finalizado correctamente.");
+    nextStep();
+  };
+
 
   // Función para renderizar el componente correspondiente según el paso actual
   const renderFormComponent = () => {
@@ -97,11 +122,42 @@ export default function RegisterPage() {
 
       return <ShippingDetailsForm nextStep={nextStep} prevStep={prevStep} updateFormData={updateFormData} formData={formData} />;
       case 4:
-     //   return <RegistroHorarioAtencion nextStep={nextStep} prevStep={prevStep} updateFormData={updateFormData} />;
-      case 5:
-      //  return <CompletionMessage formData={formData} />;
+        return (
+          <RegistroHorarioAtencion
+            nextStep={nextStep}
+            prevStep={prevStep}
+            updateFormData={updateFormData}
+            formData={{
+              horario: formData.horario?.map((h) => ({
+                dia: h.dia,
+                cerrado: h.cerrado ?? "0",  // ✅ Asegurar que siempre tenga un valor
+                horaApertura: h.horaApertura ?? "",
+                horaCierre: h.horaCierre ?? ""
+              })) ?? diasDeLaSemana.map((dia) => ({
+                dia,
+                cerrado: "0",  // ✅ Siempre definir "cerrado" correctamente
+                horaApertura: "",
+                horaCierre: ""
+              }))
+              
+            }}
+          />
+        );
+        
+        case 5:
+          return (
+          <UploadImagesForm
+            formData={formData} // ✅ Pasar todo el formData acumulado
+            updateFormData={updateFormData}
+            onSubmit={handleSuccessfulSubmit} // ✅ Solo avanzar al siguiente paso sin reenviar datos
+            prevStep={prevStep}
+          />
+        );
+      case 6:
+    return <CompletionMessage/>;
       default:
-    //    return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} />;
+        return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} formData={formData} />;
+
     }
   };
 

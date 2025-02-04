@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Checkbox,
   FormControlLabel,
@@ -11,46 +11,67 @@ import {
   Alert,
   Grid2
 } from "@mui/material";
-import { useForm, Controller, FieldValues } from "react-hook-form";
 import { themePalette } from "@/config/theme.config";
-
-interface HorarioDia {
-  apertura: string;
-  cierre: string;
-  cerrado: boolean;
-}
-
-const horarioPorDefecto: HorarioDia = {
-  apertura: "",
-  cierre: "",
-  cerrado: false,
-};
 
 const diasDeLaSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
-export const RegistroHorarioAtencion: React.FC<{ nextStep: () => void; prevStep: () => void }> = ({
+type Horario = {
+  dia: string;
+  horaApertura?: string;
+  horaCierre?: string;
+  cerrado: string; // "1" para cerrado, "0" para abierto
+};
+
+type RegistroHorarioAtencionProps = {
+  nextStep: () => void;
+  prevStep: () => void;
+  updateFormData: (data: { horario: Horario[] }) => void;
+  formData: { horario?: Horario[] }; // ✅ Permitir que `horario` sea opcional
+};
+
+export const RegistroHorarioAtencion: React.FC<RegistroHorarioAtencionProps> = ({
   nextStep,
   prevStep,
+  updateFormData,
+  formData
 }) => {
-  const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<{ [key: string]: HorarioDia }>({
-    defaultValues: diasDeLaSemana.reduce((acc, dia) => {
-      acc[dia] = { ...horarioPorDefecto };
-      return acc;
-    }, {} as { [key: string]: HorarioDia }),
-  });
+  const horario = formData.horario ?? diasDeLaSemana.map((dia) => ({
+    dia,
+    cerrado: "0",
+    horaApertura: "",
+    horaCierre: "",
+  }));
 
-  const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
+  const [errorGeneral, setErrorGeneral] = React.useState<string | null>(null);
 
-  const onSubmit = (data: FieldValues) => {
-    const algunDiaAbierto = diasDeLaSemana.some(
-      (dia) => !data[dia].cerrado && data[dia].apertura && data[dia].cierre
+  // Función para actualizar un día específico
+  const handleChange = (dia: string, campo: keyof Horario, valor: string) => {
+    const updatedHorario = horario.map((h) =>
+      h.dia === dia ? { ...h, [campo]: valor } : h
     );
+    updateFormData({ horario: updatedHorario });
+  };
+
+  // Función para manejar el checkbox de "cerrado"
+  const handleCheckboxChange = (dia: string, checked: boolean) => {
+    const updatedHorario = horario.map((h) =>
+      h.dia === dia
+        ? {
+            ...h,
+            cerrado: checked ? "1" : "0",
+            horaApertura: checked ? "" : h.horaApertura ?? "",
+            horaCierre: checked ? "" : h.horaCierre ?? "",
+          }
+        : h
+    );
+    updateFormData({ horario: updatedHorario });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validar que al menos un día tenga apertura y cierre
+    const algunDiaAbierto = horario.some((h) => h.cerrado === "0" && h.horaApertura && h.horaCierre);
 
     if (!algunDiaAbierto) {
       setErrorGeneral("Debe haber al menos un día con horario de apertura y cierre.");
@@ -58,13 +79,8 @@ export const RegistroHorarioAtencion: React.FC<{ nextStep: () => void; prevStep:
     }
 
     setErrorGeneral(null);
-    console.log(data);
+    console.log("✅ Horarios registrados:", horario);
     nextStep();
-  };
-
-  const handleCancel = () => {
-    reset();
-    prevStep();
   };
 
   return (
@@ -108,70 +124,40 @@ export const RegistroHorarioAtencion: React.FC<{ nextStep: () => void; prevStep:
           </Grid2>
         </Grid2>
 
-        <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
-          {diasDeLaSemana.map((dia) => (
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          {horario.map(({ dia, horaApertura, horaCierre, cerrado }) => (
             <Grid2 container spacing={2} key={dia} alignItems="center" style={{ marginBottom: 16 }}>
               <Grid2 size={{ xs: 12, sm: 4 }}>
                 <Typography variant="h6">{dia}</Typography>
-                <Controller
-                  name={`${dia}.cerrado`}
-                  control={control}
-                  render={({ field }) => (
-                    <FormControlLabel
-                      control={<Checkbox {...field} checked={field.value} />}
-                      label="Cerrado"
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={cerrado === "1"}
+                      onChange={(e) => handleCheckboxChange(dia, e.target.checked)}
+                      color="primary"
                     />
-                  )}
+                  }
+                  label="Cerrado"
                 />
               </Grid2>
-              {!watch(`${dia}.cerrado`) && (
+              {cerrado === "0" && (
                 <>
                   <Grid2 size={{ xs: 12, sm: 4 }}>
-                    <Controller
-                      name={`${dia}.apertura`}
-                      control={control}
-                      rules={{
-                        required: "La hora de apertura es obligatoria",
-                        validate: (value) => value !== "" || "Debes seleccionar una hora de apertura",
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          type="time"
-                          fullWidth
-                          error={!!errors[dia]?.apertura}
-                          helperText={errors[dia]?.apertura?.message}
-                          {...field}
-                        />
-                      )}
+                    <TextField
+                      type="time"
+                      fullWidth
+                      value={horaApertura ?? ""}
+                      onChange={(e) => handleChange(dia, "horaApertura", e.target.value)}
+                      placeholder="Hora de Apertura"
                     />
                   </Grid2>
                   <Grid2 size={{ xs: 12, sm: 4 }}>
-                    <Controller
-                      name={`${dia}.cierre`}
-                      control={control}
-                      rules={{
-                        required: "La hora de cierre es obligatoria",
-                        validate: {
-                          noEmpty: (value) => value !== "" || "Debes seleccionar una hora de cierre",
-                          validCloseTime: (value) => {
-                            const apertura = watch(`${dia}.apertura`);
-                            return (
-                              apertura === "" ||
-                              value > apertura ||
-                              "La hora de cierre debe ser mayor a la hora de apertura"
-                            );
-                          },
-                        },
-                      }}
-                      render={({ field }) => (
-                        <TextField
-                          type="time"
-                          fullWidth
-                          error={!!errors[dia]?.cierre}
-                          helperText={errors[dia]?.cierre?.message}
-                          {...field}
-                        />
-                      )}
+                    <TextField
+                      type="time"
+                      fullWidth
+                      value={horaCierre ?? ""}
+                      onChange={(e) => handleChange(dia, "horaCierre", e.target.value)}
+                      placeholder="Hora de Cierre"
                     />
                   </Grid2>
                 </>
@@ -183,7 +169,7 @@ export const RegistroHorarioAtencion: React.FC<{ nextStep: () => void; prevStep:
             <Grid2>
               <Button
                 variant="contained"
-                onClick={handleCancel}
+                onClick={prevStep}
                 className="h-e34 text-white rounded-[20px] normal-case"
                 sx={{
                   backgroundColor: themePalette.primary,
