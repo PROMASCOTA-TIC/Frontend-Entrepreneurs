@@ -53,12 +53,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   });
 
   const router = useRouter();
-
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(
-    formData.aceptoTerminos === "1"
-  );
+  const [acceptTerms, setAcceptTerms] = useState(formData.aceptoTerminos === "1");
 
   const handleAcceptTermsChange = (checked: boolean) => {
     setAcceptTerms(checked);
@@ -67,154 +64,111 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   const onSubmit = (data: Inputs) => {
-    const { emailConfirm, passwordConfirm, ...filteredData } = data; // ⚡ Excluir emailConfirm y passwordConfirm
+    const { emailConfirm, passwordConfirm, ...filteredData } = data;
     console.log("✅ Datos guardados en formData:", filteredData);
     updateFormData(filteredData);
-    console.log("🔄 Avanzando al siguiente paso...");
     nextStep();
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="form-group">
-      <FormLabel htmlFor="name" sx={{ color: "black" }}>
-        Nombre
-      </FormLabel>
-      <TextField
-        id="name"
-        error={!!errors.name}
-        placeholder="Ingrese su nombre"
-        {...register("name")}
-        sx={{
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: "gray" },
-            "&:hover fieldset": { borderColor: "blue" },
-            "&.Mui-focused fieldset": { borderColor: "blue" },
-          },
-        }}
-      />
-      {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+      {[
+        { field: "name", label: "Nombre" },
+        { field: "email", label: "Correo electrónico" },
+        { field: "emailConfirm", label: "Confirmar correo electrónico" },
+      ].map(({ field, label }) => (
+        <Box key={field} sx={{ display: "flex", flexDirection: "column", mb: 2, width: "100%" }}>
+          <FormLabel htmlFor={field} sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+            {label}
+          </FormLabel>
+          <TextField
+            id={field}
+            error={!!errors[field as keyof Inputs]}
+            placeholder={`Ingrese ${label.toLowerCase()}`}
+            {...register(field as keyof Inputs)}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+                "&:hover fieldset": { borderColor: themePalette.secondary },
+                "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
+              },
+              backgroundColor: "white",
+              borderRadius: "10px",
+            }}
+          />
+          {errors[field as keyof Inputs] && (
+            <p style={{ color: "red", fontSize: "14px", textAlign: "left", marginTop: "5px", width: "100%" }}>
+              {errors[field as keyof Inputs]?.message}
+            </p>
+          )}
+        </Box>
+      ))}
 
-      <FormLabel htmlFor="email" sx={{ color: "black" }}>
-        Correo electrónico
-      </FormLabel>
-      <TextField
-        id="email"
-        error={!!errors.email}
-        placeholder="Ingrese su correo electrónico"
-        {...register("email")}
-        sx={{
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: "gray" },
-            "&:hover fieldset": { borderColor: "blue" },
-            "&.Mui-focused fieldset": { borderColor: "blue" },
-          },
-        }}
-      />
-      {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+      {/* Campos de Contraseña */}
+      {[
+        { field: "password", label: "Contraseña", show: showPassword, setShow: setShowPassword },
+        { field: "passwordConfirm", label: "Confirmar contraseña", show: showPasswordConfirm, setShow: setShowPasswordConfirm },
+      ].map(({ field, label, show, setShow }) => (
+        <Box key={field} sx={{ display: "flex", flexDirection: "column", mb: 2, width: "100%" }}>
+          <FormLabel htmlFor={field} sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+            {label}
+          </FormLabel>
+          <OutlinedInput
+            id={field}
+            type={show ? "text" : "password"}
+            error={!!errors[field as keyof Inputs]}
+            placeholder={`Ingrese ${label.toLowerCase()}`}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShow(!show)}>
+                  {show ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            {...register(field as keyof Inputs)}
+            sx={{
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "10px" },
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: themePalette.secondary },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themePalette.secondary },
+              backgroundColor: "white",
+              borderRadius: "10px",
+            }}
+          />
+          {errors[field as keyof Inputs] && (
+            <p style={{ color: "red", fontSize: "14px", textAlign: "left", marginTop: "5px", width: "100%" }}>
+              {errors[field as keyof Inputs]?.message}
+            </p>
+          )}
+        </Box>
+      ))}
 
-      {/* Solo se usa para validación, pero no se envía */}
-      <FormLabel htmlFor="emailConfirm" sx={{ color: "black" }}>
-        Confirmar correo electrónico
-      </FormLabel>
-      <TextField
-        id="emailConfirm"
-        error={!!errors.emailConfirm}
-        placeholder="Confirme su correo electrónico"
-        {...register("emailConfirm")}
-        sx={{
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": { borderColor: "gray" },
-            "&:hover fieldset": { borderColor: "blue" },
-            "&.Mui-focused fieldset": { borderColor: "blue" },
-          },
-        }}
-      />
-      {errors.emailConfirm && (
-        <p className="text-red-500">{errors.emailConfirm.message}</p>
-      )}
-
-      <FormLabel htmlFor="password" sx={{ color: "black" }}>
-        Contraseña
-      </FormLabel>
-      <OutlinedInput
-        id="password"
-        type={showPassword ? "text" : "password"}
-        error={!!errors.password}
-        placeholder="Ingrese una contraseña mínimo 8 caracteres"
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <VisibilityOff /> : <Visibility />}
-            </IconButton>
-          </InputAdornment>
-        }
-        {...register("password")}
-        sx={{
-          "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray" },
-          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "blue" },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "blue",
-          },
-        }}
-      />
-      {errors.password && (
-        <p className="text-red-500">{errors.password.message}</p>
-      )}
-
-      {/* Solo se usa para validación, pero no se envía */}
-      <FormLabel htmlFor="passwordConfirm" sx={{ color: "black" }}>
-        Confirmar contraseña
-      </FormLabel>
-      <OutlinedInput
-        id="passwordConfirm"
-        type={showPasswordConfirm ? "text" : "password"}
-        error={!!errors.passwordConfirm}
-        placeholder="Ingrese una contraseña mínimo 8 caracteres"
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton
-              onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-            >
-              {showPasswordConfirm ? <VisibilityOff /> : <Visibility />}
-            </IconButton>
-          </InputAdornment>
-        }
-        {...register("passwordConfirm")}
-        sx={{
-          "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray" },
-          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "blue" },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "blue",
-          },
-        }}
-      />
-      {errors.passwordConfirm && (
-        <p className="text-red-500">{errors.passwordConfirm.message}</p>
-      )}
-
+      {/* Checkbox Acepto Términos */}
       <FormControlLabel
         control={
           <Checkbox
             checked={acceptTerms}
             onChange={(e) => handleAcceptTermsChange(e.target.checked)}
-            color="primary"
+            sx={{ color: themePalette.secondary }}
           />
         }
         label="Acepto los términos y condiciones"
         sx={{ color: "black", margin: "10px 0" }}
       />
 
+      {/* Botones */}
       <Box style={{ margin: "20px 0" }} className="button-is space-x-4">
         <Button
-          variant="contained"
-          className="h-e34 text-white rounded-[20px] normal-case"
+          variant="outlined"
+          onClick={() => router.push("/auth/login")}
           sx={{
             backgroundColor: themePalette.primary,
+            textTransform: "none",
+            color: "white",
             width: "171px",
             height: "50px",
             fontSize: "18px",
+            borderRadius: "20px",
           }}
-          onClick={() => router.push("/auth/login")}
         >
           Regresar
         </Button>
@@ -222,12 +176,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           variant="contained"
           type="submit"
           disabled={!acceptTerms}
-          className="h-e34 text-white rounded-[20px] normal-case"
           sx={{
+            textTransform: "none",
             backgroundColor: acceptTerms ? themePalette.primary : "gray",
             width: "171px",
             height: "50px",
             fontSize: "18px",
+            borderRadius: "20px",
           }}
         >
           Siguiente
