@@ -8,10 +8,15 @@ import {
   Box,
   Alert,
   CircularProgress,
+  IconButton,
+  Paper,
 } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import { themePalette } from "@/config/theme.config";
+import { theme } from "@/app/config/theme.config";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -27,7 +32,7 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 type UploadImagesFormProps = {
-  formData: any; // ⚠️ Asegurar que acepta todos los datos del formulario
+  formData: any;
   updateFormData: (data: Partial<any>) => void;
   onSubmit: (finalData: any) => void;
   prevStep: () => void;
@@ -41,12 +46,11 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
 }) => {
   const [localImages, setLocalImages] = useState<File[]>([]);
   const [logoImages, setLogoImages] = useState<File[]>([]);
-  const [localPreview, setLocalPreview] = useState<string[]>([]);
-  const [logoPreview, setLogoPreview] = useState<string[]>([]);
+  const [localPreview, setLocalPreview] = useState<string[]>(Array(4).fill(""));
+  const [logoPreview, setLogoPreview] = useState<string[]>(Array(2).fill(""));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Función para subir imágenes a Firebase Storage
   const uploadImage = async (file: File, folder: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
@@ -64,27 +68,39 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
     });
   };
 
-  // Manejar la selección de archivos
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "local" | "logo") => {
     const files = event.target.files;
     if (!files) return;
 
-    const fileArray = Array.from(files);
+    const fileArray = Array.from(files).slice(0, type === "local" ? 4 : 2);
     const previewArray = fileArray.map((file) => URL.createObjectURL(file));
 
     if (type === "local") {
       setLocalImages(fileArray);
-      setLocalPreview(previewArray);
+      setLocalPreview([...previewArray, ...Array(4 - previewArray.length).fill("")]);
     } else {
       setLogoImages(fileArray);
-      setLogoPreview(previewArray);
+      setLogoPreview([...previewArray, ...Array(2 - previewArray.length).fill("")]);
     }
   };
 
-  // ✅ Función corregida para enviar todos los datos acumulados
+  const handleRemoveImage = (index: number, type: "local" | "logo") => {
+    if (type === "local") {
+      const updatedImages = localImages.filter((_, i) => i !== index);
+      const updatedPreviews = localPreview.map((src, i) => (i === index ? "" : src));
+      setLocalImages(updatedImages);
+      setLocalPreview(updatedPreviews);
+    } else {
+      const updatedImages = logoImages.filter((_, i) => i !== index);
+      const updatedPreviews = logoPreview.map((src, i) => (i === index ? "" : src));
+      setLogoImages(updatedImages);
+      setLogoPreview(updatedPreviews);
+    }
+  };
+
   const handleSubmit = async () => {
     if (localImages.length !== 4 || logoImages.length !== 2) {
-      setError("Debe subir exactamente 4 imágenes del local y 2 del logotipo.");
+      setError("Debe subir 4 imágenes del local y 2 del logotipo.");
       return;
     }
 
@@ -92,36 +108,23 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
       setLoading(true);
       setError(null);
 
-      // Subir imágenes del local
       const uploadedLocalImages = await Promise.all(
         localImages.map((file) => uploadImage(file, "locales"))
       );
 
-      // Subir logotipos
       const uploadedLogoImages = await Promise.all(
         logoImages.map((file) => uploadImage(file, "logotipos"))
       );
 
-      console.log("✅ Imágenes subidas correctamente");
-      console.log("📌 URLs Local:", uploadedLocalImages);
-      console.log("📌 URLs Logotipo:", uploadedLogoImages);
-
-      // 🔹 Actualizar formData con TODA la información antes de enviarla
       const updatedFormData = {
-        ...formData, // ✅ Mantener todos los datos previos del formulario
+        ...formData,
         fotosLocal: uploadedLocalImages,
         fotosLogotipo: uploadedLogoImages,
       };
 
-      // 🔍 Verificar en consola si los datos están completos antes de enviarlos
-      console.log("📤 Enviando datos al backend:", JSON.stringify(updatedFormData, null, 2));
-
-      // Enviar los datos completos al backend
       const response = await fetch("http://localhost:3001/api/auth/register-entrepreneur", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedFormData),
       });
 
@@ -130,10 +133,8 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
       }
 
       const data = await response.json();
-      console.log("✅ Registro exitoso en backend:", data);
       onSubmit(data);
     } catch (error) {
-      console.error("❌ Error al enviar los datos al backend:", error);
       setError("Hubo un problema al registrar el emprendimiento.");
     } finally {
       setLoading(false);
@@ -142,71 +143,107 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
 
   return (
     <Box sx={{ width: "100%", padding: 3, textAlign: "center" }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        📸 Subir imágenes del negocio
-      </Typography>
+      <Paper elevation={3} sx={{ padding: 3, borderRadius: 3 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Las fotografias deben ser de su propia autoría
+        </Typography>
 
-      {error && <Alert severity="error">{error}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
 
-      <Grid container spacing={2} justifyContent="center">
-        {/* Imágenes del local */}
-        <Grid item xs={12} sm={6}>
-          <Typography>🏢 Imágenes del Local (4)</Typography>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, "local")}
-            style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "4px" }}
-          />
-          <Grid container spacing={1} sx={{ mt: 1 }}>
-            {localPreview.map((src, index) => (
-              <Grid item xs={3} key={index}>
-                <img src={src} alt={`Local ${index + 1}`} style={{ width: "100%", borderRadius: "5px" }} />
-              </Grid>
-            ))}
-          </Grid>
-        </Grid>
+        {[{ type: "local", title: "Fotografías del local" }, { type: "logo", title: "Imágenes del Logotipo" }].map(({ type, title }) => (
+          <Box key={type} sx={{ mb: 4 }}>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              {title}
+            </Typography>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+              sx={{
+                 textTransform: "none",
+                              height: "50px",
+                              borderRadius: "20px",
+                              fontSize: "18px",
+                              marginTop: "10px",
+                              background: theme.palette.primary.main,
+                              color: "white",
+                width: "50%", mb: 2 }}
+            >
+              Seleccionar Archivos
+              <input type="file" multiple accept="image/*" hidden onChange={(e) => handleFileChange(e, type as "local" | "logo")} />
+            </Button>
+            <Grid container spacing={2} direction="column" alignItems="center">
+              {(type === "local" ? localPreview : logoPreview).map((src, index) => (
+                <Grid item xs={12} key={index} sx={{ position: "relative" }}>
+                  <Box
+                    sx={{
+                      width: "200px",
+                      height: "120px",
+                      backgroundColor: src ? "transparent" : "#ddd",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      backgroundImage: src ? `url(${src})` : "none",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  >
+                    {!src && index + 1}
+                    {src && (
+                      <IconButton
+                        aria-label="delete"
+                        onClick={() => handleRemoveImage(index, type as "local" | "logo")}
+                        sx={{
+                          position: "absolute",
+                          top: "5px",
+                          right: "5px",
+                          backgroundColor: "rgba(255, 0, 0, 0.8)",
+                          color: "white",
+                          "&:hover": { backgroundColor: "red" },
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        ))}
 
-        {/* Imágenes del logotipo */}
-        <Grid item xs={12} sm={6}>
-          <Typography>📌 Imágenes del Logotipo (2)</Typography>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, "logo")}
-            style={{ width: "100%", padding: "10px", border: "1px solid #ccc", borderRadius: "4px" }}
-          />
-          <Grid container spacing={1} sx={{ mt: 1 }}>
-            {logoPreview.map((src, index) => (
-              <Grid item xs={6} key={index}>
-                <img src={src} alt={`Logo ${index + 1}`} style={{ width: "100%", borderRadius: "5px" }} />
-              </Grid>
-            ))}
-          </Grid>
-        </Grid>
-      </Grid>
-
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: themePalette.primary }}
-          onClick={prevStep}
-          disabled={loading}
-        >
-          Regresar
-        </Button>
-
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: themePalette.primary }}
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Guardar y Enviar"}
-        </Button>
-      </Box>
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+          <Button variant="contained"
+          sx={{ 
+                                                        backgroundColor: themePalette.primary, 
+                                                        textTransform: "none",
+                                                        color: "white",
+                                                        width: "171px", 
+                                                        height: "50px", 
+                                                        fontSize: "18px",
+                                                        borderRadius: "20px"
+                                                      }}
+           onClick={prevStep} disabled={loading}>
+            Regresar
+          </Button>
+          <Button variant="contained"
+             sx={{ 
+                                                           backgroundColor: themePalette.primary, 
+                                                           textTransform: "none",
+                                                           color: "white",
+                                                           width: "171px", 
+                                                           height: "50px", 
+                                                           fontSize: "18px",
+                                                           borderRadius: "20px"
+                                                         }}
+            onClick={handleSubmit} disabled={loading}>
+            {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Finalizar"}
+          </Button>
+        </Box>
+      </Paper>
     </Box>
   );
 };

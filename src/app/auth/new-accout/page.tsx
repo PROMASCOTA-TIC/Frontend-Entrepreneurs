@@ -9,7 +9,7 @@ import { BusinessDataForm } from "./registroDatosEmprendimiento";
 import { ShippingDetailsForm } from "./registroEnvios";
 import { RegistroHorarioAtencion } from "./registroHorarios";
 import { CompletionMessage } from "./mensajeRegistro";
-import UploadImagesForm from "./subirImagenes";
+import { UploadImagesForm } from "./subirImagenes";
 
 
 
@@ -111,7 +111,7 @@ export default function RegisterPage() {
   const renderFormComponent = () => {
     switch (currentStep) {
       case 1:
-        return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} formData={formData} />;
+    return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} formData={formData} />;
       case 2:
         case 2:
           return <BusinessDataForm 
@@ -147,6 +147,7 @@ export default function RegisterPage() {
         );
         
         case 5:
+          
           return (
           <UploadImagesForm
             formData={formData} // ✅ Pasar todo el formData acumulado
@@ -226,6 +227,8 @@ export default function RegisterPage() {
                 ? "Envíos y entregas"
                 : currentStep === 4
                 ? "Horario de atención"
+                : currentStep === 5
+                ? "Subir imágenes"
                 : "Registro completado"}
             </Typography>
             
