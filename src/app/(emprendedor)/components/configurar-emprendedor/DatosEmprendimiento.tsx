@@ -190,9 +190,6 @@ export const CambioDatosEmprendimiento: React.FC = () => {
 </FormControl>
 
 
-
-
-          {/* Número Celular */}
           <FormControl fullWidth sx={{ mb: 2 }}>
   <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
     Número celular

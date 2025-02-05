@@ -111,7 +111,7 @@ export const RegisterFormCambiar: React.FC = () => {
       setSuccessMessage("Los cambios se han actualizado correctamente.");
 
     } catch (error: any) {
-      console.error("❌ Error en la actualización:", error);
+      console.error("Error en la actualización:", error);
       setErrorMessage(
         error.response?.data?.message || "Hubo un problema al actualizar la información."
       );
