@@ -1,232 +1,267 @@
 "use client";
-import React, { useEffect } from 'react';
-import { Box, Button, Typography, IconButton, Card, CardMedia, CardContent } from '@mui/material';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useForm, Controller } from 'react-hook-form';
-import { useRouter } from 'next/navigation'; 
-import '@/assets/styles/emprendedores/general.css';
-import { themePalette } from '@/config/theme.config';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Typography,
+  IconButton,
+  CardMedia,
+  Card,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import "@/assets/styles/emprendedores/general.css";
+import { themePalette } from "@/config/theme.config";
+import { initializeApp } from "firebase/app";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { theme } from "@/app/config/theme.config";
 
-interface FormData {
-  localPhotos: File[];
-  logoPhotos: File[];
-}
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
+const API_GET = "http://localhost:3001/api/users/entrepreneurs";
+const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
+const idEntrepreneur = "7878e58e-ef64-4e7a-929f-253023dcbb85";
 
 const AgregarFotosEmpren: React.FC = () => {
-  const { handleSubmit, control, setValue, watch } = useForm<FormData>({
-    defaultValues: {
-      localPhotos: [],
-      logoPhotos: [],
-    },
-  });
+  const { handleSubmit, setValue, watch } = useForm();
+  const router = useRouter();
+  
+  const localPhotos = watch("localPhotos") || [];
+  const logoPhotos = watch("logoPhotos") || [];
 
-  const router = useRouter(); 
+  const [previewLocalPhotos, setPreviewLocalPhotos] = useState<string[]>([]);
+  const [previewLogoPhotos, setPreviewLogoPhotos] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const localPhotos = watch('localPhotos');
-  const logoPhotos = watch('logoPhotos');
 
   useEffect(() => {
-    const head = document.querySelector('head');
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/assets/styles/emprendedores/general.css';
-    head?.appendChild(link);
 
-    return () => {
-      head?.removeChild(link);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${API_GET}/${idEntrepreneur}`);
+        if (!response.ok) throw new Error("Error al obtener datos");
+
+        const data = await response.json();
+
+        if (data.fotosLocal) setPreviewLocalPhotos(data.fotosLocal.split(", "));
+        if (data.fotosLogotipo) setPreviewLogoPhotos(data.fotosLogotipo.split(", "));
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+      }
     };
+
+    fetchData();
   }, []);
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const uploadImagesToFirebase = async (files: File[], folder: string) => {
+    const urls: string[] = [];
+    for (const file of files) {
+      const storageRef = ref(
+        storage,
+        `${folder}/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`
+      );
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      urls.push(downloadURL);
+    }
+    return urls;
   };
 
-  const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files).slice(0, 4);
-      setValue('localPhotos', fileArray);
-    }
+  const handleLocalUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files ? Array.from(event.target.files).slice(0, 4) : [];
+    setValue("localPhotos", files);
+    setPreviewLocalPhotos(files.map((file) => URL.createObjectURL(file)));
   };
 
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files).slice(0, 2);
-      setValue('logoPhotos', fileArray);
-    }
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files ? Array.from(event.target.files).slice(0, 2) : [];
+    setValue("logoPhotos", files);
+    setPreviewLogoPhotos(files.map((file) => URL.createObjectURL(file)));
   };
 
   const handleRemoveLocalPhoto = (index: number) => {
-    setValue(
-      'localPhotos',
-      localPhotos.filter((_, i) => i !== index)
-    );
+    setPreviewLocalPhotos(previewLocalPhotos.filter((_: string, i: number) => i !== index));
+    setValue("localPhotos", localPhotos.filter((_: File, i: number) => i !== index));
   };
-
+  
   const handleRemoveLogoPhoto = (index: number) => {
-    setValue(
-      'logoPhotos',
-      logoPhotos.filter((_, i) => i !== index)
-    );
+    setPreviewLogoPhotos(previewLogoPhotos.filter((_: string, i: number) => i !== index));
+    setValue("logoPhotos", logoPhotos.filter((_: File, i: number) => i !== index));
   };
+  
 
-  const renderEmptySlots = (maxSlots: number, items: File[]) => {
-    const emptySlots = maxSlots - items.length;
-    const placeholders = Array(emptySlots).fill(null);
+  const onSubmit = async () => {
+    setSuccessMessage(null);
 
-    return placeholders.map((_, index) => (
-      <Box
-        key={index}
-        sx={{
-          width: 200,
-          height: 200,
-          border: '2px dashed #ccc',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#ccc',
-        }}
-      >
-        <Typography variant="body2">Ingresar imagen</Typography>
-      </Box>
-    ));
+    if (previewLocalPhotos.length < 4) {
+      setErrorMessage("Debes 4 imágenes para Fotos de tu local");
+      return;
+    }
+    if (previewLogoPhotos.length < 2) {
+      setErrorMessage("Debes  2 imágenes para Logotipo");
+      return;
+    }
+  
+    setLoading(true);
+    setErrorMessage(null);
+  
+    try {
+      let uploadedLocalUrls = previewLocalPhotos;
+      let uploadedLogoUrls = previewLogoPhotos;
+  
+      if (localPhotos.length > 0) {
+        uploadedLocalUrls = await uploadImagesToFirebase(localPhotos, "locales");
+      }
+      if (logoPhotos.length > 0) {
+        uploadedLogoUrls = await uploadImagesToFirebase(logoPhotos, "logotipos");
+      }
+  
+      const body = {
+        fotosLocal: uploadedLocalUrls,
+        fotosLogotipo: uploadedLogoUrls,
+      };
+  
+      await fetch(`${API_PATCH}/${idEntrepreneur}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+     setSuccessMessage("Fotos actualizadas correctamente");
+      console.log("Datos de imágenes actualizados correctamente.");
+    } catch (error) {
+      console.error(" Error al actualizar las imágenes:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Box
-        sx={{
-          p: 4,
-          borderRadius: '8px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography sx={{ color: themePalette.primary, fontSize: '36px', fontWeight: 'bold' }}>
+      <Box sx={{ p: 4, borderRadius: "8px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Typography sx={{ color: themePalette.primary, fontSize: "36px", fontWeight: "bold" }}>
           Agregar fotografías del emprendimiento
         </Typography>
+      {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
-        {/* Contenedor para fotos del local */}
-        <Box
-          sx={{
-            mt: 4,
-            p: 3,
-            borderRadius: '8px',
-            width: '100%',
-            textAlign: 'center',
-            background: themePalette.black10,
-          }}
+<Box sx={{ mt: 4, p: 3, width: "100%", background: themePalette.black10, borderRadius: "8px", textAlign: "center" }}>
+  <Typography sx={{ color: themePalette.primary, fontSize: "18px", fontWeight: "600" }}>Fotos de tu local</Typography>
+  <input accept=".jpg,.png" type="file" multiple onChange={handleLocalUpload} style={{ display: "none" }} id="local-upload" />
+  <label htmlFor="local-upload">
+    <Button variant="contained" component="span" startIcon={<FileUploadIcon />}
+    sx={{
+      textTransform: "none",
+                   height: "50px",
+                   borderRadius: "20px",
+                   fontSize: "18px",
+                   marginTop: "10px",
+                   background: theme.palette.primary.main,
+                   color: "white",
+     width: "20%", mb: 2 }}
+    >Seleccionar Imágenes</Button>
+  </label>
+  <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center" mt={2}>
+    {previewLocalPhotos.map((src, index) => (
+      <Card key={index} sx={{ width: 180, height: 180, position: "relative" }}>
+        <CardMedia component="img" sx={{ width: "100%", height: "100%", objectFit: "cover" }} image={src} alt={`Local ${index}`} />
+        
+        <IconButton 
+          onClick={() => handleRemoveLocalPhoto(index)} 
+          sx={{ position: "absolute", top: 5, right: 5, background: "rgba(255,0,0,0.8)", color: "white", '&:hover': { background: "red" } }}
         >
-          <Typography sx={{ color: themePalette.primary, fontSize: '18px', fontWeight: '600' }}>
-            Fotos de tu local
-          </Typography>
-          <input
-            accept=".jpg,.png"
-            type="file"
-            multiple
-            onChange={handleLocalUpload}
-            style={{ display: 'none' }}
-            id="local-upload"
-          />
-          <label htmlFor="local-upload">
-            <Button
-              variant="contained"
-              component="span"
-              sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', mt: 2 }}
-              startIcon={<FileUploadIcon />}
-            >
-              Seleccionar Imagenes
-            </Button>
-          </label>
-          <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
-            {localPhotos.map((file, index) => (
-              <Box key={index} sx={{ width: 200 }}>
-                <Card>
-                  <CardMedia component="img" height="140" image={URL.createObjectURL(file)} alt={file.name} />
-                  <CardContent>
-                    <Typography variant="body2" color="textSecondary">
-                      {file.name}
-                    </Typography>
-                    <IconButton aria-label="delete" onClick={() => handleRemoveLocalPhoto(index)} color="secondary" size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </CardContent>
-                </Card>
-              </Box>
-            ))}
-            {renderEmptySlots(4, localPhotos)}
-          </Box>
-        </Box>
+          <DeleteIcon />
+        </IconButton>
 
-        {/* Contenedor para fotos del logotipo */}
-        <Box
-          sx={{
-            mt: 4,
-            p: 3,
-            borderRadius: '8px',
-            width: '100%',
-            textAlign: 'center',
-            background: themePalette.black10,
-          }}
+      </Card>
+    ))}
+  </Box>
+</Box>
+
+
+
+<Box sx={{ mt: 4, p: 3, width: "100%", background: themePalette.black10, borderRadius: "8px", textAlign: "center" }}>
+  <Typography sx={{ color: themePalette.primary, fontSize: "18px", fontWeight: "600" }}>Logotipo</Typography>
+  <input accept=".jpg,.png" type="file" multiple onChange={handleLogoUpload} style={{ display: "none" }} id="logo-upload" />
+  <label htmlFor="logo-upload">
+    <Button variant="contained" component="span" 
+    startIcon={<FileUploadIcon />}
+     sx={{
+                     textTransform: "none",
+                                  height: "50px",
+                                  borderRadius: "20px",
+                                  fontSize: "18px",
+                                  marginTop: "10px",
+                                  background: theme.palette.primary.main,
+                                  color: "white",
+                    width: "20%", mb: 2 }}
+    >Seleccionar Imágenes</Button>
+  </label>
+  <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center" mt={2}>
+    {previewLogoPhotos.map((src, index) => (
+      <Card key={index} sx={{ width: 180, height: 180, position: "relative" }}>
+        <CardMedia component="img" sx={{ width: "100%", height: "100%", objectFit: "cover" }} image={src} alt={`Logo ${index}`} />
+        
+        <IconButton 
+          onClick={() => handleRemoveLogoPhoto(index)} 
+          sx={{ position: "absolute", top: 5, right: 5, background: "rgba(255,0,0,0.8)", color: "white", '&:hover': { background: "red" } }}
         >
-          <Typography sx={{ color: themePalette.primary, fontSize: '18px', fontWeight: '600' }}>
-            Logotipo
-          </Typography>
-          <input
-            accept=".jpg,.png"
-            type="file"
-            multiple
-            onChange={handleLogoUpload}
-            style={{ display: 'none' }}
-            id="logo-upload"
-          />
-          <label htmlFor="logo-upload">
-            <Button
-              variant="contained"
-              component="span"
-              sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', mt: 2 }}
-              startIcon={<FileUploadIcon />}
-            >
-              Seleccionar Imagenes
-            </Button>
-          </label>
-          <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
-            {logoPhotos.map((file, index) => (
-              <Box key={index} sx={{ width: 200 }}>
-                <Card>
-                  <CardMedia component="img" height="140" image={URL.createObjectURL(file)} alt={file.name} />
-                  <CardContent>
-                    <Typography variant="body2" color="textSecondary">
-                      {file.name}
-                    </Typography>
-                    <IconButton aria-label="delete" onClick={() => handleRemoveLogoPhoto(index)} color="secondary" size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </CardContent>
-                </Card>
-              </Box>
-            ))}
-            {renderEmptySlots(2, logoPhotos)}
-          </Box>
-        </Box>
+          <DeleteIcon />
+        </IconButton>
 
-        {/* Botones de Guardar y Cancelar */}
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Button type="submit" variant="contained" sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', width: '150px', height: '34px', fontSize: '18px' }}>
-            Guardar
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => router.push('/inicio')} 
-            sx={{ background: themePalette.primary, color: themePalette.cwhite, textTransform: 'none', width: '150px', height: '34px', fontSize: '18px' }}
-          >
-            Cancelar
-          </Button>
+      </Card>
+    ))}
+  </Box>
+</Box>
+
+{errorMessage && (
+  <Typography sx={{ color: "red", fontSize: "16px", mt: 2 }}>
+    {errorMessage}
+  </Typography>
+)}
+
+            <Box  sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 3 }}>
+            <Button 
+            sx={{ 
+                                                                    backgroundColor: themePalette.primary, 
+                                                                    textTransform: "none",
+                                                                    color: "white",
+                                                                    width: "171px", 
+                                                                    height: "50px", 
+                                                                    fontSize: "18px",
+                                                                    borderRadius: "20px"
+                                                                  }}
+            variant="contained" onClick={() => router.push("/inicio")}>Cancelar</Button>
+         <Button type="submit" variant="contained" disabled={loading}
+         sx={{ 
+                                                                 backgroundColor: themePalette.primary, 
+                                                                 textTransform: "none",
+                                                                 color: "white",
+                                                                 width: "171px", 
+                                                                 height: "50px", 
+                                                                 fontSize: "18px",
+                                                                 borderRadius: "20px"
+                                                               }}
+         >{loading ? <CircularProgress size={24} /> : "Guardar"}</Button>
         </Box>
       </Box>
     </form>

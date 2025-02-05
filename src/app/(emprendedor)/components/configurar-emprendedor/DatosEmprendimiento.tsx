@@ -52,7 +52,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Obtener datos actuales del emprendimiento
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,7 +65,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
         setValue("ruc", data.ruc);
         setValue("numeroCelular", data.numeroCelular);
         setValue("bancoNombre", data.bancoNombre);
-        setValue("bancoTipoCuenta", data.bancoTipoCuenta || "Ahorros"); // Asegurar que tenga un valor
+        setValue("bancoTipoCuenta", data.bancoTipoCuenta || "Ahorros"); 
         setValue("bancoNumeroCuenta", data.bancoNumeroCuenta);
         setValue("bancoNombreDuenoCuenta", data.bancoNombreDuenoCuenta);
       } catch (error) {
@@ -77,7 +77,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     fetchData();
   }, [setValue]);
 
-  // Enviar los datos al backend
+
   const onSubmit = async (data: Inputs) => {
     setLoading(true);
     setErrorMsg(null);
@@ -154,7 +154,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
   <TextField
     id="ruc"
     error={!!errors.ruc}
-    helperText={errors.ruc?.message} // 🔹 Muestra el mensaje de error
+    helperText={errors.ruc?.message} 
     placeholder="Ingrese el RUC o RIMPE"
     {...register("ruc", { 
       required: "El RUC es obligatorio", 
@@ -162,12 +162,12 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     })}
     type="text"
     inputProps={{
-      maxLength: 13, // 🔹 Restringe la cantidad máxima de caracteres permitidos
-      inputMode: "numeric", // 🔹 Asegura que en móviles aparezca el teclado numérico
+      maxLength: 13, 
+      inputMode: "numeric",
     }}
     onInput={(e) => {
       const target = e.target as HTMLInputElement;
-      target.value = target.value.replace(/\D/g, "").slice(0, 13); // 🔹 Permite solo números y recorta a 13 caracteres
+      target.value = target.value.replace(/\D/g, "").slice(0, 13); 
     }}
     slotProps={{
       input: {
@@ -180,10 +180,10 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     }}
     sx={{
       "& .MuiOutlinedInput-root": { 
-        borderRadius: "8px", // Bordes redondeados
-        "& fieldset": { borderColor: "gray" }, // Color del borde normal
-        "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+        borderRadius: "8px", 
+        "& fieldset": { borderColor: "gray" }, 
+        "&:hover fieldset": { borderColor: themePalette.secondary }, 
+        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, 
       }
     }}
   />
@@ -197,7 +197,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
   <TextField
     id="numeroCelular"
     error={!!errors.numeroCelular}
-    helperText={errors.numeroCelular?.message} // 🔹 Muestra el mensaje de error si existe
+    helperText={errors.numeroCelular?.message} 
     placeholder="Ingrese el número celular"
     {...register("numeroCelular", { 
       required: "El número de celular es obligatorio", 
@@ -205,12 +205,12 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     })}
     type="text"
     inputProps={{
-      maxLength: 10, // 🔹 Máximo de 10 caracteres
-      inputMode: "numeric", // 🔹 Asegura el teclado numérico en móviles
+      maxLength: 10, 
+      inputMode: "numeric", 
     }}
     onInput={(e) => {
       const target = e.target as HTMLInputElement;
-      target.value = target.value.replace(/\D/g, "").slice(0, 10); // 🔹 Solo números y recorta a 10 caracteres
+      target.value = target.value.replace(/\D/g, "").slice(0, 10);
     }}
     slotProps={{
       input: {
@@ -223,10 +223,10 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     }}
     sx={{
       "& .MuiOutlinedInput-root": { 
-        borderRadius: "8px", // Bordes redondeados
-        "& fieldset": { borderColor: "gray" }, // Color del borde normal
-        "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+        borderRadius: "8px",
+        "& fieldset": { borderColor: "gray" }, 
+        "&:hover fieldset": { borderColor: themePalette.secondary }, 
+        "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
       }
     }}
   />
@@ -243,11 +243,11 @@ export const CambioDatosEmprendimiento: React.FC = () => {
               {...register("bancoNombre", { required: "Campo obligatorio" })}
               value={watch("bancoNombre") || ""}
               sx={{
-                "& .MuiOutlinedInput-root": { // Aplica estilos al contenedor principal
-                  borderRadius: "8px", // Bordes redondeados
-                  "& fieldset": { borderColor: "gray" }, // Color del borde normal
-                  "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-                  "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+                "& .MuiOutlinedInput-root": { 
+                  borderRadius: "8px", 
+                  "& fieldset": { borderColor: "gray" }, 
+                  "&:hover fieldset": { borderColor: themePalette.secondary }, 
+                  "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, 
                 }
               }}
             >
@@ -287,20 +287,19 @@ export const CambioDatosEmprendimiento: React.FC = () => {
   <TextField
     id="bancoNumeroCuenta"
     error={!!errors.bancoNumeroCuenta}
-    helperText={errors.bancoNumeroCuenta?.message} // 🔹 Muestra el mensaje de error si existe
-    placeholder="Ingrese el número de cuenta"
+    helperText={errors.bancoNumeroCuenta?.message}
     {...register("bancoNumeroCuenta", { 
       required: "El número de cuenta es obligatorio", 
       pattern: { value: /^\d{10,15}$/, message: "Debe tener entre 10 y 15 dígitos numéricos" }
     })}
     type="text"
     inputProps={{
-      maxLength: 15, // 🔹 Máximo de 15 caracteres
-      inputMode: "numeric", // 🔹 Asegura el teclado numérico en móviles
+      maxLength: 15, 
+      inputMode: "numeric", 
     }}
     onInput={(e) => {
       const target = e.target as HTMLInputElement;
-      target.value = target.value.replace(/\D/g, "").slice(0, 15); // 🔹 Solo números y recorta a 15 caracteres
+      target.value = target.value.replace(/\D/g, "").slice(0, 15); 
     }}
     slotProps={{
       input: {
@@ -313,10 +312,10 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     }}
     sx={{
       "& .MuiOutlinedInput-root": { 
-        borderRadius: "8px", // Bordes redondeados
-        "& fieldset": { borderColor: "gray" }, // Color del borde normal
-        "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+        borderRadius: "8px", 
+        "& fieldset": { borderColor: "gray" }, 
+        "&:hover fieldset": { borderColor: themePalette.secondary },
+        "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
       }
     }}
   />
@@ -331,7 +330,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
   <TextField
     id="bancoNombreDuenoCuenta"
     error={!!errors.bancoNombreDuenoCuenta}
-    helperText={errors.bancoNombreDuenoCuenta?.message} // 🔹 Muestra el mensaje de error si existe
+    helperText={errors.bancoNombreDuenoCuenta?.message} 
     placeholder="Ingrese el nombre del propietario"
     {...register("bancoNombreDuenoCuenta", { 
       required: "Campo obligatorio", 
@@ -339,11 +338,11 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     })}
     type="text"
     inputProps={{
-      maxLength: 50, // 🔹 Evita que ingresen más de 50 caracteres
+      maxLength: 50, 
     }}
     onInput={(e) => {
       const target = e.target as HTMLInputElement;
-      target.value = target.value.replace(/[^A-Za-z\s]/g, ""); // 🔹 Solo permite letras y espacios
+      target.value = target.value.replace(/[^A-Za-z\s]/g, "");
     }}
     InputProps={{
       endAdornment: (
@@ -354,10 +353,10 @@ export const CambioDatosEmprendimiento: React.FC = () => {
     }}
     sx={{
       "& .MuiOutlinedInput-root": { 
-        borderRadius: "8px", // Bordes redondeados
-        "& fieldset": { borderColor: "gray" }, // Color del borde normal
-        "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+        borderRadius: "8px", 
+        "& fieldset": { borderColor: "gray" }, 
+        "&:hover fieldset": { borderColor: themePalette.secondary }, 
+        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, 
       }
     }}
   />

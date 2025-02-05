@@ -18,17 +18,16 @@ import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { themePalette } from "@/config/theme.config";
 
-// 📌 API
 const API_GET = "http://localhost:3001/api/users/entrepreneurs";
 const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
 const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d";
 
-// 📌 Definir estructura del horario
+
 type Horario = {
   dia: string;
   horaApertura?: string;
   horaCierre?: string;
-  cerrado: string; // "1" para cerrado, "0" para abierto
+  cerrado: string;
 };
 
 const diasDeLaSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
@@ -57,7 +56,7 @@ const CambiarHoraAtencion: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  // 📌 Cargar horarios desde el backend
+
   useEffect(() => {
     const fetchHorarios = async () => {
       try {
@@ -87,7 +86,7 @@ const CambiarHoraAtencion: React.FC = () => {
     fetchHorarios();
   }, []);
 
-  // 📌 Sincronizar checkboxes automáticamente al cargar datos
+
   useEffect(() => {
     const horarios = getValues("horario") || [];
     horarios.forEach((horario, index) => {
@@ -97,7 +96,6 @@ const CambiarHoraAtencion: React.FC = () => {
     });
   }, [watch("horario")]);
 
-  // 📌 Enviar datos al backend
   const onSubmit = async (data: { horario: Horario[] }) => {
     setLoading(true);
     setErrorMsg(null);
@@ -111,7 +109,7 @@ const CambiarHoraAtencion: React.FC = () => {
 
       if (!response.ok) throw new Error("Error al actualizar los horarios");
 
-      console.log("✅ Horarios actualizados correctamente");
+      console.log("Horarios actualizados correctamente");
       setSuccessMessage("Los cambios se han actualizado correctamente.");
 
     } catch (error) {

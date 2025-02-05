@@ -35,12 +35,11 @@ type Inputs = {
 
 export const RegisterFormCambiar: React.FC = () => {
   const router = useRouter();
-  const entrepreneurId = "252cdb28-808e-4fb9-8297-4124ced58d1d"; // Se debe obtener dinámicamente si es necesario
-
+  const entrepreneurId = "252cdb28-808e-4fb9-8297-4124ced58d1d"; 
   const {
     register,
     handleSubmit,
-    setValue, // ✅ Para establecer valores iniciales
+    setValue, 
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(registerSchema),
@@ -63,13 +62,12 @@ export const RegisterFormCambiar: React.FC = () => {
 
         const { name, email } = response.data;
 
-        // ✅ Establecer valores iniciales en los campos del formulario
         setValue("name", name);
         setValue("email", email);
-        setValue("emailConfirm", email); // Se usa el mismo valor para confirmar
+        setValue("emailConfirm", email); 
 
       } catch (error) {
-        console.error("❌ Error al cargar los datos del usuario:", error);
+        console.error("Error al cargar los datos del usuario:", error);
         setErrorMessage("Error al cargar la información del usuario.");
       }
     };
@@ -84,13 +82,13 @@ export const RegisterFormCambiar: React.FC = () => {
   const onSubmit = async (data: Inputs) => {
     setLoading(true);
     setErrorMessage(null);
-    setSuccessMessage(null); // Limpiar mensajes previos
+    setSuccessMessage(null);
 
     let filteredData = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => value !== undefined && value !== "")
     );
 
-    // 🔹 Eliminar emailConfirm y passwordConfirm (Solo se usan para validación en frontend)
+
     delete filteredData.emailConfirm;
     delete filteredData.passwordConfirm;
 

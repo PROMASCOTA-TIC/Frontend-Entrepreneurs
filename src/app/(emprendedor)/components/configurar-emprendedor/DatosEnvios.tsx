@@ -19,7 +19,7 @@ import { GoogleMap, Polygon, useJsApiLoader } from "@react-google-maps/api";
 import { useRouter } from "next/navigation";
 import EditIcon from "@mui/icons-material/Edit";
 
-// 📌 API
+
 const API_GET = "http://localhost:3001/api/users/entrepreneurs";
 const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
 const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d";
