@@ -1,164 +1,257 @@
- "use client";
+"use client";
 
-import React, { useState } from 'react';
-import IconButton from '@mui/material/IconButton';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputAdornment from '@mui/material/InputAdornment';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import EditIcon from '@mui/icons-material/Edit';
-import { Box, Button, FormControl, FormLabel, Typography } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema } from '@/validations/registerSchema';
-import { useRouter } from 'next/navigation';
-import '@/app/auth/new-accout/Login.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import IconButton from "@mui/material/IconButton";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputAdornment from "@mui/material/InputAdornment";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import EditIcon from "@mui/icons-material/Edit";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Typography,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "@/validations/registerSchema";
+import { useRouter } from "next/navigation";
+import "@/app/auth/new-accout/Login.css";
 import "./Login.css";
-import { themePalette } from '@/config/theme.config';
+import { themePalette } from "@/config/theme.config";
 
 type Inputs = {
-    name: string;
-    email: string;
-    emailConfirm: string;
-    password: string;
-    passwordConfirm: string;
+  name?: string;
+  email?: string;
+  emailConfirm?: string;
+  password?: string;
+  passwordConfirm?: string;
 };
 
 export const RegisterFormCambiar: React.FC = () => {
-    const router = useRouter(); 
-    const { register, handleSubmit, formState: { errors } } = useForm<Inputs>({
-        resolver: zodResolver(registerSchema),
-        mode: 'onChange',
-    });
+  const router = useRouter();
+  const entrepreneurId = "252cdb28-808e-4fb9-8297-4124ced58d1d"; // Se debe obtener dinámicamente si es necesario
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setValue, // ✅ Para establecer valores iniciales
+    formState: { errors },
+  } = useForm<Inputs>({
+    resolver: zodResolver(registerSchema),
+    mode: "onChange",
+  });
 
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
-    const handleClickShowPasswordConfirm = () => setShowPasswordConfirm((show) => !show);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const onSubmit = (data: Inputs) => {
-        console.log(data);
+  useEffect(() => {
+    // 🔹 Cargar datos del usuario desde la API
+    const fetchEntrepreneurData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3001/api/users/entrepreneurs/${entrepreneurId}`
+        );
+
+        const { name, email } = response.data;
+
+        // ✅ Establecer valores iniciales en los campos del formulario
+        setValue("name", name);
+        setValue("email", email);
+        setValue("emailConfirm", email); // Se usa el mismo valor para confirmar
+
+      } catch (error) {
+        console.error("❌ Error al cargar los datos del usuario:", error);
+        setErrorMessage("Error al cargar la información del usuario.");
+      }
     };
 
-    return (
-        <Box sx={{ maxWidth: 400, mx: 'auto', mt: 5, textAlign: 'center' }}>
-            <Typography gutterBottom sx={{ fontWeight: 'bold', color: themePalette.primary, fontSize:'24px' }}>
-                Editar información del propietario
-            </Typography>
-            
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <FormLabel sx={{ color: 'black', fontWeight: 'bold', textAlign: 'left' }}>Nombre</FormLabel>
-                <OutlinedInput
-                    placeholder="Ingrese su nombre y apellido"
-                    {...register('name')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton edge="end">
-                                <EditIcon />
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    sx={{
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray', borderRadius: '8px' },
-                    }}
-                />
-                {errors.name && <Typography color="error" sx={{ textAlign: 'left' }}>{errors.name.message}</Typography>}
-            </FormControl>
+    fetchEntrepreneurData();
+  }, [entrepreneurId, setValue]);
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <FormLabel sx={{ color: 'black', fontWeight: 'bold', textAlign: 'left' }}>Correo electrónico</FormLabel>
-                <OutlinedInput
-                    placeholder="Ingrese su correo electrónico"
-                    {...register('email')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton edge="end">
-                                <EditIcon />
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    sx={{
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray', borderRadius: '8px' },
-                    }}
-                />
-                {errors.email && <Typography color="error" sx={{ textAlign: 'left' }}>{errors.email.message}</Typography>}
-            </FormControl>
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPasswordConfirm = () =>
+    setShowPasswordConfirm((show) => !show);
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <FormLabel sx={{ color: 'black', fontWeight: 'bold', textAlign: 'left' }}>Confirmar correo electrónico</FormLabel>
-                <OutlinedInput
-                    placeholder="Confirme su correo electrónico"
-                    {...register('emailConfirm')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton edge="end">
-                                <EditIcon />
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    sx={{
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray', borderRadius: '8px' },
-                    }}
-                />
-                {errors.emailConfirm && <Typography color="error" sx={{ textAlign: 'left' }}>{errors.emailConfirm.message}</Typography>}
-            </FormControl>
+  const onSubmit = async (data: Inputs) => {
+    setLoading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null); // Limpiar mensajes previos
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <FormLabel sx={{ color: 'black', fontWeight: 'bold', textAlign: 'left' }}>Contraseña actual</FormLabel>
-                <OutlinedInput
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Ingrese su contraseña actual"
-                    {...register('password')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton onClick={handleClickShowPassword} edge="end">
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    sx={{
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray', borderRadius: '8px' },
-                    }}
-                />
-                {errors.password && <Typography color="error" sx={{ textAlign: 'left' }}>{errors.password.message}</Typography>}
-            </FormControl>
-
-            <FormControl fullWidth sx={{ mb: 2 }}>
-                <FormLabel sx={{ color: 'black', fontWeight: 'bold', textAlign: 'left' }}>Confirmar nueva contraseña</FormLabel>
-                <OutlinedInput
-                    type={showPasswordConfirm ? 'text' : 'password'}
-                    placeholder="Ingresa una nueva contraseña"
-                    {...register('passwordConfirm')}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton onClick={handleClickShowPasswordConfirm} edge="end">
-                                {showPasswordConfirm ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                    sx={{
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'gray', borderRadius: '8px' },
-                    }}
-                />
-                {errors.passwordConfirm && <Typography color="error" sx={{ textAlign: 'left' }}>{errors.passwordConfirm.message}</Typography>}
-            </FormControl>
-
-            <Box style={{ margin: '20px 0' }} className="button-is space-x-10" display="flex" justifyContent="center" >
-            <Button variant="contained" className="h-e34 text-white rounded-[20px] normal-case"
-            onClick={() => router.push('/inicio')} 
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
-                >
-                    Cancelar
-                </Button>
-                <Button
-                    variant="contained" className="h-e34 text-white rounded-[20px] normal-case"
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
-                    onClick={handleSubmit(onSubmit)}
-                >
-                    Guardar
-                </Button>
-            </Box>
-        </Box>
+    let filteredData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== undefined && value !== "")
     );
+
+    // 🔹 Eliminar emailConfirm y passwordConfirm (Solo se usan para validación en frontend)
+    delete filteredData.emailConfirm;
+    delete filteredData.passwordConfirm;
+
+    if (Object.keys(filteredData).length === 0) {
+      setErrorMessage("Debe modificar al menos un campo antes de guardar.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.patch(
+        `http://localhost:3001/api/users/update-entrepreneur/${entrepreneurId}`,
+        filteredData,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("✅ Emprendedor actualizado:", response.data);
+      setSuccessMessage("Los cambios se han actualizado correctamente.");
+
+    } catch (error: any) {
+      console.error("❌ Error en la actualización:", error);
+      setErrorMessage(
+        error.response?.data?.message || "Hubo un problema al actualizar la información."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box sx={{ maxWidth: 400, mx: "auto", mt: 5, textAlign: "center" }}>
+      <Typography
+        gutterBottom
+        sx={{ fontWeight: "bold", color: themePalette.primary, fontSize: "24px" }}
+      >
+        Editar información del propietario
+      </Typography>
+
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+      {successMessage && <Alert severity="success">{successMessage}</Alert>}
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
+            Nombre
+          </FormLabel>
+          <OutlinedInput
+            placeholder="Ingrese su nombre y apellido"
+            {...register("name")}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton edge="end">
+                  <EditIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+            sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
+          />
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
+            Correo electrónico
+          </FormLabel>
+          <OutlinedInput
+            placeholder="Ingrese su correo electrónico"
+            {...register("email")}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton edge="end">
+                  <EditIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+            sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
+          />
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
+            Confirmar correo electrónico
+          </FormLabel>
+          <OutlinedInput
+            placeholder="Confirme su correo electrónico"
+            {...register("emailConfirm")}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton edge="end">
+                  <EditIcon />
+                </IconButton>
+              </InputAdornment>
+            }
+            sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
+          />
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
+            Contraseña nueva
+          </FormLabel>
+          <OutlinedInput
+            type={showPassword ? "text" : "password"}
+            placeholder="Ingrese su contraseña actual"
+            {...register("password")}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton onClick={handleClickShowPassword} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
+          />
+        </FormControl>
+
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
+            Confirmar nueva contraseña
+          </FormLabel>
+          <OutlinedInput
+            type={showPasswordConfirm ? "text" : "password"}
+            placeholder="Ingresa una nueva contraseña"
+            {...register("passwordConfirm")}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton onClick={handleClickShowPasswordConfirm} edge="end">
+                  {showPasswordConfirm ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
+          />
+        </FormControl>
+
+        <Box display="flex" justifyContent="center" gap={2} mt={2}  className="button-is space-x-4" >
+          <Button variant="contained" 
+          sx={{
+                                       textTransform: "none",
+                                       backgroundColor: themePalette.primary,
+                                       width: "171px",
+                                       height: "50px",
+                                       fontSize: "18px",
+                                       borderRadius: "20px"
+                                     }}
+          onClick={() => router.push("/inicio")}>
+            Cancelar
+          </Button>
+          <Button variant="contained" type="submit" 
+           sx={{
+                                        textTransform: "none",
+                                        backgroundColor: themePalette.primary,
+                                        width: "171px",
+                                        height: "50px",
+                                        fontSize: "18px",
+                                        borderRadius: "20px"
+                                      }}
+          disabled={loading}>
+            {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Guardar"}
+          </Button>
+        </Box>
+      </form>
+    </Box>
+  );
 };

@@ -4,7 +4,7 @@ import { Box, Button, FormLabel, Checkbox, TextField, MenuItem, FormControlLabel
 import { themePalette } from "@/config/theme.config";
 import { GoogleMap, LoadScript, Polygon } from "@react-google-maps/api";
 
-const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
 type Inputs = {
   realizaEnvios: string;
