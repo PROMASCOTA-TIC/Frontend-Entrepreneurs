@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, FormLabel, Checkbox, TextField, MenuItem, FormControlLabel, FormHelperText, FormControl, Select } from "@mui/material";
 import { themePalette } from "@/config/theme.config";
-import { GoogleMap, LoadScript, Polygon } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Polygon, useJsApiLoader } from "@react-google-maps/api";
 
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -57,7 +57,7 @@ const zonas = [
   },
   {
       nombre: "Sur",
-      color: "red",
+      color: "lightblue",
       path: [
           { lat: -0.2185585, lng: -78.534955 },
           { lat: -0.2801331, lng: -78.584337 },
@@ -153,6 +153,12 @@ export const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<Inputs>>({});
+  const [zonaSeleccionada, setZonaSeleccionada] = useState<string | null>(null);  
+    const { isLoaded } = useJsApiLoader({
+      googleMapsApiKey: apiKey || "",
+    });
+  
+    
 
   useEffect(() => {
     setFormValues((prev) => ({ ...prev, ...formData }));
@@ -191,6 +197,9 @@ export const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
   const handleChange = (field: keyof Inputs, value: string) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
     validateField(field, value);
+    if (field === "sectorLocal") {
+      setZonaSeleccionada(value);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -272,46 +281,56 @@ export const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
         </Box>
       ))}
 
-      {/* Selector de Sector */}
-      <FormLabel sx={{ color: "black", mb: 1, fontWeight: "bold" }}>Sector</FormLabel>
-<FormControl fullWidth error={!!errors.sectorLocal} sx={{ mb: 2 }}>
-  <Select
-    id="sectorLocal"
-    value={formValues.sectorLocal || ""}
-    onChange={(e) => handleChange("sectorLocal", e.target.value)}
-    displayEmpty
-    sx={{
-      backgroundColor: "white",
-      borderRadius: "10px",
-      "&.MuiOutlinedInput-root": {
-        "&:hover fieldset": { borderColor: themePalette.secondary },
-        "&.Mui-focused fieldset": { borderColor: themePalette.secondary }
-      }
-    }}
-  >
-    <MenuItem value="" disabled>Seleccione el sector</MenuItem>
-    {zonas.map((zona) => (
-      <MenuItem key={zona.nombre} value={zona.nombre}>
-        {zona.nombre}
-      </MenuItem>
-    ))}
-  </Select>
-  {errors.sectorLocal && (
-    <FormHelperText sx={{ color: "red" }}>{errors.sectorLocal}</FormHelperText>
-  )}
-</FormControl>
-
-
-      {/* Mapa */}
-      <FormLabel sx={{ color: "black" }}>Mapa de sectorización</FormLabel>
-      <LoadScript googleMapsApiKey={apiKey || ""}>
-        <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-          {zonas.map((zona, index) => (
-            <Polygon key={index} paths={zona.path} options={{ fillColor: zona.color, fillOpacity: 0.2 }} />
+{/* Selector de Sector */}
+<FormLabel sx={{ color: "black", mb: 1, fontWeight: "bold" }}>Sector</FormLabel>
+      <FormControl fullWidth error={!!errors["sectorLocal"]} sx={{ mb: 2 }}>
+        <Select
+          id="sectorLocal"
+          value={formValues.sectorLocal || ""}
+          onChange={(e) => handleChange("sectorLocal", e.target.value)}
+          displayEmpty
+          sx={{
+            backgroundColor: "white",
+            borderRadius: "10px",
+            "&.MuiOutlinedInput-root": {
+              "&:hover fieldset": { borderColor: themePalette.secondary },
+              "&.Mui-focused fieldset": { borderColor: themePalette.secondary }
+            }
+          }}
+        >
+          <MenuItem value="" disabled>Seleccione el sector</MenuItem>
+          {zonas.map((zona) => (
+            <MenuItem key={zona.nombre} value={zona.nombre}>
+              {zona.nombre}
+            </MenuItem>
           ))}
-        </GoogleMap>
-      </LoadScript>
+        </Select>
+        {errors["sectorLocal"] && (
+          <FormHelperText sx={{ color: "red" }}>{errors["sectorLocal"]}</FormHelperText>
+        )}
+      </FormControl>
 
+      {/* Mapa de Sectorización */}
+      {isLoaded && (
+        <>
+          <FormLabel sx={{ color: "black" }}>Mapa de sectorización</FormLabel>
+          <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
+            {zonas.map((zona, index) => (
+              <Polygon
+                key={index}
+                paths={zona.path}
+                options={{
+                  fillColor: zonaSeleccionada === zona.nombre ? "red" : zona.color, 
+                  fillOpacity: zonaSeleccionada === zona.nombre ? 0.6 : 0.2, 
+                  strokeColor: zonaSeleccionada === zona.nombre ? "black" : zona.color, 
+                  strokeWeight: zonaSeleccionada === zona.nombre ? 3 : 1, 
+                }}
+              />
+            ))}
+          </GoogleMap>
+        </>
+      )}
+     
       {/* Botones */}
       <Box  style={{ margin: "20px 0" }} className="button-is space-x-4">
         <Button variant="contained" onClick={prevStep} sx={{ 
