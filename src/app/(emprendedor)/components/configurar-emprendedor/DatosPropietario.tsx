@@ -142,9 +142,7 @@ export const RegisterFormCambiar: React.FC = () => {
             {...register("name")}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton edge="end">
                   <EditIcon />
-                </IconButton>
               </InputAdornment>
             }
             sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
@@ -160,9 +158,7 @@ export const RegisterFormCambiar: React.FC = () => {
             {...register("email")}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton edge="end">
                   <EditIcon />
-                </IconButton>
               </InputAdornment>
             }
             sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
@@ -178,9 +174,7 @@ export const RegisterFormCambiar: React.FC = () => {
             {...register("emailConfirm")}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton edge="end">
                   <EditIcon />
-                </IconButton>
               </InputAdornment>
             }
             sx={{ "& .MuiOutlinedInput-notchedOutline": { borderColor: "gray", borderRadius: "8px" } }}
