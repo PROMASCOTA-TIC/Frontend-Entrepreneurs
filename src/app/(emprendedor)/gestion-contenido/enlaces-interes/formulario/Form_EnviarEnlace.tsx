@@ -358,15 +358,15 @@ const Form_EnviarEnlace: React.FC = () => {
               </Grid2>
             </Grid2>
 
-            {/* Archivos multimedia */}
+            {/* Archivos multimedia 
             <Grid2 size={12}>
               <h2 className='h2-bold txtcolor-primary txt-center'>Archivos Multimedia</h2>
             </Grid2>
-
+            
             <Grid2 size={12} className='flex-center'>
               <ArchivosMultimedia />
             </Grid2>
-
+*/}
             {/* Botones */}
             <Grid2 size={12}>
               <div style={{ paddingTop: '21px' }}>

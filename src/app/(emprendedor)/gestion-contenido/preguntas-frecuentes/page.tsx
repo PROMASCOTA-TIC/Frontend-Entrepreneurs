@@ -4,7 +4,7 @@ import PF_Categorias from "./PF_Categorias";
 import "/src/assets/styles/gestionContenido/general.css";
 import "/src/assets/styles/gestionContenido/estilos.css";
 
-export default function PreguntasFrecuente() {
+export default function PreguntasFrecuentes() {
     return (
         <div>
             <BarraDeBusqueda

@@ -81,11 +81,10 @@
 
 /* Cabecera del chat */
 .chatHeader {
-  background-color: #444;  /* Ejemplo */
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px;
+  justify-content: space-between;
+  padding: 10px;
   border-radius: 8px 8px 0 0;
   color: white;
 }
@@ -138,6 +137,96 @@
   transition: border-color 0.3s ease-in-out;  /* Suaviza el cambio de borde */
 }
 
-.chatInputContainer input:focus {
-  border-color: #00AA28 !important ;/* Verde cuando está enfocado */
+.chatInputContainer:focus {
+  outline: none; /* Elimina el borde predeterminado */
+  border: 2px solid #00aa28; /* Cambia el borde a color verde */
+  box-shadow: 0 0 5px rgba(0, 170, 40, 0.5); /* Agrega un efecto de resplandor verde */
+}
+
+.feedback-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.positive-feedback, .negative-feedback {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.positive-feedback:hover {
+  color: green;
+}
+
+.negative-feedback:hover {
+  color: red;
+}
+
+.feedback-message {
+  font-size: 14px;
+  margin-top: 5px;
+  color: gray;
+}
+
+.feedbackButtons {
+  display: flex;
+  gap: 15px;
+  margin-top: 8px;
+  justify-content: center;
+}
+
+.thumbsUp,
+.thumbsDown {
+  background-color: #f5f5f5;
+  border: 2px solid transparent;
+  font-size: 20px;
+  padding: 3px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.thumbsUp {
+  color: green;
+  border-color: green;
+}
+
+.thumbsDown {
+  color: red;
+  border-color: red;
+}
+
+.thumbsUp:hover {
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+.thumbsDown:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.thumbsUp:active,
+.thumbsDown:active {
+  transform: scale(0.9);
+}
+
+.feedbackStatus {
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+  color: #555;
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.closeButton:hover {
+  color: #ff4d4d; /* Cambia de color al pasar el mouse */
 }

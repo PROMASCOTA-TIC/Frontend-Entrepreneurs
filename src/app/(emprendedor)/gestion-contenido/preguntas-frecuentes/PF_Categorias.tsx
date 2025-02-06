@@ -7,12 +7,12 @@ import BotonCategoria from "@/components/gestionContenido/botones/BotonCategoria
 
 const PF_Categorias = () => {
   const buttons = [
-    { name: 'Publicar Contenido', icon: UploadFile, link: '' },
-    { name: 'Registro y Cuenta', icon: ManageAccounts, link: '' },
-    { name: 'Compras y Pagos', icon: Payment, link: '' },
-    { name: 'Productos y Servicios', icon: Store, link: '' },
-    { name: 'Soporte al Cliente', icon: SupportAgent, link: '' },
-    { name: 'Seguridad y Privacidad', icon: Security, link: '' },
+    { name: 'Publicar Contenido', icon: <UploadFile />, id: 1 },
+    { name: 'Registro y Cuenta', icon: <ManageAccounts />, id: 2 },
+    { name: 'Compras y Pagos', icon: <Payment />, id: 3 },
+    { name: 'Productos y Servicios', icon: <Store/>, id: 4 },
+    { name: 'Soporte al Cliente', icon: <SupportAgent />, id: 5 },
+    { name: 'Seguridad y Privacidad', icon: <Security />, id: 6 },
   ];
 
   return (
@@ -24,9 +24,13 @@ const PF_Categorias = () => {
         gap: '30px',
       }}
     >
-      {buttons.map((button, index) => (
-        <Box key={index} sx={{ flex: '0 0 auto' }}>
-          <BotonCategoria name={button.name} icon={button.icon} link={button.link} />
+      {buttons.map((button) => (
+        <Box key={button.id} sx={{ flex: '0 0 auto' }}>
+          <BotonCategoria
+            name={button.name}
+            icon={button.icon}
+            link={`/gestion-contenido/preguntas-frecuentes/categorias?categoryId=${button.id}`}
+          />
         </Box>
       ))}
     </Box>
