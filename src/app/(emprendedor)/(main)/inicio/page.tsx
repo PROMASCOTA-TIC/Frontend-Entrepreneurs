@@ -1,7 +1,7 @@
 "use client";
 import React from 'react'
 import Carousel from '../../components/inicio-emprendedor/CarruselProductos';
-import ProductTable from '../../components/inicio-emprendedor/TablaProductosTerminarStock';
+import ListaProductosSinStock from '../../components/inicio-emprendedor/TablaProductosTerminarStock';
 
 const products = [
     {
@@ -71,7 +71,8 @@ products={products}
 onEdit={handleEdit}     
 onDelete={handleDelete} 
 />
-<ProductTable/>
+
+<ListaProductosSinStock/>
 </>
 
   )

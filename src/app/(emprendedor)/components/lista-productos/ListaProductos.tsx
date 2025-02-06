@@ -128,7 +128,7 @@ const ListaProductos: React.FC = () => {
   };
 
   useEffect(() => {
-    const storedEntrepreneurId = localStorage.getItem("entrepreneurId") || "9d4d342e-aca0-4c88-868e-c86e2fb9b793";
+    const storedEntrepreneurId = localStorage.getItem("entrepreneurId") || "ca224da6-01f1-4546-943d-c00f52f296dd";
     setEntrepreneurId(storedEntrepreneurId);
   }, []);
 

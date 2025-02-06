@@ -52,7 +52,6 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
   const [fetching, setFetching] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  // ✅ Cargar datos del producto cuando el modal se abre
   useEffect(() => {
     const fetchProductData = async () => {
       if (!product || !product.id) return;
