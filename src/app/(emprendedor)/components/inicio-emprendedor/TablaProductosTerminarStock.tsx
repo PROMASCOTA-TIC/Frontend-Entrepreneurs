@@ -13,6 +13,7 @@ import DetallesProducto from "../detalles-producto/DetallesProducto";
 import EditarProducto from "../actualizar-producto/EditarProducto";
 import axios from "axios";
 import { useGridApiRef } from "@mui/x-data-grid";
+import { URL_BASE } from "@/config/config";
 
 
 interface ProductDetails {
@@ -32,7 +33,7 @@ interface ProductDetails {
 }
 
 const ListaProductosSinStock: React.FC = () => {
-  const [openDialog, setOpenDialog] = useState(false);
+
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDetails | null>(null);
@@ -49,10 +50,12 @@ const ListaProductosSinStock: React.FC = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   
+
+  
   const handleEditProduct = async (productId: string) => {
     try {
       console.log("Obteniendo datos actualizados del producto:", productId);
-      const response = await axios.get(`http://localhost:3001/api/products/edit/${productId}`);
+      const response = await axios.get(`${URL_BASE}products/edit/${productId}`);
       const updatedProduct = response.data;
 
       console.log("Datos obtenidos:", updatedProduct);
@@ -87,7 +90,7 @@ const ListaProductosSinStock: React.FC = () => {
     if (!productToDelete) return;
   
     try {
-      const response = await axios.delete(`http://localhost:3001/api/products/${productToDelete}`);
+      const response = await axios.delete( `${URL_BASE}products/${productToDelete}`);
   
       setSnackbarMessage(`"${productToDeleteName}" eliminado correctamente.`);
       setSnackbarOpen(true);
@@ -109,20 +112,20 @@ const ListaProductosSinStock: React.FC = () => {
   
   const fetchProducts = async () => {
     if (!entrepreneurId) {
-      console.error("⚠️ No se encontró el ID del emprendedor.");
+      console.error(" No se encontró el ID del emprendedor.");
       return;
     }
   
-    const endpoint = `http://localhost:3001/api/products/entrepreneur/${entrepreneurId}/low-stock`;
+    const endpoint = `${URL_BASE}products/entrepreneur/${entrepreneurId}/low-stock`;
     console.log("🔍 Haciendo petición a:", endpoint);
   
     try {
       const response = await axios.get(endpoint);
   
-      console.log("✅ Respuesta del servidor:", response.data);
+      console.log("Respuesta del servidor:", response.data);
   
       if (!Array.isArray(response.data)) {
-        console.error("❌ La respuesta del servidor no es un array:", response.data);
+        console.error(" La respuesta del servidor no es un array:", response.data);
         return;
       }
   
@@ -145,11 +148,11 @@ const ListaProductosSinStock: React.FC = () => {
       setRows(formattedData);
     } catch (error: any) {
       if (error.response) {
-        console.error("❌ Error en la respuesta del servidor:", error.response.status, error.response.data);
+        console.error("Error en la respuesta del servidor:", error.response.status, error.response.data);
       } else if (error.request) {
-        console.error("❌ No se recibió respuesta del servidor:", error.request);
+        console.error("No se recibió respuesta del servidor:", error.request);
       } else {
-        console.error("❌ Error en la petición:", error.message);
+        console.error(" Error en la petición:", error.message);
       }
     }
   };

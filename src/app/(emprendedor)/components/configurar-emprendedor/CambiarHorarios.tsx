@@ -17,9 +17,10 @@ import dayjs from "dayjs";
 import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { themePalette } from "@/config/theme.config";
+import { URL_BASE } from "@/config/config";
 
-const API_GET = "http://localhost:3001/api/users/entrepreneurs";
-const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
+const API_GET = `${URL_BASE}users/entrepreneurs`;
+const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
 const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d";
 
 

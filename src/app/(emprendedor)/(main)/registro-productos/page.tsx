@@ -11,6 +11,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import { useRouter } from "next/navigation";
 import { themePalette } from "@/config/theme.config";
+import { URL_BASE } from "@/config/config";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -41,7 +42,7 @@ interface ProductData {
 
 export default function RegistroProducto() {
   const router = useRouter();
-  const entrepreneurId = "ca224da6-01f1-4546-943d-c00f52f296dd"; // ID fijo para pruebas
+  const entrepreneurId = "ca224da6-01f1-4546-943d-c00f52f296dd"; 
 
   const [productData, setProductData] = useState<ProductData>({
     entrepreneurId,
@@ -124,7 +125,7 @@ export default function RegistroProducto() {
         multimediaFiles: uploadedUrls,
       };
     
-      const response = await fetch("http://localhost:3001/api/products", {
+      const response = await fetch(`${URL_BASE}products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +171,7 @@ export default function RegistroProducto() {
 
   const handleCancelar = () => {
     setProductData({
-      entrepreneurId, // Mantener el ID fijo para pruebas
+      entrepreneurId, 
       publicationType: "",
       petTypeId: "",
       categoryId: "",

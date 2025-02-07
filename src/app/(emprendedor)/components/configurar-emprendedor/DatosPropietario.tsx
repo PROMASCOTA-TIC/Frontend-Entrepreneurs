@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import "@/app/auth/new-accout/Login.css";
 import "./Login.css";
 import { themePalette } from "@/config/theme.config";
+import { URL_BASE } from "@/config/config";
 
 type Inputs = {
   name?: string;
@@ -53,12 +54,11 @@ export const RegisterFormCambiar: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // 🔹 Cargar datos del usuario desde la API
+  
     const fetchEntrepreneurData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3001/api/users/entrepreneurs/${entrepreneurId}`
-        );
+        const response = await axios.get(`${URL_BASE}users/entrepreneurs/${entrepreneurId}`);
+
 
         const { name, email } = response.data;
 
@@ -100,7 +100,7 @@ export const RegisterFormCambiar: React.FC = () => {
 
     try {
       const response = await axios.patch(
-        `http://localhost:3001/api/users/update-entrepreneur/${entrepreneurId}`,
+        `${URL_BASE}users/update-entrepreneur/${entrepreneurId}`,
         filteredData,
         { headers: { "Content-Type": "application/json" } }
       );

@@ -5,17 +5,18 @@ import { Box, Typography, RadioGroup, FormControlLabel, Radio, Grid2 } from "@mu
 import { Icon } from "@iconify/react";
 import { themePalette } from "@/config/theme.config";
 import axios from "axios";
+import { URL_BASE } from "@/config/config";
 
 interface TipoMascotaProps {
-  value: string; // Valor seleccionado (id del tipo de mascota)
-  onChange: (value: string) => void; // Función para actualizar el valor seleccionado
-  error?: string; // Mensaje de error opcional
+  value: string;
+  onChange: (value: string) => void; 
+  error?: string;
 }
 
 interface PetTypeOption {
-  id: string; // ID del tipo de mascota
-  icon: string; // Icono asociado
-  label: string; // Nombre del tipo de mascota
+  id: string; 
+  icon: string; 
+  label: string; 
 }
 
 const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange, error }) => {
@@ -32,9 +33,9 @@ const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange, error }) => 
 
   const fetchPetTypes = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/products/register/pet-types");
+      const response = await axios.get(`${URL_BASE}products/register/pet-types`);
       const data = response.data.map((item: { id: string; name: string }) => ({
-        id: item.id, // Asegurarse de usar el id como value
+        id: item.id, 
         icon: petTypeIcons[item.id] || "mdi:alert",
         label: item.name, // Mostrar el nombre como etiqueta
       }));
@@ -156,7 +157,7 @@ const TipoMascota: React.FC<TipoMascotaProps> = ({ value, onChange, error }) => 
               ))}
             </Grid2>
           </RadioGroup>
-          {/* Mostrar mensaje de error si existe */}
+
           {error && (
             <Typography
               color="error"

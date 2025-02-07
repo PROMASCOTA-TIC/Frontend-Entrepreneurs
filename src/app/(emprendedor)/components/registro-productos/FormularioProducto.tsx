@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, TextField, Typography, MenuItem, Grid2 } from "@mui/material";
 import { themePalette } from "@/config/theme.config";
+import { URL_BASE } from "@/config/config";
 
 interface FormularioRegistroProductoProps {
   data: {
@@ -17,19 +18,19 @@ interface FormularioRegistroProductoProps {
     description: string;
   };
   onChange: (key: keyof FormularioRegistroProductoProps["data"], value: any) => void;
-  errors?: Partial<Record<keyof FormularioRegistroProductoProps["data"], string>>; // Manejo de errores
+  errors?: Partial<Record<keyof FormularioRegistroProductoProps["data"], string>>; 
 }
 
 const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
   data,
   onChange,
-  errors = {}, // Manejo de errores
+  errors = {}, 
 }) => {
   const [sizes, setSizes] = useState<{ id: string; name: string }[]>([]);
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
   const [subcategories, setSubcategories] = useState<{ id: string; name: string; categoryId: string }[]>([]);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/products/register";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||  `${URL_BASE}products/register`;
   const endpoints = {
     sizes: `${API_BASE_URL}/sizes`,
     categories: `${API_BASE_URL}/categories`,
@@ -91,8 +92,8 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
             fullWidth
             margin="normal"
             variant="outlined"
-            error={Boolean(errors[name as keyof FormularioRegistroProductoProps["data"]])} // Error visual
-            helperText={errors[name as keyof FormularioRegistroProductoProps["data"]] || ""} // Mensaje de error
+            error={Boolean(errors[name as keyof FormularioRegistroProductoProps["data"]])} 
+            helperText={errors[name as keyof FormularioRegistroProductoProps["data"]] || ""} 
             sx={{ maxWidth: "400px", textAlign: "left", "& .MuiSelect-select": { textAlign: "left" } }}
             {...textFieldProps}
           >
@@ -126,8 +127,8 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
             margin="normal"
             variant="outlined"
             type={type}
-            error={Boolean(errors[name as keyof FormularioRegistroProductoProps["data"]])} // Error visual
-            helperText={errors[name as keyof FormularioRegistroProductoProps["data"]] || ""} // Mensaje de error
+            error={Boolean(errors[name as keyof FormularioRegistroProductoProps["data"]])}
+            helperText={errors[name as keyof FormularioRegistroProductoProps["data"]] || ""} 
             sx={{ maxWidth: "400px" }}
             {...textFieldProps}
           />

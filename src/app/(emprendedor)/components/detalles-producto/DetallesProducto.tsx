@@ -107,7 +107,6 @@ const DetallesProducto: React.FC<DetallesProductoProps> = ({
               </Typography>
             </Grid2>
 
-            {/* Multimedia */}
             <Grid2 size={{ xs: 12 }}>
               <Typography
                 variant="h6"

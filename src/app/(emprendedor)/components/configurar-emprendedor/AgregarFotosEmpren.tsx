@@ -24,6 +24,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { theme } from "@/app/config/theme.config";
+import { URL_BASE } from "@/config/config";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -37,8 +38,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-const API_GET = "http://localhost:3001/api/users/entrepreneurs";
-const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
+const API_GET = `${URL_BASE}users/entrepreneurs`;
+const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
 const idEntrepreneur = "7878e58e-ef64-4e7a-929f-253023dcbb85";
 
 const AgregarFotosEmpren: React.FC = () => {

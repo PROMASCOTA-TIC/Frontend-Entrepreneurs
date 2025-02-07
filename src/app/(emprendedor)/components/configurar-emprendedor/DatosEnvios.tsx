@@ -18,10 +18,11 @@ import { themePalette } from "@/config/theme.config";
 import { GoogleMap, Polygon, useJsApiLoader } from "@react-google-maps/api";
 import { useRouter } from "next/navigation";
 import EditIcon from "@mui/icons-material/Edit";
+import { URL_BASE } from "@/config/config";
 
 
-const API_GET = "http://localhost:3001/api/users/entrepreneurs";
-const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
+const API_GET = `${URL_BASE}users/entrepreneurs`;
+const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
 const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d";
 
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
@@ -196,7 +197,7 @@ export const CambioDatosEnvio: React.FC = () => {
 
         const data = await response.json();
 
-        // Convertir booleanos a strings para los checkboxes
+
         setValue("realizaEnvios", data.realizaEnvios ? "1" : "0");
         setValue("soloRetiraEnTienda", data.soloRetiraEnTienda ? "1" : "0");
         setValue("callePrincipal", data.callePrincipal);
@@ -314,7 +315,7 @@ export const CambioDatosEnvio: React.FC = () => {
     <Controller
       name={field as keyof Inputs}
       control={control}
-      rules={{ required: "Este campo es obligatorio" }} // 🚀 Validación
+      rules={{ required: "Este campo es obligatorio" }}
       render={({ field, fieldState }) => (
         <TextField
           placeholder={`Ingrese ${field.name}`}
@@ -325,10 +326,10 @@ export const CambioDatosEnvio: React.FC = () => {
           sx={{
             mb: 1,
             "& .MuiOutlinedInput-root": { 
-              borderRadius: "8px", // Bordes redondeados
-              "& fieldset": { borderColor: "gray" }, // Color del borde normal
-              "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-              "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+              borderRadius: "8px", 
+              "& fieldset": { borderColor: "gray" },
+              "&:hover fieldset": { borderColor: themePalette.secondary },
+              "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, 
             }
           }}
           slotProps={{
@@ -360,7 +361,7 @@ export const CambioDatosEnvio: React.FC = () => {
             {...field}
             onChange={(e) => {
               field.onChange(e.target.value);
-              setZonaSeleccionada(e.target.value); // Marcar la zona seleccionada
+              setZonaSeleccionada(e.target.value); 
             }}
             sx={{ mb: 2 }}
           >

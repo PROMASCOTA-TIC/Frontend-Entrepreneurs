@@ -14,6 +14,7 @@ import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridTool
 import { esES } from '@mui/x-data-grid/locales';
 import { Edit, Delete } from '@mui/icons-material';
 import { red } from '@mui/material/colors';
+import { URL_BASE } from '@/config/config';
 
 
 dayjs.locale('es'); 
@@ -56,7 +57,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
   const apiRef = useGridApiRef(); 
-  const entrepreneurId = '9d4d342e-aca0-4c88-868e-c86e2fb9b793';
+  const entrepreneurId = 'ca224da6-01f1-4546-943d-c00f52f296dd';
   const [offerToEdit, setOfferToEdit] = useState<Oferta | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -75,7 +76,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/products/entrepreneur/${entrepreneurId}`)
+    axios.get(`${URL_BASE}products/entrepreneur/${entrepreneurId}`)
       .then((response) => {
         setProductos(response.data);
       })
@@ -88,7 +89,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     if (open) {
       console.log("Cargando ofertas...");
       setLoadingOfertas(true);
-      axios.get(`http://localhost:3001/api/offers/entrepreneur/${entrepreneurId}`)
+      axios.get(`${URL_BASE}offers/entrepreneur/${entrepreneurId}`)
         .then((response) => {
           if (response.data.status === 'success') {
             setOfertas(response.data.data);
@@ -128,7 +129,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     if (!offerToDelete) return;
   
     try {
-      const response = await axios.delete(`http://localhost:3001/api/offers/${offerToDelete}`);
+      const response = await axios.delete(`${URL_BASE}offers/${offerToDelete}`);
   
       if (response.data.status === 'success') {
         apiRef.current.setRowSelectionModel([]); // Limpia la selección de la tabla
@@ -197,14 +198,14 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
       renderCell: (params) => (
         <Box 
           sx={{  
-            fontSize: '14px', // Mismo tamaño que otras columnas
-            fontFamily: 'inherit', // Hereda la tipografía general
-            fontWeight: 'normal', // Evita que sea más gruesa
+            fontSize: '14px', 
+            fontFamily: 'inherit', 
+            fontWeight: 'normal', 
             color: obtenerColorEstatus(params.value),
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            width: '100%', // Asegura que ocupe toda la celda
+            width: '100%', 
             height: '100%',
           }}
         >
@@ -241,7 +242,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
  
     setLoading(true);
     try {
-       const response = await axios.patch(`http://localhost:3001/api/offers/${offerToEdit.id}`, {
+      const response = await axios.patch(`${URL_BASE}offers/${offerToEdit.id}`, {
           discountPercentage: Number(data.porcentajeDescuento),
           startDate: dayjs(data.startDate).toISOString(),
           endDate: dayjs(data.endDate).toISOString(),
@@ -275,7 +276,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
 
   const onSubmit = async (data: any) => {
     if (offerToEdit) {
-      await updateOffer(data); // Si hay una oferta en edición, la actualiza en vez de crear una nueva
+      await updateOffer(data); 
       return;
     }
   
@@ -291,7 +292,8 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     };
   
     try {
-      const response = await axios.post('http://localhost:3001/api/offers/', ofertaData);
+      const response = await axios.post(`${URL_BASE}offers/`, ofertaData);
+
   
       if (response.data.status === 'success') {
         setOfertas([...ofertas, {
@@ -462,7 +464,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
                     <DatePicker
                       {...field}
                       format="DD/MM/YYYY"
-                      minDate={dayjs().add(1, 'day')} // No permite la fecha de hoy ni pasadas
+                      minDate={dayjs().add(1, 'day')} 
                       onChange={(date) => field.onChange(date)}
                       slotProps={{
                         textField: {
@@ -490,7 +492,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
                     <DatePicker
                       {...field}
                       format="DD/MM/YYYY"
-                      minDate={startDate ? dayjs(startDate).add(1, 'day') : dayjs().add(1, 'day')} // No permite fechas anteriores a la fecha de inicio ni pasadas
+                      minDate={startDate ? dayjs(startDate).add(1, 'day') : dayjs().add(1, 'day')} 
                       onChange={(date) => field.onChange(date)}
                       slotProps={{
                         textField: {
@@ -529,7 +531,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
                   rules={{
                     required: "El porcentaje de descuento es obligatorio",
                     pattern: {
-                      value: /^[1-9]$|^[1-9][0-9]$/, // Solo números enteros entre 1 y 99
+                      value: /^[1-9]$|^[1-9][0-9]$/,
                       message: "El valor debe ser un número entero entre 1 y 99"
                     },
                     validate: value => {
@@ -547,13 +549,13 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
                       value={field.value || ''}
                       inputProps={{
                         min: 1,
-                        max: 99,  // Máximo 99
-                        step: 1,  // Solo permite números enteros
+                        max: 99, 
+                        step: 1, 
                       }}
                       onKeyPress={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                        // Permitir solo números y evitar caracteres no válidos
+                       
                         if (!/[0-9]/.test(event.key)) {
-                          event.preventDefault();  // Prevenir la tecla si no es un número
+                          event.preventDefault();  
                         }
                       }}
                     />
@@ -568,7 +570,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
               <Grid2 size={{ xs: 12, sm: 8 }}>
                 <TextField
                   value={`$${precioConDescuento.toFixed(2)}`}
-                  InputProps={{ readOnly: true }}  // Solo lectura
+                  InputProps={{ readOnly: true }} 
                   fullWidth
                   sx={{ maxWidth: '100px' }}
                 />
@@ -621,11 +623,11 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
             </Box>
           ) : (
             <DataGrid
-            key={ofertas.length} // Clave dinámica para forzar re-render cuando se quede vacío
+            key={ofertas.length} 
             apiRef={apiRef}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
             columns={columns}
-            rows={ofertas.length > 0 ? ofertas : []} // Garantiza que nunca sea undefined
+            rows={ofertas.length > 0 ? ofertas : []} 
             getRowId={(row) => row.id}
             initialState={{ pagination: { paginationModel: { pageSize: 5 } } }}
             pageSizeOptions={[5, 10, 25]}

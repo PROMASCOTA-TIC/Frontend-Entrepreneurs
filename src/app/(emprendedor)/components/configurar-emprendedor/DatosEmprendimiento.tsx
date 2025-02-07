@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { themePalette } from "@/config/theme.config";
 import EditIcon from '@mui/icons-material/Edit';
 import { taintObjectReference } from "next/dist/server/app-render/entry-base";
+import { URL_BASE } from "@/config/config";
 
 type Inputs = {
   nombreEmprendimiento: string;
@@ -32,10 +33,10 @@ type Inputs = {
   bancoNombreDuenoCuenta: string;
 };
 
-const API_GET = "http://localhost:3001/api/users/entrepreneurs";
-const API_PATCH = "http://localhost:3001/api/users/update-entrepreneur";
-const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d"; // ID del emprendimiento
+const API_GET = `${URL_BASE}users/entrepreneurs`;
+const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
 
+const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d"; 
 export const CambioDatosEmprendimiento: React.FC = () => {
   const router = useRouter();
   const {
@@ -60,7 +61,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
         if (!response.ok) throw new Error("Error al obtener datos");
         const data = await response.json();
 
-        // Precargar los valores en los campos del formulario
+       
         setValue("nombreEmprendimiento", data.nombreEmprendimiento);
         setValue("ruc", data.ruc);
         setValue("numeroCelular", data.numeroCelular);
@@ -118,7 +119,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" gap={2}>
-          {/* Nombre del emprendimiento */}
+         
           <FormControl fullWidth sx={{ mb: 2 }}>
             <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>Nombre del emprendimiento</FormLabel>
             <TextField
@@ -136,17 +137,17 @@ export const CambioDatosEmprendimiento: React.FC = () => {
                 },
               }}
               sx={{
-                "& .MuiOutlinedInput-root": { // Aplica estilos al contenedor principal
-                  borderRadius: "8px", // Bordes redondeados
-                  "& fieldset": { borderColor: "gray" }, // Color del borde normal
-                  "&:hover fieldset": { borderColor: themePalette.secondary }, // Color al pasar el mouse
-                  "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, // Color cuando está enfocado
+                "& .MuiOutlinedInput-root": { 
+                  borderRadius: "8px", 
+                  "& fieldset": { borderColor: "gray" }, 
+                  "&:hover fieldset": { borderColor: themePalette.secondary },
+                  "&.Mui-focused fieldset": { borderColor: themePalette.secondary }, 
                 }
               }}
            />
           </FormControl>
 
-          {/* RUC */}
+
           <FormControl fullWidth sx={{ mb: 2 }}>
   <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
     RUC/RIMPE
@@ -233,7 +234,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
 </FormControl>
 
 
-          {/* Banco */}
+
           <FormControl fullWidth sx={{ mb: 2 }}>
             <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>Nombre del banco</FormLabel>
             <TextField
@@ -278,8 +279,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
             </RadioGroup>
           </FormControl>
 
-          {/* Número de cuenta */}
-      {/* Número de cuenta */}
+
 <FormControl fullWidth sx={{ mb: 2 }}>
   <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
     Número de cuenta
@@ -322,7 +322,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
 </FormControl>
 
 
-          {/* Propietario de la cuenta */}
+
           <FormControl fullWidth>
   <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
     Nombre del propietario de la cuenta
@@ -363,7 +363,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
 </FormControl>
 
 
-          {/* Botones */}
+
           <Box display="flex" justifyContent="center" gap={2} mt={2}  className="button-is space-x-4">
             <Button variant="contained" onClick={() => router.push("/inicio")}
             

@@ -14,6 +14,7 @@ import DetallesProducto from "../detalles-producto/DetallesProducto";
 import EditarProducto from "../actualizar-producto/EditarProducto";
 import axios from "axios";
 import { useGridApiRef } from "@mui/x-data-grid";
+import { URL_BASE } from "@/config/config";
 
 
 interface ProductDetails {
@@ -53,7 +54,7 @@ const ListaProductos: React.FC = () => {
   const handleEditProduct = async (productId: string) => {
     try {
       console.log("Obteniendo datos actualizados del producto:", productId);
-      const response = await axios.get(`http://localhost:3001/api/products/edit/${productId}`);
+      const response = await axios.get(`${URL_BASE}products/edit/${productId}`);
       const updatedProduct = response.data;
 
       console.log("Datos obtenidos:", updatedProduct);
@@ -78,7 +79,7 @@ const ListaProductos: React.FC = () => {
     if (!productToDelete) return;
   
     try {
-      const response = await axios.delete(`http://localhost:3001/api/products/${productToDelete}`);
+      const response = await axios.delete(`${URL_BASE}products/${productToDelete}`);
   
       setSnackbarMessage(`"${productToDeleteName}" eliminado correctamente.`);
       setSnackbarOpen(true);
@@ -105,7 +106,7 @@ const ListaProductos: React.FC = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:3001/api/products/entrepreneur/${entrepreneurId}`);
+      const response = await axios.get(`${URL_BASE}products/entrepreneur/${entrepreneurId}`);
       const formattedData = response.data.map((product: any) => ({
         id: product.id,
         name: product.name,

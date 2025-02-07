@@ -4,14 +4,14 @@ import { Icon } from "@iconify/react";
 import { themePalette } from "@/config/theme.config";
 
 interface TipoPublicacionProps {
-  value: string; // Valor actual del tipo de publicación
-  onChange: (value: string) => void; // Función para actualizar el valor
-  error?: string; // Mensaje de error opcional
+  value: string;
+  onChange: (value: string) => void; 
+  error?: string; 
 }
 
 const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange, error }) => {
   const handleSelect = (option: string) => {
-    onChange(option); // Notifica al padre sobre el cambio
+    onChange(option); 
   };
 
   return (
@@ -69,7 +69,7 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange, erro
               style={{ fontSize: "60px", color: themePalette.primary }}
             />
             <Button
-              onClick={() => handleSelect("1")} // Cambiar a "1" para Producto
+              onClick={() => handleSelect("1")} 
               sx={{
                 background: value === "1" ? themePalette.secondary: themePalette.primary,
                 color: value === "1" ? themePalette.cwhite : themePalette.cwhite,
@@ -85,7 +85,6 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange, erro
             </Button>
           </Grid2>
 
-          {/* Botón Servicio con icono arriba */}
           <Grid2
             size={{ xs: 12, sm: 6, md: 3 }}
             display="flex"
@@ -98,7 +97,7 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange, erro
               style={{ fontSize: "60px", color: themePalette.primary }}
             />
             <Button
-              onClick={() => handleSelect("0")} // Cambiar a "0" para Servicio
+              onClick={() => handleSelect("0")} 
               sx={{
                 background: value === "0" ? themePalette.secondary : themePalette.primary,
                 color: value === "0" ? themePalette.cwhite : themePalette.cwhite,
@@ -115,7 +114,6 @@ const TipoPublicacion: React.FC<TipoPublicacionProps> = ({ value, onChange, erro
           </Grid2>
         </Grid2>
 
-        {/* Mostrar mensaje de error si existe */}
         {error && (
           <Typography
             color="error"

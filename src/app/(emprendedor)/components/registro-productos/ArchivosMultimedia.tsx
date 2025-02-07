@@ -7,9 +7,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { theme, themePalette } from "@/app/config/theme.config";
 
 interface ArchivosMultimediaProps {
-  value: string[]; // URLs actuales de los archivos multimedia
-  onChange: (files: string[]) => void; // Callback para actualizar las URLs
-  error?: string; // Mensaje de error opcional
+  value: string[]; 
+  onChange: (files: string[]) => void; 
+  error?: string; 
 }
 
 interface PreviewFile {
@@ -25,14 +25,14 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
   const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const newFiles = Array.from(files).slice(0, 4 - previewFiles.length); // Limitar a 4 archivos
+      const newFiles = Array.from(files).slice(0, 4 - previewFiles.length);
       const newPreviews = newFiles.map((file) => ({
         url: URL.createObjectURL(file),
         isVideo: file.type.startsWith("video/"),
       }));
       const updatedFiles = [...previewFiles, ...newPreviews];
-      setPreviewFiles(updatedFiles); // Actualizar vista previa
-      onChange(updatedFiles.map((file) => file.url)); // Pasar los valores al componente padre
+      setPreviewFiles(updatedFiles);
+      onChange(updatedFiles.map((file) => file.url)); 
     }
   };
 
