@@ -10,6 +10,10 @@ import Link from 'next/link';
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import { URL_BASE } from '@/config/config';
+
+import axios from 'axios';
+import Notification from '@/components/ui/notification-lg/Notification';
 
 type Inputs = {
     email: string;
@@ -18,20 +22,80 @@ type Inputs = {
 
 
 export const LoginForm = () => {
-    const router = useRouter(); 
+    const [notification, setNotification] = useState<{
+        open: boolean;
+        message: string;
+        type: 'success' | 'error' | 'info' | 'warning';
+    }>({ open: false, message: '', type: 'info' });
     const { register, handleSubmit, formState: { errors } } = useForm<Inputs>({
         resolver: zodResolver(loginSchema),
         mode: 'onChange',
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
+
 
     const handleClickShowPassword: () => void = () => setShowPassword((show) => !show);
 
-    const onSubmit = (data: Inputs) => {
-        console.log({ ...data });
+    const onSubmit = async (data: Inputs) => {
+        try {
+            const response = await axios.post(`${URL_BASE}auth/login-entrepreneur`,
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            );
+    
+            if (response.status === 200 || response.status === 201) {
+                setNotification({
+                    open: true,
+                    message: 'Inicio de sesión exitoso',
+                    type: 'success',
+                });
+    
+                const expirationTime = new Date(new Date().getTime() + 3600 * 1000);
+                document.cookie = `auth_cookie=${response.data.token}; expires=${expirationTime.toUTCString()}; path=/`;
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user_id', response.data.id);
+                router.push('/');
+            }
+        } catch (error: any) {
+            if (error.response) {
+                const errorMessage = error.response.data.message;
+    
+                // ✅ Detectamos si el usuario no está aprobado
+                if (error.response.status === 403 && errorMessage.includes("Estado de la cuenta")) {
+                    setNotification({
+                        open: true,
+                        message: errorMessage,
+                        type: 'warning',
+                    });
+                } else if (error.response.status === 401) {
+                    setNotification({
+                        open: true,
+                        message: 'Contraseña incorrecta',
+                        type: 'error',
+                    });
+                } else {
+                    setNotification({
+                        open: true,
+                        message: 'Credenciales incorrectas',
+                        type: 'error',
+                    });
+                }
+            } else {
+                setNotification({
+                    open: true,
+                    message: 'Error al conectar con el servidor',
+                    type: 'error',
+                });
+            }
+        }
     };
-
+    
     return (
        <>
         <Typography 
@@ -53,6 +117,8 @@ export const LoginForm = () => {
                     Crea una cuenta
                 </Link>
             </Typography>
+
+            
         <Box component="form" onSubmit={handleSubmit(onSubmit)}
             sx={{
                 display: 'flex',
@@ -61,7 +127,14 @@ export const LoginForm = () => {
                 width: '100%',
                 marginBottom: '21px',
             }}
+            noValidate
         >
+            <Notification
+            open={notification.open}
+                onClose={() => setNotification({ ...notification, open: false })}
+                message={notification.message}
+                type={notification.type}
+            />
             <FormLabel htmlFor="email"
                 sx={{
                     color: themePalette.black,

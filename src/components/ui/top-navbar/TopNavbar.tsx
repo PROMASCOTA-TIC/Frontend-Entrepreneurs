@@ -88,7 +88,11 @@ const NavbarEm: React.FC = () => {
             onClose={handleCloseUserMenu}
           >
             {settings.map((setting) => (
-              <MenuItem key={setting.text} onClick={handleCloseUserMenu}>
+              <MenuItem key={setting.text}    onClick={() => {
+                handleCloseUserMenu();
+                  localStorage.clear();
+                  document.cookie = 'auth_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';  
+                }}>
                 <Link href={setting.path} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <Typography textAlign="center">{setting.text}</Typography>
                 </Link>

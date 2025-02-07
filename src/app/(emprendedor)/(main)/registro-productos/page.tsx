@@ -99,7 +99,7 @@ export default function RegistroProducto() {
       const blob = await fetch(file).then((res) => res.blob());
       const storageRef = ref(
         storage,
-        `products/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`
+        `products/${Date.now()}_${Math.random().toString(36).slice(2)}`
       );
       await uploadBytes(storageRef, blob);
       const downloadURL = await getDownloadURL(storageRef);
