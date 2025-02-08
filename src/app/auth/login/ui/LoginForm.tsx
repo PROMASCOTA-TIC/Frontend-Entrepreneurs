@@ -60,6 +60,7 @@ export const LoginForm = () => {
                 document.cookie = `auth_cookie=${response.data.token}; expires=${expirationTime.toUTCString()}; path=/`;
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user_id', response.data.id);
+                localStorage.setItem('entrepreneur_id', response.data.idEntrepreneur);
                 router.push('/inicio');
             }
         } catch (error: any) {

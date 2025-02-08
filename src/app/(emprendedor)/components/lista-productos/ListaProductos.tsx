@@ -44,13 +44,28 @@ const ListaProductos: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const apiRef = useGridApiRef();
+
+
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn(" No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
+
+  
   const handleViewProduct = (product: ProductDetails) => {
     setSelectedProduct(product);
     setOpenDetailsDialog(true);
   };
+
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
-  
+
+
+
   const handleEditProduct = async (productId: string) => {
     try {
       console.log("Obteniendo datos actualizados del producto:", productId);
@@ -128,10 +143,7 @@ const ListaProductos: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const storedEntrepreneurId = localStorage.getItem("entrepreneurId") || "ca224da6-01f1-4546-943d-c00f52f296dd";
-    setEntrepreneurId(storedEntrepreneurId);
-  }, []);
+
 
   useEffect(() => {
     if (entrepreneurId) {

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, Button, CircularProgress, DialogContent, DialogTitle, Grid2, Typography,Dialog } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Button, CircularProgress, DialogContent, DialogTitle, Typography, Dialog, Grid2 } from "@mui/material";
 import TipoPublicacion from "../../components/registro-productos/TipoPublicacion";
 import TipoMascota from "../../components/registro-productos/TipoMascota";
 import FormularioRegistroProducto from "../../components/registro-productos/FormularioProducto";
@@ -26,7 +26,7 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 interface ProductData {
-  entrepreneurId: string;
+  entrepreneurId: string | null;
   publicationType: string;
   petTypeId: string;
   categoryId: string;
@@ -42,10 +42,19 @@ interface ProductData {
 
 export default function RegistroProducto() {
   const router = useRouter();
-  const entrepreneurId = "ca224da6-01f1-4546-943d-c00f52f296dd"; 
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
 
   const [productData, setProductData] = useState<ProductData>({
-    entrepreneurId,
+    entrepreneurId: null,
     publicationType: "",
     petTypeId: "",
     categoryId: "",
@@ -65,6 +74,14 @@ export default function RegistroProducto() {
   const [successMessage, setSuccessMessage] = useState("");
 
   
+  useEffect(() => {
+    if (entrepreneurId) {
+      setProductData((prev) => ({ ...prev, entrepreneurId }));
+    }
+  }, [entrepreneurId]);
+
+
+
   const updateProductData = (key: keyof ProductData, value: any) => {
     setProductData((prev) => ({
       ...prev,
@@ -153,8 +170,7 @@ export default function RegistroProducto() {
       }
     
       const data = await response.json();
-    
-      // ✅ Mensaje con el nombre del producto guardado
+
       setSuccessMessage(`"${productData.name}" se guardó exitosamente.`);
       setOpenSuccessDialog(true);
     

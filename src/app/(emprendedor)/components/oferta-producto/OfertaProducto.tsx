@@ -50,30 +50,26 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   const [precioConDescuento, setPrecioConDescuento] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const { control, handleSubmit, watch, reset, formState: { errors } } = useForm();
-  const porcentajeDescuento = watch('porcentajeDescuento');
-  const startDate = watch('startDate');  
+  const porcentajeDescuento = watch("porcentajeDescuento");
+  const startDate = watch("startDate");
   const [ofertas, setOfertas] = useState<Oferta[]>([]);
   const [loadingOfertas, setLoadingOfertas] = useState<boolean>(true);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
-  const apiRef = useGridApiRef(); 
-  const entrepreneurId = 'ca224da6-01f1-4546-943d-c00f52f296dd';
+  const apiRef = useGridApiRef();
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
   const [offerToEdit, setOfferToEdit] = useState<Oferta | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const resetForm = () => {
-    reset({
-      startDate: null,
-      endDate: null,
-      porcentajeDescuento: '',
-    });
-  
-    setSelectedProduct(null);
-    setPrecioActual(0);
-    setPrecioConDescuento(0);
-    setOfferToEdit(null);
-  };
-  
+
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
 
   useEffect(() => {
     axios.get(`${URL_BASE}products/entrepreneur/${entrepreneurId}`)
@@ -84,6 +80,8 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
         console.error('Error al obtener productos:', error);
       });
   }, [entrepreneurId]);
+ 
+
 
   useEffect(() => {
     if (open) {
@@ -104,9 +102,21 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     }
   }, [open]);
 
-
-
+  const resetForm = () => {
+    reset({
+      startDate: null,
+      endDate: null,
+      porcentajeDescuento: '',
+    });
   
+    setSelectedProduct(null);
+    setPrecioActual(0);
+    setPrecioConDescuento(0);
+    setOfferToEdit(null);
+  };
+  
+
+
   const handleDeleteOffer = (offerId: string) => {
     setOfferToDelete(offerId);
     setOpenDeleteDialog(true);
@@ -132,10 +142,10 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
       const response = await axios.delete(`${URL_BASE}offers/${offerToDelete}`);
   
       if (response.data.status === 'success') {
-        apiRef.current.setRowSelectionModel([]); // Limpia la selección de la tabla
-  
+        apiRef.current.setRowSelectionModel([]); 
         setOfertas((prevOfertas) => prevOfertas.filter((oferta) => oferta.id !== offerToDelete));
         console.log('Oferta eliminada:', response.data);
+        setMessage('¡Oferta eliminada con éxito!'); 
       }
     } catch (error) {
       console.error('Error al eliminar la oferta:', error);
@@ -237,6 +247,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
     },
     
   ];
+  
   const updateOffer = async (data: any) => {
     if (!offerToEdit) return;
  
@@ -276,7 +287,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
 
   const onSubmit = async (data: any) => {
     if (offerToEdit) {
-      await updateOffer(data); 
+      await updateOffer(data);
       return;
     }
   
@@ -377,8 +388,8 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
         sx={{
           textTransform: "none",
           width: "120px",
-          background: themePalette.black10,
-          color: themePalette.black,
+          background: themePalette.primary,
+          color: themePalette.cwhite,
           "&:hover": { background: themePalette.secondary },
         }}
       >
@@ -391,8 +402,8 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
         sx={{
           textTransform: "none",
           width: "120px",
-          background: themePalette.black10,
-          color: themePalette.black,
+          background: themePalette.primary,
+          color: themePalette.cwhite,
           "&:hover": { background: "red" },
         }}
       >

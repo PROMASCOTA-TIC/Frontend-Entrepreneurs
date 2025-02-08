@@ -43,6 +43,27 @@ const ListaProductosSinStock: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const apiRef = useGridApiRef();
+
+// Obtener entrepreneurId de localStorage
+useEffect(() => {
+  const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+  
+  if (storedEntrepreneurId) {
+    setEntrepreneurId(storedEntrepreneurId);
+  } else {
+    console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+  }
+}, []);
+
+// Obtener productos solo si existe entrepreneurId
+useEffect(() => {
+  if (entrepreneurId) {
+    fetchProducts();
+  }
+}, [entrepreneurId]);
+
+
+
   const handleViewProduct = (product: ProductDetails) => {
     setSelectedProduct(product);
     setOpenDetailsDialog(true);
@@ -50,6 +71,7 @@ const ListaProductosSinStock: React.FC = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
   
+
 
   
   const handleEditProduct = async (productId: string) => {
@@ -112,23 +134,23 @@ const ListaProductosSinStock: React.FC = () => {
   
   const fetchProducts = async () => {
     if (!entrepreneurId) {
-      console.error(" No se encontró el ID del emprendedor.");
+      console.error("No se encontró el ID del emprendedor.");
       return;
     }
-  
+
     const endpoint = `${URL_BASE}products/entrepreneur/${entrepreneurId}/low-stock`;
     console.log("🔍 Haciendo petición a:", endpoint);
-  
+
     try {
       const response = await axios.get(endpoint);
-  
+
       console.log("Respuesta del servidor:", response.data);
-  
+
       if (!Array.isArray(response.data)) {
         console.error(" La respuesta del servidor no es un array:", response.data);
         return;
       }
-  
+
       const formattedData = response.data.map((product: any) => ({
         id: product.id,
         name: product.name,
@@ -144,7 +166,7 @@ const ListaProductosSinStock: React.FC = () => {
         weight: product.weight,
         createdAt: product.createdAt,
       }));
-  
+
       setRows(formattedData);
     } catch (error: any) {
       if (error.response) {
@@ -157,17 +179,7 @@ const ListaProductosSinStock: React.FC = () => {
     }
   };
 
-  
-  useEffect(() => {
-    const storedEntrepreneurId = localStorage.getItem("entrepreneurId") || "ca224da6-01f1-4546-943d-c00f52f296dd";
-    setEntrepreneurId(storedEntrepreneurId);
-  }, []);
 
-  useEffect(() => {
-    if (entrepreneurId) {
-      fetchProducts();
-    }
-  }, [entrepreneurId]);
 
   const CustomToolbar = () => (
     <GridToolbarContainer sx={{ display: "flex", justifyContent: "space-between" }}>
