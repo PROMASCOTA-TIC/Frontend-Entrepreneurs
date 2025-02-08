@@ -94,20 +94,33 @@ export default function RegistroProducto() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const uploadImagesToFirebase = async (files: string[]) => {
+  const uploadMediaToFirebase = async (files: string[]) => {
     const urls: string[] = [];
+    
     for (const file of files) {
-      const blob = await fetch(file).then((res) => res.blob());
+      const response = await fetch(file);
+      const blob = await response.blob();
+
+      const fileType = blob.type;
+      const fileExtension = fileType.split("/")[1]; 
+
+      const prefix = fileType.startsWith("image/") ? "imagenes" : "videos";
+  
+
       const storageRef = ref(
         storage,
-        `products/${Date.now()}_${Math.random().toString(36).slice(2)}`
+        `emprendedores/productos/${prefix}/${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExtension}`
       );
+
       await uploadBytes(storageRef, blob);
+
       const downloadURL = await getDownloadURL(storageRef);
       urls.push(downloadURL);
     }
+  
     return urls;
   };
+  
 
   const handleGuardar = async () => {
     if (!validateForm()) {
@@ -119,7 +132,7 @@ export default function RegistroProducto() {
     console.log("Datos antes de subir:", productData);
 
     try {
-      const uploadedUrls = await uploadImagesToFirebase(productData.multimediaFiles);
+      const uploadedUrls = await uploadMediaToFirebase(productData.multimediaFiles);
       const updatedProductData = {
         ...productData,
         multimediaFiles: uploadedUrls,

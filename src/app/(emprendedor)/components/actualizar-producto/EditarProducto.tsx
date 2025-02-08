@@ -20,8 +20,8 @@ import FormularioRegistroProducto from "../registro-productos/FormularioProducto
 import ArchivosMultimedia from "../registro-productos/ArchivosMultimedia";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { initializeApp } from "firebase/app";
+import { URL_BASE } from "@/config/config";
 
-// 🔥 Configuración de Firebase
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
@@ -59,7 +59,7 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
       setFetching(true);
       try {
         console.log("Obteniendo datos del producto desde el backend:", product.id);
-        const response = await axios.get(`http://localhost:3001/api/products/edit/${product.id}`);
+        const response = await axios.get(`${URL_BASE}products/edit/${product.id}`);
         const updatedProduct = response.data;
 
         console.log("Datos obtenidos para edición:", updatedProduct);
@@ -111,33 +111,47 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const uploadImagesToFirebase = async (files: string[]) => {
+  const uploadMediaToFirebase = async (files: string[]) => {
     const urls: string[] = [];
-    for (const file of files) {
-      if (file.startsWith("https://")) {
 
-        urls.push(file);
-      } else {
-        const blob = await fetch(file).then((res) => res.blob());
-        const storageRef = ref(
-          storage,
-          `products/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`
-        );
-        await uploadBytes(storageRef, blob);
-        const downloadURL = await getDownloadURL(storageRef);
-        urls.push(downloadURL);
-      }
+    for (const file of files) {
+        if (file.startsWith("https://")) {
+            urls.push(file);
+        } else {
+
+            const response = await fetch(file);
+            const blob = await response.blob();
+
+            const fileType = blob.type;
+            const fileExtension = fileType.split("/")[1]; 
+
+
+            const prefix = fileType.startsWith("image/") ? "imagenes" : "videos";
+
+
+            const storageRef = ref(
+                storage,
+                `emprendedores/productos/${prefix}/${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExtension}`
+            );
+
+            await uploadBytes(storageRef, blob);
+
+            const downloadURL = await getDownloadURL(storageRef);
+            urls.push(downloadURL);
+        }
     }
+    
     return urls;
-  };
+};
+
 
   const handleUpdate = async () => {
     if (!validateForm()) return;
   
     setLoading(true);
     try {
-      const uploadedUrls = await uploadImagesToFirebase(formData.multimediaFiles);
-  
+      const uploadedUrls = await uploadMediaToFirebase(formData.multimediaFiles);
+
       const formattedData = {
         entrepreneurId: formData.entrepreneurId,
         publicationType: formData.publicationType,
@@ -153,7 +167,7 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
       };
       console.log("Enviando datos limpios al backend:", formattedData);
       const response = await axios.patch(
-        `http://localhost:3001/api/products/${formData.id}`,
+       `${URL_BASE}products/${formData.id}`,
         formattedData
       );
   

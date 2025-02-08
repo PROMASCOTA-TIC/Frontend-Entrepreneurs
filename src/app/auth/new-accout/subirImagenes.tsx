@@ -17,6 +17,7 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/
 import { initializeApp } from "firebase/app";
 import { themePalette } from "@/config/theme.config";
 import { theme } from "@/app/config/theme.config";
+import { URL_BASE } from "@/config/config";
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -53,7 +54,7 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
 
   const uploadImage = async (file: File, folder: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-      const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
+      const storageRef = ref(storage, `emprendedores/negocios/${folder}/${Date.now()}_${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on(
@@ -67,6 +68,7 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
       );
     });
   };
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "local" | "logo") => {
     const files = event.target.files;
@@ -122,7 +124,7 @@ export const UploadImagesForm: React.FC<UploadImagesFormProps> = ({
         fotosLogotipo: uploadedLogoImages,
       };
 
-      const response = await fetch("http://localhost:3001/api/auth/register-entrepreneur", {
+      const response = await fetch(`${URL_BASE}auth/register-entrepreneur`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedFormData),

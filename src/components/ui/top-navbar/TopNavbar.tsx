@@ -32,7 +32,6 @@ const NavbarEm: React.FC = () => {
     handleCloseUserMenu();
 
     if (path === '/auth/login') {
-      // Solo al hacer clic en "Cerrar sesión" se eliminan la cookie y el localStorage
       localStorage.clear();
       document.cookie = 'auth_cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     }
@@ -64,7 +63,6 @@ const NavbarEm: React.FC = () => {
             </Box>
           </Link>
 
-          {/* Menú de cuenta */}
           <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', ml: 'auto' }}>
             <Tooltip title="Open settings">
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -87,7 +85,6 @@ const NavbarEm: React.FC = () => {
               </Box>
             </Tooltip>
 
-            {/* Menú desplegable */}
             <Menu
               sx={{ mt: '45px' }}
               anchorEl={anchorElUser}

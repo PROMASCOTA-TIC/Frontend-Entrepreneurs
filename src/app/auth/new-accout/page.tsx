@@ -99,15 +99,13 @@ export default function RegisterPage() {
 
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // Enviar datos al backend
-  // Enviar datos al backend
   const handleSuccessfulSubmit = () => {
     console.log("✅ Registro finalizado correctamente.");
     nextStep();
   };
 
 
-  // Función para renderizar el componente correspondiente según el paso actual
+
   const renderFormComponent = () => {
     switch (currentStep) {
       case 1:
@@ -150,9 +148,9 @@ export default function RegisterPage() {
           
           return (
           <UploadImagesForm
-            formData={formData} // ✅ Pasar todo el formData acumulado
+            formData={formData} 
             updateFormData={updateFormData}
-            onSubmit={handleSuccessfulSubmit} // ✅ Solo avanzar al siguiente paso sin reenviar datos
+            onSubmit={handleSuccessfulSubmit} 
             prevStep={prevStep}
           />
         );
