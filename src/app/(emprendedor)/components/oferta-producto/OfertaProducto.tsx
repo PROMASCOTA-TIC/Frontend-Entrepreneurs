@@ -13,7 +13,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter,useGridApiRef } from '@mui/x-data-grid';
 import { esES } from '@mui/x-data-grid/locales';
 import { Edit, Delete } from '@mui/icons-material';
-import { red } from '@mui/material/colors';
 import { URL_BASE } from '@/config/config';
 
 
@@ -39,11 +38,12 @@ interface Oferta {
 interface OfertaProductoProps {
   open: boolean;
   onClose: () => void;
+  entrepreneurId: string | null;
 }
 
 
 
-const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
+const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose, entrepreneurId }) => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Producto | null>(null);
   const [precioActual, setPrecioActual] = useState<number>(0);
@@ -57,30 +57,33 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose }) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
   const apiRef = useGridApiRef();
-  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
   const [offerToEdit, setOfferToEdit] = useState<Oferta | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [loadingProductos, setLoadingProductos] = useState<boolean>(false);
+
 
 
   useEffect(() => {
-    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
-    if (storedEntrepreneurId) {
-      setEntrepreneurId(storedEntrepreneurId);
-    } else {
-      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+    if (!entrepreneurId || entrepreneurId === "null") {
+      return;
     }
-  }, []);
 
-  useEffect(() => {
-    axios.get(`${URL_BASE}products/entrepreneur/${entrepreneurId}`)
-      .then((response) => {
-        setProductos(response.data);
-      })
-      .catch((error) => {
-        console.error('Error al obtener productos:', error);
-      });
-  }, [entrepreneurId]);
- 
+    if (open) { 
+      console.log(`🔎 Cargando productos para entrepreneurId: ${entrepreneurId}`);
+      setLoadingProductos(true);
+
+      axios.get(`${URL_BASE}products/entrepreneur/${entrepreneurId}`)
+        .then((response) => {
+          setProductos(response.data);
+        })
+        .catch((error) => {
+          console.error("Error al obtener productos:", error);
+        })
+        .finally(() => {
+          setLoadingProductos(false);
+        });
+    }
+  }, [open, entrepreneurId]); 
 
 
   useEffect(() => {

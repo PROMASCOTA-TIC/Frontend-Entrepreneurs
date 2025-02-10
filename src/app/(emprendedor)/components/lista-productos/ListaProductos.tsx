@@ -322,7 +322,7 @@ const ListaProductos: React.FC = () => {
   anchorOrigin={{ vertical: "top", horizontal: "center" }}
 />
 
-      <OfertaProducto open={openDialog} onClose={() => setOpenDialog(false)} />
+      <OfertaProducto open={openDialog} onClose={() => setOpenDialog(false)}  entrepreneurId={entrepreneurId} />
       {selectedProduct && <DetallesProducto product={selectedProduct} open={openDetailsDialog} onClose={() => setOpenDetailsDialog(false)} />}
       {selectedProduct && <EditarProducto open={openEditDialog} onClose={() => setOpenEditDialog(false)} product={selectedProduct} onUpdateSuccess={fetchProducts} />}
     </Box>
