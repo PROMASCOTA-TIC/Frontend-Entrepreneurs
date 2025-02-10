@@ -21,7 +21,7 @@ import { URL_BASE } from "@/config/config";
 
 const API_GET = `${URL_BASE}users/entrepreneurs`;
 const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
-const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d";
+
 
 
 type Horario = {
@@ -34,7 +34,15 @@ type Horario = {
 const diasDeLaSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 const CambiarHoraAtencion: React.FC = () => {
+  
   const router = useRouter();
+
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+ 
   const {
     control,
     handleSubmit,
@@ -53,15 +61,26 @@ const CambiarHoraAtencion: React.FC = () => {
     },
   });
 
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
- const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+      setErrorMsg("No se encontró el ID del emprendedor. Por favor, inicia sesión nuevamente.");
+    }
+  }, []);
+  
+
+
+  useEffect(() => {
+    
+    if (!entrepreneurId) return;
+
     const fetchHorarios = async () => {
       try {
-        const response = await fetch(`${API_GET}/${idEntrepreneur}`);
+        const response = await fetch(`${API_GET}/${entrepreneurId}`);
         if (!response.ok) throw new Error("Error al obtener datos");
 
         const data = await response.json();
@@ -85,7 +104,7 @@ const CambiarHoraAtencion: React.FC = () => {
     };
 
     fetchHorarios();
-  }, []);
+  }, [entrepreneurId, setValue]);
 
 
   useEffect(() => {
@@ -97,12 +116,20 @@ const CambiarHoraAtencion: React.FC = () => {
     });
   }, [watch("horario")]);
 
+
   const onSubmit = async (data: { horario: Horario[] }) => {
+
+    if (!entrepreneurId) {
+      setErrorMsg("No se encontró el ID del emprendedor.");
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
+    setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${API_PATCH}/${idEntrepreneur}`, {
+      const response = await fetch(`${API_PATCH}/${entrepreneurId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -120,6 +147,14 @@ const CambiarHoraAtencion: React.FC = () => {
       setLoading(false);
     }
   };
+  if (!entrepreneurId) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
+
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

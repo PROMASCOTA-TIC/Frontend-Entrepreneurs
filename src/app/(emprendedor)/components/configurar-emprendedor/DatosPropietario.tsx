@@ -36,7 +36,7 @@ type Inputs = {
 
 export const RegisterFormCambiar: React.FC = () => {
   const router = useRouter();
-  const entrepreneurId = "252cdb28-808e-4fb9-8297-4124ced58d1d"; 
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -53,33 +53,46 @@ export const RegisterFormCambiar: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+
   useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
+
+  // ✅ Obtener datos del emprendedor dinámicamente
+  useEffect(() => {
+    if (!entrepreneurId) return; // 🔥 Solo ejecuta si entrepreneurId no es null
   
     const fetchEntrepreneurData = async () => {
       try {
         const response = await axios.get(`${URL_BASE}users/entrepreneurs/${entrepreneurId}`);
-
-
         const { name, email } = response.data;
-
+  
         setValue("name", name);
         setValue("email", email);
-        setValue("emailConfirm", email); 
-
+        setValue("emailConfirm", email);
       } catch (error) {
         console.error("Error al cargar los datos del usuario:", error);
         setErrorMessage("Error al cargar la información del usuario.");
       }
     };
-
+  
     fetchEntrepreneurData();
-  }, [entrepreneurId, setValue]);
+  }, [entrepreneurId, setValue]); 
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowPasswordConfirm = () =>
-    setShowPasswordConfirm((show) => !show);
+  const handleClickShowPasswordConfirm = () => setShowPasswordConfirm((show) => !show);
 
   const onSubmit = async (data: Inputs) => {
+    if (!entrepreneurId) {
+      setErrorMessage("No se encontró el ID del emprendedor.");
+      return;
+    }
+
     setLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -87,7 +100,6 @@ export const RegisterFormCambiar: React.FC = () => {
     let filteredData = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => value !== undefined && value !== "")
     );
-
 
     delete filteredData.emailConfirm;
     delete filteredData.passwordConfirm;
@@ -107,7 +119,6 @@ export const RegisterFormCambiar: React.FC = () => {
 
       console.log("✅ Emprendedor actualizado:", response.data);
       setSuccessMessage("Los cambios se han actualizado correctamente.");
-
     } catch (error: any) {
       console.error("Error en la actualización:", error);
       setErrorMessage(
@@ -117,6 +128,7 @@ export const RegisterFormCambiar: React.FC = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <Box sx={{ maxWidth: 400, mx: "auto", mt: 5, textAlign: "center" }}>

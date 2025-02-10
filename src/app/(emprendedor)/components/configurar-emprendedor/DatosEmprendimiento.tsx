@@ -36,56 +36,65 @@ type Inputs = {
 const API_GET = `${URL_BASE}users/entrepreneurs`;
 const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
 
-const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d"; 
 export const CambioDatosEmprendimiento: React.FC = () => {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<Inputs>({
-    mode: "onChange",
-  });
-
-  const [loading, setLoading] = useState(false);
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<Inputs>({ mode: "onChange" });
 
 
   useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+      setErrorMsg("No se encontró el ID del emprendedor. Por favor, inicia sesión nuevamente.");
+    }
+  }, []);
+
+
+  useEffect(() => {
+    if (!entrepreneurId) return;
+
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_GET}/${idEntrepreneur}`);
+        const response = await fetch(`${API_GET}/${entrepreneurId}`);
         if (!response.ok) throw new Error("Error al obtener datos");
         const data = await response.json();
 
-       
         setValue("nombreEmprendimiento", data.nombreEmprendimiento);
         setValue("ruc", data.ruc);
         setValue("numeroCelular", data.numeroCelular);
         setValue("bancoNombre", data.bancoNombre);
-        setValue("bancoTipoCuenta", data.bancoTipoCuenta || "Ahorros"); 
+        setValue("bancoTipoCuenta", data.bancoTipoCuenta || "Ahorros");
         setValue("bancoNumeroCuenta", data.bancoNumeroCuenta);
         setValue("bancoNombreDuenoCuenta", data.bancoNombreDuenoCuenta);
       } catch (error) {
         console.error("Error cargando datos:", error);
         setErrorMsg("No se pudieron cargar los datos.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, [setValue]);
-
+  }, [entrepreneurId, setValue]);
 
   const onSubmit = async (data: Inputs) => {
+    if (!entrepreneurId) {
+      setErrorMsg("No se encontró el ID del emprendedor.");
+      return;
+    }
+
     setLoading(true);
     setErrorMsg(null);
     setSuccessMessage(null);
 
     try {
-      const response = await fetch(`${API_PATCH}/${idEntrepreneur}`, {
+      const response = await fetch(`${API_PATCH}/${entrepreneurId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -104,6 +113,15 @@ export const CambioDatosEmprendimiento: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (!entrepreneurId) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
+
 
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 5, textAlign: "center" }}>

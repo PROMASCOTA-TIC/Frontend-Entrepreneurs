@@ -12,6 +12,7 @@ import {
   Typography,
   Alert,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { themePalette } from "@/config/theme.config";
@@ -23,7 +24,7 @@ import { URL_BASE } from "@/config/config";
 
 const API_GET = `${URL_BASE}users/entrepreneurs`;
 const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
-const idEntrepreneur = "252cdb28-808e-4fb9-8297-4124ced58d1d";
+
 
 const apiKey = process.env.NEXT_PUBLIC_API_KEY;
 
@@ -37,15 +38,6 @@ type Inputs = {
   sectorLocal: string;
 };
 
-const fieldLabels: { [key in keyof Inputs]: string } = {
-    callePrincipal: "Calle Principal",
-    calleSecundaria: "Calle Secundaria",
-    numeracion: "Numeración",
-    referencia: "Referencia",
-    realizaEnvios: "",
-    soloRetiraEnTienda: "",
-    sectorLocal: "",
-  };
 
 const zonas = [
     {
@@ -162,7 +154,10 @@ const center = { lat: -0.180653, lng: -78.467834 };
 
 export const CambioDatosEnvio: React.FC = () => {
   const router = useRouter();
-  const { control, handleSubmit, setValue, watch, formState: { errors }, setError, clearErrors} = useForm<Inputs>({
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: apiKey || "" });
+
+  const { control, handleSubmit, setValue, watch, formState: { errors }}= useForm<Inputs>({
     defaultValues: {
       realizaEnvios: "0",
       soloRetiraEnTienda: "0",
@@ -183,16 +178,25 @@ export const CambioDatosEnvio: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: apiKey || "",
-  });
+  // ✅ Obtener el ID del emprendedor desde localStorage
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+      setErrorMsg("No se encontró el ID del emprendedor. Por favor, inicia sesión nuevamente.");
+    }
+  }, []);
 
-  
 
   useEffect(() => {
     const fetchData = async () => {
+
+      if (!entrepreneurId) return;
+
       try {
-        const response = await fetch(`${API_GET}/${idEntrepreneur}`);
+        const response = await fetch(`${API_GET}/${entrepreneurId}`);
         if (!response.ok) throw new Error("Error al obtener datos");
 
         const data = await response.json();
@@ -208,11 +212,13 @@ export const CambioDatosEnvio: React.FC = () => {
       } catch (error) {
         console.error("Error cargando datos:", error);
         setErrorMsg("No se pudieron cargar los datos.");
+      }finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [entrepreneurId, setValue]);
 
   const validateCheckboxes = () => {
     const realizaEnvios = watch("realizaEnvios") === "1";
@@ -236,7 +242,7 @@ export const CambioDatosEnvio: React.FC = () => {
     setSuccessMessage(null);
 
     try {
-      await fetch(`${API_PATCH}/${idEntrepreneur}`, {
+      await fetch(`${API_PATCH}/${entrepreneurId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -250,6 +256,15 @@ export const CambioDatosEnvio: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (!entrepreneurId) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <CircularProgress size={40} />
+      </Box>
+    );
+  }
+  
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", mt: 5, textAlign: "left", padding: 3, borderRadius: 2 }}>

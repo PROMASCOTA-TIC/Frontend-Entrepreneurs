@@ -40,7 +40,7 @@ const storage = getStorage(app);
 
 const API_GET = `${URL_BASE}users/entrepreneurs`;
 const API_PATCH = `${URL_BASE}users/update-entrepreneur`;
-const idEntrepreneur = "7878e58e-ef64-4e7a-929f-253023dcbb85";
+
 
 const AgregarFotosEmpren: React.FC = () => {
   const { handleSubmit, setValue, watch } = useForm();
@@ -48,7 +48,7 @@ const AgregarFotosEmpren: React.FC = () => {
   
   const localPhotos = watch("localPhotos") || [];
   const logoPhotos = watch("logoPhotos") || [];
-
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
   const [previewLocalPhotos, setPreviewLocalPhotos] = useState<string[]>([]);
   const [previewLogoPhotos, setPreviewLogoPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -57,10 +57,21 @@ const AgregarFotosEmpren: React.FC = () => {
 
 
   useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      setErrorMessage("No se encontró el ID del emprendedor. Inicie sesión nuevamente.");
+    }
+  }, []);
+
+
+  useEffect(() => {
+    if (!entrepreneurId) return;
 
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_GET}/${idEntrepreneur}`);
+        const response = await fetch(`${API_GET}/${entrepreneurId}`);
         if (!response.ok) throw new Error("Error al obtener datos");
 
         const data = await response.json();
@@ -73,7 +84,7 @@ const AgregarFotosEmpren: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [entrepreneurId]);
 
   const uploadImagesToFirebase = async (files: File[], folder: string) => {
     const urls: string[] = [];
@@ -143,12 +154,12 @@ const AgregarFotosEmpren: React.FC = () => {
         fotosLogotipo: uploadedLogoUrls,
       };
   
-      await fetch(`${API_PATCH}/${idEntrepreneur}`, {
+      await fetch(`${API_PATCH}/${entrepreneurId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-     setSuccessMessage("Fotos actualizadas correctamente");
+      setSuccessMessage("Fotos actualizadas correctamente");
       console.log("Datos de imágenes actualizados correctamente.");
     } catch (error) {
       console.error(" Error al actualizar las imágenes:", error);
