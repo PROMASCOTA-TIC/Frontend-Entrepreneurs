@@ -13,6 +13,7 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
+  Typography,
 } from "@mui/material";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/validations/registerSchema";
@@ -20,6 +21,7 @@ import "@/app/auth/new-accout/Login.css";
 import "./Login.css";
 import { themePalette } from "@/config/theme.config";
 import { useRouter } from "next/navigation";
+import TerminosModal from "@/app/(emprendedor)/components/modals/TerminosModal";
 
 type Inputs = {
   name: string;
@@ -56,6 +58,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(formData.aceptoTerminos === "1");
+  const [openTermsModal, setOpenTermsModal] = useState(false); 
 
   const handleAcceptTermsChange = (checked: boolean) => {
     setAcceptTerms(checked);
@@ -141,7 +144,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         </Box>
       ))}
 
-      <FormControlLabel
+<FormControlLabel
         control={
           <Checkbox
             checked={acceptTerms}
@@ -149,9 +152,26 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             sx={{ color: themePalette.secondary }}
           />
         }
-        label="Acepto los términos y condiciones"
+        label={
+          <Typography>
+            Acepto los{" "}
+            <span
+              onClick={() => setOpenTermsModal(true)}
+              style={{
+                color: themePalette.primary,
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
+            >
+              términos y condiciones
+            </span>
+          </Typography>
+        }
         sx={{ color: "black", margin: "10px 0" }}
       />
+
+      {/* Modal de Términos y Condiciones */}
+      <TerminosModal open={openTermsModal} onClose={() => setOpenTermsModal(false)} />
 
       {/* Botones */}
       <Box style={{ margin: "20px 0" }} className="button-is space-x-4">
