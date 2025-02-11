@@ -130,12 +130,12 @@ export default function RegisterPage() {
             formData={{
               horario: formData.horario?.map((h) => ({
                 dia: h.dia,
-                cerrado: h.cerrado ?? "0",  // ✅ Asegurar que siempre tenga un valor
+                cerrado: h.cerrado ?? "0",
                 horaApertura: h.horaApertura ?? "",
                 horaCierre: h.horaCierre ?? ""
               })) ?? diasDeLaSemana.map((dia) => ({
                 dia,
-                cerrado: "0",  // ✅ Siempre definir "cerrado" correctamente
+                cerrado: "0",  
                 horaApertura: "",
                 horaCierre: ""
               }))
@@ -252,17 +252,50 @@ export default function RegisterPage() {
             },
           }}
         >
-          <Image
-            src={fondoDuenos}
-            alt="imagen"
-            style={{
-              margin: 0,
-              padding: 0,
-              width: "100%",
-              height: "auto",
-            }}
-            priority
-          />
+  <Grid2 
+  size={{ xs: 0}}
+  sx={{
+    display: { xs: "none", md: "block" },
+    margin: 0,
+    padding: 0,
+    position: "relative",
+    width: "100%", 
+    height: "100%", // Cambio importante: Se adapta a la altura del contenedor padre
+    overflow: "hidden", // Evita desbordes
+  }}
+>
+  <Box sx={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
+    {/* Imagen de fondo */}
+    <Image 
+      src={fondoDuenos} 
+      alt="imagen"
+      layout="fill"
+      objectFit="cover" 
+      objectPosition="center center"
+      priority
+    />
+
+    {/* Texto encima de la imagen */}
+    <Typography 
+      sx={{
+        position: "absolute",
+        top: "3%",
+        left: "55%",
+        transform: "translate(-50%, -50%)",
+        color: "white",
+        fontSize: { xs: "2rem", md: "3rem" },
+        fontWeight: "bold",
+        textAlign: "center",
+        textShadow: "2px 2px 10px rgba(0, 0, 0, 0.5)",
+        width: "100%",
+      }}
+    >
+      Emprendedores
+    </Typography>
+  </Box>
+</Grid2>
+
+
         </Grid2>
       </Grid2>
     </div>

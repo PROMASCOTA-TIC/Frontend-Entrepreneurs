@@ -104,7 +104,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         </Box>
       ))}
 
-      {/* Campos de Contraseña */}
       {[
         { field: "password", label: "Contraseña", show: showPassword, setShow: setShowPassword },
         { field: "passwordConfirm", label: "Confirmar contraseña", show: showPasswordConfirm, setShow: setShowPasswordConfirm },
@@ -142,7 +141,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         </Box>
       ))}
 
-      {/* Checkbox Acepto Términos */}
       <FormControlLabel
         control={
           <Checkbox

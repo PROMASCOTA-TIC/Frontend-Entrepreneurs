@@ -57,7 +57,7 @@ const NavbarEm: React.FC = () => {
                   fontSize: { xs: '1rem', md: '1.5rem' },
                 }}
               >
-                PROMASCOTA
+                PROMASKOTA
               </Typography>
               <img src={logo.src} alt="Logo" style={{ height: '40px', marginRight: '8px' }} />
             </Box>
