@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from 'react';
-import { Box, Typography, Button,Grid2 } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Box, Typography, Button, Grid2 } from '@mui/material';
 import { DataGrid, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter, GridColDef } from '@mui/x-data-grid';
 import { useForm, Controller } from 'react-hook-form';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -24,8 +25,36 @@ const ListaPedidos: React.FC = () => {
       endDate: null,
     },
   });
+
   const [openModal, setOpenModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
+  const entrepreneurId = "a9201395-3f2f-42e4-bca0-9506ee84167b"; // 🔥 Luego cambiar a localStorage
+
+  // 🔥 Función para obtener órdenes del backend
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/api/products/${entrepreneurId}/orders-total`);
+        if (response.data && response.data.orders) {
+          const formattedOrders = response.data.orders.map((order: any) => ({
+            id: order.id.substring(0, 8), 
+            date: dayjs(order.createdAt).format('DD/MM/YYYY'), 
+            client: order.buyer?.name || 'N/A', 
+            products: order.totalItems,  
+            quantity: order.totalItems, 
+            total: `$${order.total.toFixed(2)}`, // 🔥 Total de la orden
+            status: order.isPaid ? "Pagado" : "No Pagado", // 🔥 Estado de pago
+            delivery: order.homeDelivery ? "Domicilio" : "Retiro en Tienda", // 🔥 Tipo de entrega
+          }));
+          setOrders(formattedOrders);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   const handleFilter = async () => {
     const isValid = await trigger(["startDate", "endDate"]);
@@ -41,13 +70,13 @@ const ListaPedidos: React.FC = () => {
     setOpenModal(true);
   };
 
+  // 🔥 Definición de las columnas del DataGrid (SE ELIMINÓ `price`)
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', minWidth: 30, flex: 0.5 },
     { field: 'date', headerName: 'Fecha', minWidth: 100, flex: 1 },
     { field: 'client', headerName: 'Cliente', minWidth: 150, flex: 1.5 },
-    { field: 'products', headerName: 'Productos', minWidth: 150, flex: 1.5 },
+    { field: 'products', headerName: 'Items', minWidth: 150, flex: 1.5 },
     { field: 'quantity', headerName: 'Cantidad', minWidth: 80, flex: 1 },
-    { field: 'price', headerName: 'Precio', minWidth: 80, flex: 1 },
     { field: 'total', headerName: 'Total', minWidth: 80, flex: 1 },
     { field: 'status', headerName: 'Estado', minWidth: 120, flex: 1 },
     { field: 'delivery', headerName: 'Tipo de Entrega', minWidth: 120, flex: 1 },
@@ -66,24 +95,6 @@ const ListaPedidos: React.FC = () => {
     },
   ];
 
-  const rows = [
-    { 
-      id: 1, 
-      date: '2024-10-18', 
-      client: 'Juan Pérez', 
-      orderNumber: '1234', 
-      total: '$250', 
-      paymentStatus: 'Pagado', 
-      paymentMethod: 'Tarjeta', 
-      deliveryType: 'Domicilio', 
-      sector: 'Centro', 
-      address: 'Av. Siempre Viva 123', 
-      items: [
-        { id: 1, name: 'Producto 1', description: 'Descripción 1', category: 'Categoria1', subcategory: 'Subcategoria', quantity: 2, price: '$150' }
-      ] 
-    },
-  ];
-
   const CustomToolbar = () => (
     <GridToolbarContainer sx={{ display: 'flex', justifyContent: 'space-between' }}>
       <div>
@@ -96,10 +107,20 @@ const ListaPedidos: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-         <Typography  sx={{ marginBottom: '20px', textAlign: 'left', fontSize:'24px',fontWeight:'bold',color:themePalette.primary, padding:'15px' }}>
+      <Typography
+        sx={{
+          marginBottom: '20px',
+          textAlign: 'left',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: themePalette.primary,
+          padding: '15px',
+        }}
+      >
         Lista de pedidos
       </Typography>
-        <Grid2 container spacing={2} alignItems="center" justifyContent="flex-end">
+
+      <Grid2 container spacing={2} alignItems="center" justifyContent="flex-end">
         <Grid2 size={{ xs: 12, sm: 4, md: 2.09 }}>
           <Controller
             name="startDate"
@@ -107,109 +128,38 @@ const ListaPedidos: React.FC = () => {
             rules={{ required: "La fecha de inicio es obligatoria" }}
             render={({ field }) => (
               <>
-                <DatePicker
-                  {...field}
-                  label="Fecha de inicio"
-                  format="DD/MM/YYYY"
-                  onChange={(date) => field.onChange(date)}
-                  sx={{ width: "100%" }}
-                />
-                {errors.startDate && (
-                  <Typography color="error" variant="body2">
-                    {errors.startDate.message}
-                  </Typography>
-                )}
+                <DatePicker {...field} label="Fecha de inicio" format="DD/MM/YYYY" sx={{ width: "100%" }} />
+                {errors.startDate && <Typography color="error">{errors.startDate.message}</Typography>}
               </>
             )}
           />
-   </Grid2>
+        </Grid2>
 
-   <Grid2 size={{ xs: 12, sm: 4, md: 2 }}>
+        <Grid2 size={{ xs: 12, sm: 4, md: 2 }}>
           <Controller
             name="endDate"
             control={control}
-            rules={{
-              required: "La fecha de fin es obligatoria",
-              validate: (value) => {
-                const startDate = getValues("startDate");
-                return startDate && value && dayjs(value).isBefore(startDate) ? "La fecha de fin no puede ser anterior a la fecha de inicio" : true;
-              },
-            }}
+            rules={{ required: "La fecha de fin es obligatoria" }}
             render={({ field }) => (
               <>
-                <DatePicker
-                  {...field}
-                  label="Fecha de fin"
-                  format="DD/MM/YYYY"
-                  minDate={getValues("startDate") || undefined}
-                  onChange={(date) => field.onChange(date)}
-                  sx={{ width: "100%" }}
-                />
-                {errors.endDate && (
-                  <Typography color="error" variant="body2">
-                    {errors.endDate.message}
-                  </Typography>
-                )}
+                <DatePicker {...field} label="Fecha de fin" format="DD/MM/YYYY" sx={{ width: "100%" }} />
+                {errors.endDate && <Typography color="error">{errors.endDate.message}</Typography>}
               </>
             )}
           />
- </Grid2>
+        </Grid2>
 
- <Grid2 size={{ xs: 12, sm: 4, md: 1 }} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit(handleFilter)}
-            sx={{ background: themePalette.primary, textTransform: 'none', borderRadius: '20px', width: '100%', mr: 2 }}
-          >
+        <Grid2 size={{ xs: 12, sm: 4, md: 1 }}>
+          <Button variant="contained" color="primary" onClick={handleSubmit(handleFilter)} sx={{ borderRadius: '20px', width: '100%', mr: 2 }}>
             Filtrar
           </Button>
-          </Grid2>
-       </Grid2>
-    
-    <Box sx={{ height: 400, width: "100%", marginTop: "30px" }}>
-          <DataGrid
-            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-            rows={rows}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 5 },
-              },
-            }}
-            pageSizeOptions={[5, 10, 25]}
-            slots={{
-              toolbar: CustomToolbar,
-            }}
-            slotProps={{
-              toolbar: {
-                showQuickFilter: true,
-                quickFilterProps: { debounceMs: 500 },
-              },
-            }}
-            sx={{
-              '& .MuiDataGrid-toolbarContainer': {
-                backgroundColor: themePalette.cwhite,
-                padding: '0.5rem',
-              },
-              '& .MuiDataGrid-columnHeader': {
-                backgroundColor: themePalette.black10,
-                fontWeight: 'bold',
-              },
-              '& .MuiDataGrid-footerContainer': {
-                backgroundColor: themePalette.black10,
-                fontWeight: 'bold',
-              },
-            }}
-          />
+        </Grid2>
+      </Grid2>
 
-        <ResumenPedido
-          open={openModal}
-          onClose={() => setOpenModal(false)}
-          orderData={selectedOrder}
-        />
+      <Box sx={{ height: 400, width: "100%", marginTop: "30px" }}>
+        <DataGrid rows={orders} columns={columns} pageSizeOptions={[5, 10, 25]} slots={{ toolbar: CustomToolbar }} />
+        <ResumenPedido open={openModal} onClose={() => setOpenModal(false)} orderData={selectedOrder} />
       </Box>
-    
     </LocalizationProvider>
   );
 };
