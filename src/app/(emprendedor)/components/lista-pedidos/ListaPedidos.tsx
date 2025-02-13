@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from "@mui/material";
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, CircularProgress } from "@mui/material";
 import { DataGrid, GridColDef, GridToolbarContainer, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter } from "@mui/x-data-grid";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { Close } from "@mui/icons-material";
@@ -10,13 +10,14 @@ import { esES } from "@mui/x-data-grid/locales";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { URL_BASE } from "@/config/config";
+import { URL_BASE, URL_BASE2 } from "@/config/config";
 
 const ListaPedidos: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const entrepreneurId = "a9201395-3f2f-42e4-bca0-9506ee84167b";
   const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -33,6 +34,7 @@ const ListaPedidos: React.FC = () => {
             total: `$${Number(order.total || 0).toFixed(2)}`,
             status: order.isPaid ? "Pagado" : "No Pagado",
             delivery: order.homeDelivery ? "Domicilio" : "Retiro en Tienda",
+            isDelivered: order.isDelivered, 
             rawData: order,
           }));
           setOrders(formattedOrders);
@@ -45,46 +47,67 @@ const ListaPedidos: React.FC = () => {
   }, []);
 
   const updateStock = async () => {
-    if (!selectedOrder) return;
+    if (!selectedOrder || selectedOrder.isDelivered) return;
+  
+    setLoading(true);
   
     try {
       const requests = selectedOrder.orderItems.map(async (item: any) => {
         const productId = item.itemId;
         const orderId = selectedOrder.id;
         const orderItemId = item.orderItemId;
-        const quantitySold = item.quantity;
-  
+        const quantitySold = Number(item.quantity);
         const productResponse = await axios.get(`${URL_BASE}products/${productId}`);
-        const currentStock = productResponse.data.stock ?? 0;
-        const currentSoldQuantity = productResponse.data.soldQuantity ?? 0;
+        const currentStock = Number(productResponse.data.stock ?? 0);
+        
+        if (isNaN(currentStock)) {
+          throw new Error(`Valores inválidos en stock.`);
+        }
+  
   
         const newStock = Math.max(currentStock - quantitySold, 0);
-        const newSoldQuantity = currentSoldQuantity + quantitySold;
+        const newSoldQuantity = (item.soldQuantity ?? 0) + quantitySold;
+        
+        console.log(`📦 Producto ${productId} → Stock Actual: ${currentStock}, Nuevo Stock: ${newStock}`);
+        console.log(`📊 Producto ${productId} → Vendidos Actuales: ${item.soldQuantity}, Nuevo SoldQuantity: ${newSoldQuantity}`);
   
-        const stockPayload = { stock: newStock, soldQuantity: newSoldQuantity };
-        console.log(`🔄 Actualizando stock del producto ${productId} con`, stockPayload);
+        const stockPayload = { 
+          stock: newStock, 
+          soldQuantity: newSoldQuantity 
+        };
+  
         await axios.patch(`${URL_BASE}products/${productId}`, stockPayload, {
           headers: { "Content-Type": "application/json" },
         });
   
-        console.log(`🔄 Cambiando estado del ítem ${orderItemId} en la orden ${orderId}`);
-        await axios.patch(`http://localhost:3002/api/orders/${orderId}/item/${orderItemId}`, {}, {
+        await axios.patch(`${URL_BASE2}orders/${orderId}/item/${orderItemId}`, {}, {
           headers: { "Content-Type": "application/json" },
         });
-  
-        console.log(`✅ Producto ${productId} y estado del ítem ${orderItemId} actualizado correctamente`);
       });
   
       await Promise.all(requests);
       console.log("✅ Todos los productos y estados de ítems fueron actualizados exitosamente.");
   
-      setOpenModal(false);
+      setSelectedOrder((prevOrder: any) => ({
+        ...prevOrder,
+        isDelivered: true,
+      }));
+  
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order.id === selectedOrder.id ? { ...order, isDelivered: true } : order
+        )
+      );
+  
     } catch (error: any) {
       console.error("❌ Error en la actualización:", error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
   
 
+  
   const handleOpenModal = (orderData: any) => {
     setSelectedOrder(orderData.rawData);
     setOpenModal(true);
@@ -99,6 +122,17 @@ const ListaPedidos: React.FC = () => {
     { field: "total", headerName: "Total", minWidth: 80, flex: 0.8 },
     { field: "status", headerName: "Estado", minWidth: 120, flex: 1 },
     { field: "delivery", headerName: "Tipo de Entrega", minWidth: 120, flex: 1 },
+    {
+      field: "isDelivered",
+      headerName: "Entregado",
+      minWidth: 100,
+      flex: 0.8,
+      renderCell: (params) => (
+        <Typography sx={{ color: params.row.isDelivered ? "green" : "red" }}>
+          {params.row.isDelivered ? "Sí" : "No"}
+        </Typography>
+      ),
+    },
     {
       field: "details",
       headerName: "Detalles",
@@ -243,15 +277,14 @@ const ListaPedidos: React.FC = () => {
               background: themePalette.primary,
             }}
              onClick={() => setOpenModal(false)}>Cerrar</Button>
-          <Button variant="contained"  sx={{
-              textTransform: "none",
-              width: "213px",
-              height: "34px",
-              borderRadius: "20px",
-              fontSize: "18px",
-              background: themePalette.primary,
-            }}
-             onClick={updateStock}>Entregado</Button>
+        <Button 
+            variant="contained"
+            disabled={selectedOrder?.isDelivered || loading} 
+            onClick={updateStock}
+            sx={{ minWidth: "150px", minHeight: "36px", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : (selectedOrder?.isDelivered ? "Ya Entregado" : "Entregado")}
+          </Button>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>
