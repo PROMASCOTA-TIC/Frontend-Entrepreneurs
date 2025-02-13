@@ -290,21 +290,28 @@ const ListaPedidos: React.FC = () => {
               background: themePalette.primary,
             }}
              onClick={() => setOpenModal(false)}>Cerrar</Button>
-        <Button 
-            variant="contained"
-            disabled={selectedOrder?.isDelivered || loading} 
-            onClick={updateStock}
-            sx={{
-              textTransform: "none",
-              width: "213px",
-              height: "34px",
-              borderRadius: "20px",
-              fontSize: "18px",
-              background: themePalette.primary,
-            }}
-          >
-            {loading ? <CircularProgress size={24}  /> : (selectedOrder?.isDelivered ? "Ya Entregado" : "Entregado")}
-          </Button>
+       <Button
+  variant="contained"
+  disabled={selectedOrder?.isDelivered || loading}
+  onClick={updateStock}
+  sx={{
+    textTransform: "none",
+    width: "213px",
+    height: "34px",
+    borderRadius: "20px",
+    fontSize: "18px",
+    background: themePalette.primary,
+  }}
+>
+  {loading ? (
+    <CircularProgress size={24} />
+  ) : selectedOrder?.isDelivered ? (
+    "Ya " + (selectedOrder?.homeDelivery ? "Enviado" : "Retirado")
+  ) : (
+    selectedOrder?.homeDelivery ? "Enviado" : "Retirado"
+  )}
+</Button>
+
         </DialogActions>
       </Dialog>
     </LocalizationProvider>
