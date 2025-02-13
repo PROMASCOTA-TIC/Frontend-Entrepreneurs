@@ -27,8 +27,12 @@ const PF_Categorias = () => {
       try {
         const response = await fetch(`http://localhost:3001/api/faqs/categories/${categoryId}/faqs`);
         const data = await response.json();
+
+        // Filtrar solo los artículos con estado "approved"
+        const articulosAprobados = data.filter((articulo: any) => articulo.status === "approved");
+
         // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
-        const articulosAdaptados = data.map((articulo: any) => ({
+        const articulosAdaptados = articulosAprobados.map((articulo: any) => ({
           id: articulo.id || articulo.faqId, // Asignar `faqId` si `id` no existe
           titulo: articulo.title || "Sin título",
           descripcion: articulo.description || "Sin descripción disponible",

@@ -52,19 +52,17 @@ const BotonCancelar: React.FC<BotonCancelarProps> = ({ link, onConfirm }) => {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title" style={{ textAlign: 'center' }}>
-                    {"Descartar cambios"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        ¿Estás seguro de que deseas descartar este elemento? Esta acción no se puede deshacer.
+                <DialogTitle id="alert-dialog-title" className='bg-primary txtcolor-white p-13' >{"Descartar Cambios"}</DialogTitle>
+                <DialogContent style={{ padding: '0px' }}>
+                    <DialogContentText id="alert-dialog-description" className='txtcolor-black txt-justify n-bold p-21'>
+                        ¿Estás seguro de que deseas descartar los cambios? Esta acción no se puede deshacer.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions className='flex-center'>
-                    <Button onClick={handleConfirm} color="error" autoFocus>
-                        Descartar
+                <DialogActions className='flex-center p-13' style={{ gap: '34px' }}>
+                    <Button onClick={handleConfirm} autoFocus className='bg-secondary txtcolor-white'>
+                        Aceptar
                     </Button>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleClose} className='bg-primary txtcolor-white' style={{ margin: '0px' }}>
                         Cancelar
                     </Button>
                 </DialogActions>

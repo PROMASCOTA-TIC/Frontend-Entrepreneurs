@@ -13,7 +13,7 @@ const PR_Categorias = () => {
   // ** Función para obtener todos los publireportajes **
   const fetchAllAdvertorials = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/advertorials/all');
+      const response = await fetch('http://localhost:3001/api/advertorials/status/approved');
       const data = await response.json();
       console.log('Datos recibidos:', data); // Log para ver los datos de la API
 
@@ -28,7 +28,7 @@ const PR_Categorias = () => {
 
       setArticulos(articulosAdaptados);
     } catch (error) {
-      console.error('Error al obtener los publireportajes:', error);
+      console.error('Error al obtener los publireportajes aprobados:', error);
       setArticulos([]); // Si hay error, se limpia la lista
     } finally {
       setLoading(false);
@@ -47,7 +47,10 @@ const PR_Categorias = () => {
       const data = await response.json();
       console.log(`Publireportajes de la categoría ${categoryId}:`, data);
 
-      const articulosAdaptados = data.map((articulo: any) => ({
+      // Filtrar solo los que tengan estado "approved"
+      const aprobados = data.filter((articulo: any) => articulo.status === "approved");
+
+      const articulosAdaptados = aprobados.map((articulo: any) => ({
         id: articulo.id || articulo.advertorialId,
         titulo: articulo.title || "Sin título",
         descripcion: articulo.description || "Sin descripción",

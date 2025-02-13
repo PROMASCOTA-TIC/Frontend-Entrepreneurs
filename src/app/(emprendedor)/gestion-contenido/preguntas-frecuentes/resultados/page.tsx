@@ -24,8 +24,11 @@ const ResultadosPage = () => {
         const response = await fetch(`${endpoint}?query=${query}`);
         const data = await response.json();
 
+        // Filtrar solo los que tengan estado "approved"
+        const aprobados = data.filter((articulo: any) => articulo.status === "approved");
+
         // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
-        const articulosAdaptados = data.map((articulo: any) => ({
+        const articulosAdaptados = aprobados.map((articulo: any) => ({
           id: articulo.id || articulo.faqId, // Asignar `faqId` si `id` no existe
           titulo: articulo.title,
           descripcion: articulo.description,

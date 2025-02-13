@@ -141,7 +141,7 @@ const Form_EnviarEnlace: React.FC = () => {
 
             {/* Nombre */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Nombre</h2>
+              <h2 className='h2-bold txtcolor-primary'>Nombre *</h2>
             </Grid2>
 
             {/* Nombre: Input */}
@@ -170,7 +170,7 @@ const Form_EnviarEnlace: React.FC = () => {
 
             {/* Correo */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Correo</h2>
+              <h2 className='h2-bold txtcolor-primary'>Correo *</h2>
             </Grid2>
 
             {/* Correo: Input */}
@@ -205,7 +205,7 @@ const Form_EnviarEnlace: React.FC = () => {
 
             {/* Categoria */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Categoría</h2>
+              <h2 className='h2-bold txtcolor-primary'>Categoría *</h2>
             </Grid2>
 
             {/* Categoria: Select */}
@@ -249,7 +249,7 @@ const Form_EnviarEnlace: React.FC = () => {
 
             {/* Titulo */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Título</h2>
+              <h2 className='h2-bold txtcolor-primary'>Título *</h2>
             </Grid2>
 
             {/* Titulo: Input */}
@@ -284,7 +284,7 @@ const Form_EnviarEnlace: React.FC = () => {
 
             {/* Descripcion */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Descripción</h2>
+              <h2 className='h2-bold txtcolor-primary'>Descripción *</h2>
             </Grid2>
 
             {/* Descripcion: Input */}
@@ -325,7 +325,7 @@ const Form_EnviarEnlace: React.FC = () => {
 
             {/* Fuentes */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Fuentes</h2>
+              <h2 className='h2-bold txtcolor-primary'>Fuentes *</h2>
             </Grid2>
 
             {/* Fuentes: Input */}
@@ -358,15 +358,14 @@ const Form_EnviarEnlace: React.FC = () => {
               </Grid2>
             </Grid2>
 
-            {/* Archivos multimedia 
             <Grid2 size={12}>
               <h2 className='h2-bold txtcolor-primary txt-center'>Archivos Multimedia</h2>
             </Grid2>
-            
+
             <Grid2 size={12} className='flex-center'>
               <ArchivosMultimedia />
             </Grid2>
-*/}
+
             {/* Botones */}
             <Grid2 size={12}>
               <div style={{ paddingTop: '21px' }}>
