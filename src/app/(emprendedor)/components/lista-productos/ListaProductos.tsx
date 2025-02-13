@@ -201,12 +201,12 @@ const ListaProductos: React.FC = () => {
         localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         rows={rows.length > 0 ? rows : []} 
           columns={[
-            { field: "name", headerName: "Nombre", minWidth: 150, flex: 1 },
+            { field: "name", headerName: "Nombre", minWidth: 150, flex: 1.16 },
             { field: "petType", headerName: "Tipo de Mascota", minWidth: 130, flex: 1 },
-            { field: "category", headerName: "Categoría", minWidth: 130, flex: 1 },
-            { field: "subcategory", headerName: "Subcategoría", minWidth: 130, flex: 1 },
-            { field: "finalPrice", headerName: "Precio", minWidth: 100, flex: 0.8 },
-            { field: "stock", headerName: "Stock", minWidth: 100, flex: 0.8 },
+            { field: "category", headerName: "Categoría", minWidth: 130, flex:0.5 },
+            { field: "subcategory", headerName: "Subcategoría", minWidth: 135, flex: 1 },
+            { field: "finalPrice", headerName: "Precio", minWidth: 100, flex: 0.5 },
+            { field: "stock", headerName: "Stock", minWidth: 100, flex: 0.5 },
             {
               field: "ver",
               headerName: "Detalles",
@@ -247,6 +247,7 @@ const ListaProductos: React.FC = () => {
           }}
 
           sx={{
+            fontSize: "16px",
             "& .MuiDataGrid-toolbarContainer": {
               backgroundColor: themePalette.cwhite,
               padding: "0.5rem",

@@ -164,6 +164,7 @@ const EditarProducto: React.FC<EditarProductoProps> = ({
         name: formData.name,
         description: formData.description,
         multimediaFiles: uploadedUrls,
+        weight: formData.weight ? parseFloat(formData.weight) : null,
       };
       console.log("Enviando datos limpios al backend:", formattedData);
       const response = await axios.patch(
