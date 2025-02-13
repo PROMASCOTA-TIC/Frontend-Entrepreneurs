@@ -15,12 +15,25 @@ import { URL_BASE, URL_BASE2 } from "@/config/config";
 const ListaPedidos: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const entrepreneurId = "a9201395-3f2f-42e4-bca0-9506ee84167b";
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
+
   useEffect(() => {
     const fetchOrders = async () => {
+
+      if (!entrepreneurId) return;
+
       try {
         const response = await axios.get(`${URL_BASE}products/${entrepreneurId}/orders-total`);
         if (response.data && response.data.orders) {
@@ -44,7 +57,7 @@ const ListaPedidos: React.FC = () => {
       }
     };
     fetchOrders();
-  }, []);
+  }, [entrepreneurId]);
 
   const updateStock = async () => {
     if (!selectedOrder || selectedOrder.isDelivered) return;
@@ -128,7 +141,7 @@ const ListaPedidos: React.FC = () => {
       minWidth: 100,
       flex: 0.8,
       renderCell: (params) => (
-        <Typography sx={{ color: params.row.isDelivered ? "green" : "red" }}>
+        <Typography sx={{ color: params.row.isDelivered ? "green" : "red", paddingTop:"15px" }}>
           {params.row.isDelivered ? "Sí" : "No"}
         </Typography>
       ),
@@ -161,15 +174,15 @@ const ListaPedidos: React.FC = () => {
         Lista de Pedidos
       </Typography>
 
-      <Box sx={{ height: 400, width: "100%", marginTop: "30px" }}>
+      <Box sx={{ height: 500, width: "100%", marginTop: "30px" }}>
         <DataGrid 
         localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         initialState={{
           pagination: {
-            paginationModel: { pageSize: 10 },
+            paginationModel: { pageSize: 20 },
           },
         }}
-        rows={orders} columns={columns} pageSizeOptions={[5, 10, 25]} 
+        rows={orders} columns={columns} pageSizeOptions={[5, 10, 25, 50, 100]} 
         slots={{
           toolbar: CustomToolbar,
         }}
@@ -281,9 +294,16 @@ const ListaPedidos: React.FC = () => {
             variant="contained"
             disabled={selectedOrder?.isDelivered || loading} 
             onClick={updateStock}
-            sx={{ minWidth: "150px", minHeight: "36px", display: "flex", alignItems: "center", justifyContent: "center" }}
+            sx={{
+              textTransform: "none",
+              width: "213px",
+              height: "34px",
+              borderRadius: "20px",
+              fontSize: "18px",
+              background: themePalette.primary,
+            }}
           >
-            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : (selectedOrder?.isDelivered ? "Ya Entregado" : "Entregado")}
+            {loading ? <CircularProgress size={24}  /> : (selectedOrder?.isDelivered ? "Ya Entregado" : "Entregado")}
           </Button>
         </DialogActions>
       </Dialog>
