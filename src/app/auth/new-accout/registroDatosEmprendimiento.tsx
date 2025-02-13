@@ -1,201 +1,362 @@
 "use client";
-import React from 'react';
-import { Box, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, MenuItem } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { registroEmprendimiento } from '@/validations/registroEmprendimiento';
-import { themePalette } from '@/config/theme.config';
+import React from "react";
+import {
+  Box,
+  Button,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  TextField,
+  MenuItem,
+  FormControl,
+  Select,
+  FormHelperText,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import { themePalette } from "@/config/theme.config";
 
 type Inputs = {
-    name: string;
-    ruc: string;
-    phoneNumber: string;
-    businessType: string;
-    bankName: string;
-    accountType: string;
-    accountNumber: string;
-    accountHolderName: string;
+  nombreEmprendimiento: string;
+  ruc: string;
+  numeroCelular: string;
+  bancoNombre: string;
+  bancoTipoCuenta: string;
+  bancoNumeroCuenta: string;
+  bancoNombreDuenoCuenta: string;
 };
 
 type BusinessDataFormProps = {
-    nextStep: () => void;
-    prevStep: () => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  updateFormData: (data: Partial<Inputs>) => void;
+  formData: Partial<Inputs>;
 };
 
-export const BusinessDataForm: React.FC<BusinessDataFormProps> = ({ nextStep, prevStep }) => {
-    const { register, handleSubmit, formState: { errors } } = useForm<Inputs>({
-        resolver: zodResolver(registroEmprendimiento),
-        mode: 'onChange',
-    });
 
-    const onSubmit = (data: Inputs) => {
-        console.log(data);
-        nextStep();  // Avanza al siguiente paso después de una validación exitosa
-    };
+export const BusinessDataForm: React.FC<BusinessDataFormProps> = ({
+  nextStep,
+  prevStep,
+  updateFormData,
+  formData,
+}) => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = useForm<Inputs>({
+    mode: "onChange",
+    defaultValues: formData,
+  });
 
-    return (
-        <FormControl className="form-group" component="form" onSubmit={handleSubmit(onSubmit)}>
-   
-            <FormLabel htmlFor="name" sx={{ color: 'black' }}>Nombre</FormLabel>
-            <TextField
-                id="name"
-                error={!!errors.name}
-                placeholder="Ingrese el nombre del emprendimiento"
-                {...register('name')}
-                onInput={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    input.value = input.value.replace(/[^A-Za-z\s]/g, '');
-                }}
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: 'gray' },
-                        '&:hover fieldset': { borderColor: 'blue' },
-                        '&.Mui-focused fieldset': { borderColor: 'blue' },
-                    },
-                }}
-            />
-            {errors.name && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.name.message}</p>}
 
-            <FormLabel htmlFor="ruc" sx={{ color: 'black' }}>RUC/RIMPE</FormLabel>
-            <TextField
-                id="ruc"
-                error={!!errors.ruc}
-                placeholder="Ingrese el RUC o RIMPE"
-                {...register('ruc')}
-                onInput={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    input.value = input.value.replace(/[^0-9]/g, '');
-                }}
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: 'gray' },
-                        '&:hover fieldset': { borderColor: 'blue' },
-                        '&.Mui-focused fieldset': { borderColor: 'blue' },
-                    },
-                }}
-            />
-            {errors.ruc && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.ruc.message}</p>}
+  const handleFieldChange = (field: keyof Inputs, value: string) => {
+    const currentValues = watch();
+    setValue(field, value);
+    updateFormData({ ...currentValues, [field]: value });
+  };
 
-            <FormLabel htmlFor="phoneNumber" sx={{ color: 'black' }}>Número celular</FormLabel>
-            <TextField
-                id="phoneNumber"
-                error={!!errors.phoneNumber}
-                placeholder="Ingrese el número celular"
-                {...register('phoneNumber')}
-                onInput={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    input.value = input.value.replace(/[^0-9]/g, '');
-                }}
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: 'gray' },
-                        '&:hover fieldset': { borderColor: 'blue' },
-                        '&.Mui-focused fieldset': { borderColor: 'blue' },
-                    },
-                }}
-            />
-            {errors.phoneNumber && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.phoneNumber.message}</p>}
+  const onSubmit = (data: Inputs) => {
+    console.log("✅ Datos guardados en formData:", data);
+    updateFormData(data);
+    console.log("🔄 Avanzando al siguiente paso...");
+    nextStep();
+  };
 
-            <FormLabel sx={{ color: 'black' }}>¿Qué vende tu emprendimiento?</FormLabel>
-            <RadioGroup sx={{justifyContent:'center'}} row aria-label="businessType" {...register('businessType')} defaultValue="">
-                <FormControlLabel value="Productos" control={<Radio />} label="Productos" />
-                <FormControlLabel value="Servicios" control={<Radio />} label="Servicios" />
-            </RadioGroup>
-            {errors.businessType && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.businessType.message}</p>}
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%" }}>
+       
+      <FormControl className="form-group" sx={{ width: "100%" }}>
+        {/* Nombre del Emprendimiento */}
+        <FormLabel sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+  Nombre del emprendimiento
+</FormLabel>
+<TextField
+  id="nombreEmprendimiento"
+  placeholder="Ingrese el nombre del emprendimiento"
+  {...register("nombreEmprendimiento", {
+    required: "Este campo es obligatorio",
+    pattern: {
+      value: /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ ]+$/,
+      message: "Solo se permiten letras y números",
+    },
+  })}
+  error={!!errors.nombreEmprendimiento}
+  onInput={(e) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ ]/g, ""); // 🔥 Bloquea caracteres especiales
+  }}
+  sx={{
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+      "&:hover fieldset": { borderColor: themePalette.secondary },
+      "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
+    },
+    backgroundColor: "white",
+    borderRadius: "10px",
+    mb: 1,
+  }}
+/>
+{errors.nombreEmprendimiento && (
+  <FormHelperText sx={{ color: "red", margin: 0 }}>
+    {errors.nombreEmprendimiento.message}
+  </FormHelperText>
+)}
 
-            <FormLabel htmlFor="bankName" sx={{ color: 'black' }}>Nombre del banco</FormLabel>
-            <TextField
-    id="bankName"
-    select
-    error={!!errors.bankName}
-    {...register('bankName')}
-    defaultValue=""
+{/* RUC/RIMPE */}
+<FormLabel htmlFor="ruc" sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+  RUC/RIMPE
+</FormLabel>
+<TextField
+  id="ruc"
+  placeholder="Ingrese el RUC o RIMPE"
+  {...register("ruc", {
+    required: "Este campo es obligatorio",
+    pattern: { value: /^[0-9]{13}$/, message: "Debe tener 13 dígitos numéricos" },
+  })}
+  error={!!errors.ruc}
+  onInput={(e) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/[^0-9]/g, "").slice(0, 13); // 🔥 Solo permite números y máximo 13 caracteres
+  }}
+  sx={{
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+      "&:hover fieldset": { borderColor: themePalette.secondary },
+      "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
+    },
+    backgroundColor: "white",
+    borderRadius: "10px",
+    mb: 2,
+  }}
+/>
+{errors.ruc && <FormHelperText sx={{ color: "red", margin: 0 }}>{errors.ruc.message}</FormHelperText>}
+
+
+        {/* Número Celular */}
+<FormLabel htmlFor="numeroCelular" sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+  Número celular
+</FormLabel>
+<TextField
+  id="numeroCelular"
+  placeholder="Ingrese el número celular"
+  {...register("numeroCelular", {
+    required: "Este campo es obligatorio",
+    pattern: { value: /^09[0-9]{8}$/, message: "Debe empezar con 09 y tener 10 dígitos" },
+  })}
+  error={!!errors.numeroCelular}
+  onInput={(e) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/[^0-9]/g, "").slice(0, 10); // 🔥 Solo números, máximo 10 caracteres
+  }}
+  sx={{
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+      "&:hover fieldset": { borderColor: themePalette.secondary },
+      "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
+    },
+    backgroundColor: "white",
+    borderRadius: "10px",
+    mb: 2,
+  }}
+/>
+{errors.numeroCelular && (
+  <FormHelperText sx={{ color: "red", margin: 0 }}>
+    {errors.numeroCelular.message}
+  </FormHelperText>
+)}
+
+{/* Nombre del Banco */}
+<FormLabel htmlFor="bancoNombre" sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+  Nombre del banco
+</FormLabel>
+<FormControl fullWidth sx={{ mb: 2 }} error={!!errors.bancoNombre}>
+  <Select
+    labelId="bancoNombre-label"
+    id="bancoNombre"
+    {...register("bancoNombre", { required: "Debe seleccionar un banco" })}
+    value={watch("bancoNombre") || ""}
+    onChange={(e) => handleFieldChange("bancoNombre", e.target.value)}
+    displayEmpty
     sx={{
-        '& .MuiOutlinedInput-root': {
-            '& fieldset': { borderColor: 'gray' },
-            '&:hover fieldset': { borderColor: 'blue' },
-            '&.Mui-focused fieldset': { borderColor: 'blue' },
-        },
+      backgroundColor: "white",  
+      borderRadius: "10px",      
+      "&.MuiOutlinedInput-root": {   
+        "&:hover fieldset": { borderColor: themePalette.secondary }, 
+        "&.Mui-focused fieldset": { borderColor: themePalette.secondary } 
+      }
     }}
->
+  >
     <MenuItem value="" disabled>
-        Seleccione el banco
+      Seleccione un banco
     </MenuItem>
     {[
-        "Banco Pichincha", "Banco Guayaquil", "Produbanco", "Banco del Pacífico",
-        "Banco Internacional", "Banco Bolivariano", "Banco del Austro",
-        "Cooperativa JEP", "Cooperativa Policia Nacional Limitada",
-        "Cooperativa Alianza Del Valle", "Cooperativa 29 de Octubre"
+      "Banco Pichincha", "Banco Guayaquil", "Produbanco", "Banco del Pacífico",
+      "Banco Internacional", "Banco Bolivariano", "Banco del Austro",
+      "Cooperativa JEP", "Cooperativa Policia Nacional Limitada",
+      "Cooperativa Alianza Del Valle", "Cooperativa 29 de Octubre"
     ].map((bank) => (
-        <MenuItem key={bank} value={bank}>{bank}</MenuItem>
+      <MenuItem key={bank} value={bank}>
+        {bank}
+      </MenuItem>
     ))}
-</TextField>
+  </Select>
+  {errors.bancoNombre && (
+    <FormHelperText sx={{ color: "red", margin: 0 }}>{errors.bancoNombre.message}</FormHelperText>
+  )}
+</FormControl>
 
-            <FormLabel sx={{ color: 'black' }}>Tipo de cuenta</FormLabel>
-            <RadioGroup sx={{justifyContent:'center'}} row aria-label="accountType" {...register('accountType')} defaultValue="">
-                <FormControlLabel value="Ahorros" control={<Radio />} label="Ahorros" />
-                <FormControlLabel value="Corriente" control={<Radio />} label="Corriente" />
-            </RadioGroup>
-            {errors.accountType && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.accountType.message}</p>}
 
-            <FormLabel htmlFor="accountNumber" sx={{ color: 'black' }}>Número de cuenta</FormLabel>
-            <TextField
-                id="accountNumber"
-                error={!!errors.accountNumber}
-                placeholder="Ingrese el número de cuenta"
-                {...register('accountNumber')}
-                onInput={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    input.value = input.value.replace(/[^0-9]/g, '');
-                }}
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: 'gray' },
-                        '&:hover fieldset': { borderColor: 'blue' },
-                        '&.Mui-focused fieldset': { borderColor: 'blue' },
-                    },
-                }}
-            />
-            {errors.accountNumber && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.accountNumber.message}</p>}
+{/* Tipo de Cuenta */}
+<FormControl component="fieldset" sx={{ width: "100%" }} error={!!errors.bancoTipoCuenta}>
+  <FormLabel sx={{ color: "black", mb: 1, fontWeight: "bold", textAlign: "center" }}>
+    Tipo de cuenta
+  </FormLabel>
+  <RadioGroup
+    row
+    {...register("bancoTipoCuenta", { required: "Debe seleccionar un tipo de cuenta" })}
+    value={watch("bancoTipoCuenta") || ""}
+    onChange={(e) => handleFieldChange("bancoTipoCuenta", e.target.value)}
+    sx={{ display: "flex", justifyContent: "center", gap: 3 }}
+  >
+    <FormControlLabel
+      value="Ahorros"
+      control={
+        <Radio
+          sx={{
+            color: "black",
+            "&.Mui-checked": { color: themePalette.primary }
+          }}
+        />
+      }
+      label="Ahorros"
+      sx={{
+        "& .MuiTypography-root": { color: "black" }
+      }}
+    />
+    <FormControlLabel
+      value="Corriente"
+      control={
+        <Radio
+          sx={{
+            color: "black",
+            "&.Mui-checked": { color: themePalette.primary }
+          }}
+        />
+      }
+      label="Corriente"
+      sx={{
+        "& .MuiTypography-root": { color: "black" }
+      }}
+    />
+  </RadioGroup>
+  {errors.bancoTipoCuenta && (
+    <FormHelperText sx={{ color: "red", textAlign: "center", marginTop: "5px" }}>
+      {errors.bancoTipoCuenta.message}
+    </FormHelperText>
+  )}
+</FormControl>
 
-            <FormLabel htmlFor="accountHolderName" sx={{ color: 'black' }}>Nombre del propietario de la cuenta</FormLabel>
-            <TextField
-                id="accountHolderName"
-                error={!!errors.accountHolderName}
-                placeholder="Ingrese el nombre del propietario"
-                {...register('accountHolderName')}
-                onInput={(e) => {
-                    const input = e.target as HTMLInputElement;
-                    input.value = input.value.replace(/[^A-Za-z\s]/g, '');
-                }}
-                sx={{
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': { borderColor: 'gray' },
-                        '&:hover fieldset': { borderColor: 'blue' },
-                        '&.Mui-focused fieldset': { borderColor: 'blue' },
-                    },
-                }}
-            />
-            {errors.accountHolderName && <p className="text-red-500" style={{ textAlign: 'left' }}>{errors.accountHolderName.message}</p>}
+        
 
-            <Box style={{ margin: '20px 0' }} className="button-is space-x-4">
-                <Button
-                    variant="contained"
-                    onClick={prevStep}
-                    className="h-e34 text-white rounded-[20px] normal-case"
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
-                >
-                    Regresar
-                </Button>
-                <Button
-                    variant="contained"
-                    type="submit"
-                    className="h-e34 text-white rounded-[20px] normal-case"
-                    sx={{ backgroundColor: themePalette.primary, width: '171px', height: '50px', fontSize: '18px' }}
-                >
-                    Siguiente
-                </Button>
-            </Box>
-        </FormControl>
-    );
+{/* Número de Cuenta */}
+<FormLabel htmlFor="bancoNumeroCuenta" sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+  Número de cuenta
+</FormLabel>
+<TextField
+  id="bancoNumeroCuenta"
+  placeholder="Ingrese el número de cuenta"
+  {...register("bancoNumeroCuenta", {
+    required: "Este campo es obligatorio",
+    pattern: { value: /^[0-9]{10,15}$/, message: "Debe tener entre 10 y 15 dígitos" },
+  })}
+  error={!!errors.bancoNumeroCuenta}
+  onInput={(e) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/[^0-9]/g, "").slice(0, 15); // 🔥 Solo números, máximo 15 caracteres
+  }}
+  sx={{
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+      "&:hover fieldset": { borderColor: themePalette.secondary },
+      "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
+    },
+    backgroundColor: "white",
+    borderRadius: "10px",
+    mb: 2,
+  }}
+/>
+{errors.bancoNumeroCuenta && (
+  <FormHelperText sx={{ color: "red", margin: 0 }}>
+    {errors.bancoNumeroCuenta.message}
+  </FormHelperText>
+)}
+
+{/* Nombre del Propietario de la Cuenta */}
+<FormLabel htmlFor="bancoNombreDuenoCuenta" sx={{ color: "black", mb: 1, fontWeight: "bold" }}>
+  Nombre del propietario de la cuenta
+</FormLabel>
+<TextField
+  id="bancoNombreDuenoCuenta"
+  placeholder="Ingrese el nombre del propietario"
+  {...register("bancoNombreDuenoCuenta", {
+    required: "Este campo es obligatorio",
+    pattern: { value: /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/, message: "Solo se permiten letras" },
+  })}
+  error={!!errors.bancoNombreDuenoCuenta}
+  onInput={(e) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, ""); // 🔥 Bloquea números y caracteres especiales
+  }}
+  sx={{
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": { borderColor: "gray", borderRadius: "10px" },
+      "&:hover fieldset": { borderColor: themePalette.secondary },
+      "&.Mui-focused fieldset": { borderColor: themePalette.secondary },
+    },
+    backgroundColor: "white",
+    borderRadius: "10px",
+    mb: 2,
+  }}
+/>
+{errors.bancoNombreDuenoCuenta && (
+  <FormHelperText sx={{ color: "red", margin: 0 }}>
+    {errors.bancoNombreDuenoCuenta.message}
+  </FormHelperText>
+)}
+
+
+       
+
+        {/* Botones */}
+        <Box  style={{ margin: "20px 0" }} className="button-is space-x-4">
+          <Button variant="contained" onClick={prevStep} 
+          sx={{ 
+                      backgroundColor: themePalette.primary, 
+                      textTransform: "none",
+                      color: "white",
+                      width: "171px", 
+                      height: "50px", 
+                      fontSize: "18px",
+                      borderRadius: "20px"
+                    }}>
+            Regresar
+          </Button>
+          <Button variant="contained" type="submit" 
+          sx={{
+                      textTransform: "none",
+                      backgroundColor: themePalette.primary,
+                      width: "171px",
+                      height: "50px",
+                      fontSize: "18px",
+                      borderRadius: "20px"
+                    }}>
+            Siguiente
+          </Button>
+        </Box>
+      </FormControl>
+    </form>
+  );
 };
