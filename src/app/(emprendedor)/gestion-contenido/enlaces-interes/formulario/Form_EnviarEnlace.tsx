@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Alert, Box, Grid2, MenuItem, Select, Snackbar, TextField } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,6 +51,15 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 const Form_EnviarEnlace: React.FC = () => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Almacena los archivos seleccionados
+  const router = useRouter();
+
+  //********************************************* */
+  const [userData, setUserData] = useState({ name: "", email: "" });
+
   // 1. Configurar React Hook Form
   const {
     register,
@@ -60,20 +69,44 @@ const Form_EnviarEnlace: React.FC = () => {
     resolver: zodResolver(enviarEnlaceSchema),
     mode: "onChange", // Valida en tiempo real
     defaultValues: {
-      // Si deseas inicializar ciertos campos (por ejemplo, si ya conoces el ownerName).
-      ownerName: "",
-      ownerEmail: "",
+      // **************************************************************************
+      ownerName: userData.name,
+      ownerEmail: userData.email,
     },
   });
 
   const [open, setOpen] = useState(false);
 
-  // Estados para feedback de la operación
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Almacena los archivos seleccionados
-  const router = useRouter();
+  // *************************************************
+  // Crear una funcion que obtenga datos de un usuario en base al id
+  // Tomar el id de localstorage.get('user_id') y hacer una peticion a la API
+
+  // const getUserData = async () => {
+  //   //const userId = localStorage.getItem('entrepreneurId');
+  //   const entrepreneurId = "fcbb22fe-bfc5-4c63-8fe7-bb01f762f604"; // Cambiar por el id real
+  //   if (!entrepreneurId) return;
+
+  //   try {
+  //     const response = await fetch(`http://localhost:3001/api/users/entrepreneurs/${entrepreneurId}`);
+  //     if (!response.ok) {
+  //       throw new Error(`Error al obtener datos de usuario. Status: ${response.status}`);
+  //     }
+
+  //     const userData = await response.json();
+
+  //     setUserData(userData);
+
+  //     console.log("Datos de usuario:", userData);
+  //   } catch (error) {
+  //     console.error("Error al obtener datos de usuario:", error);
+  //   }
+  // }
+
+  // // usar hook useEffect llamar a la funcion de arriba
+  // useEffect(() => {
+  //   getUserData();
+  // }, []);
+  /**************************************************************************************************************** */
 
   // Función para subir archivos a Firebase
   const uploadMediaToFirebase = async (files: File[]) => {
@@ -84,7 +117,7 @@ const Form_EnviarEnlace: React.FC = () => {
     const urls: string[] = [];
     for (const file of files) {
       try {
-        const storageRef = ref(storage, `gestion-cotenido/enlaces-interes/${Date.now()}_${file.name}`);
+        const storageRef = ref(storage, `gestion-contenido/enlaces-interes/${Date.now()}_${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
         urls.push(downloadURL);
@@ -116,7 +149,6 @@ const Form_EnviarEnlace: React.FC = () => {
         description: data.description,
         sourceLink: data.sourceLink,
         imagesUrl: imagesUrlString,
-        // imagesUrl: imagesUrls.length > 0 ? imagesUrls.join(",") : null, // Guardar las URLs separadas por comas
       };
 
       console.log("Datos a enviar al backend:", createLinkDto); // Agregar log
@@ -336,6 +368,7 @@ const Form_EnviarEnlace: React.FC = () => {
                     },
                     '& .MuiInputBase-input': {
                       minHeight: '100px',
+                      whiteSpace: 'pre-line',
                     },
                   }}
                 />

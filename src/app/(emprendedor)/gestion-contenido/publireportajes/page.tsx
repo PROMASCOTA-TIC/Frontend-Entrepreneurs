@@ -17,15 +17,18 @@ const PR_Categorias = () => {
       const data = await response.json();
       console.log('Datos recibidos:', data); // Log para ver los datos de la API
 
+      // Filtrar solo los que tengan estado "approved"
+      const aprobados = data.filter((articulo: any) => articulo.status === "approved");
+
       // Adaptar los datos para el componente
-      const articulosAdaptados = data.map((articulo: any) => ({
+      const articulosAdaptados = aprobados.map((articulo: any) => ({
         id: articulo.id || articulo.advertorialId,
         titulo: articulo.title || "Sin título",
         descripcion: articulo.description || "Sin descripción",
         link: articulo.link || "#",
-        imagen: articulo.imagesUrl 
-          ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
-          : "https://via.placeholder.com/100", // Imagen por defecto si no tiene imagen
+        imagen: articulo.imagesUrl
+          ? articulo.imagesUrl.split(",")[0].trim() // Tomar solo la primera imagen
+          : [],
       }));
 
       setArticulos(articulosAdaptados);
@@ -57,9 +60,9 @@ const PR_Categorias = () => {
         titulo: articulo.title || "Sin título",
         descripcion: articulo.description || "Sin descripción",
         link: articulo.link || "#",
-        imagen: articulo.imagesUrl 
-          ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
-          : "https://via.placeholder.com/100",
+        imagen: articulo.imagesUrl
+          ? articulo.imagesUrl.split(",")[0].trim() // Tomar solo la primera imagen
+          : [],
       }));
 
       setArticulos(articulosAdaptados);
@@ -85,7 +88,7 @@ const PR_Categorias = () => {
       <div
         className="flex-center"
         style={{
-          height: "100vh",
+          height: "66vh",
           flexDirection: "column",
           gap: "20px",
         }}

@@ -24,11 +24,8 @@ const ResultadosPage = () => {
         const response = await fetch(`${endpoint}?query=${query}`);
         const data = await response.json();
 
-        // Filtrar solo los que tengan estado "approved"
-        const aprobados = data.filter((articulo: any) => articulo.status === "approved");
-
         // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
-        const articulosAdaptados = aprobados.map((articulo: any) => ({
+        const articulosAdaptados = data.map((articulo: any) => ({
           id: articulo.id || articulo.faqId, // Asignar `faqId` si `id` no existe
           titulo: articulo.title,
           descripcion: articulo.description,
@@ -52,7 +49,7 @@ const ResultadosPage = () => {
       <div
         className="flex-center"
         style={{
-          height: "100vh", // Ocupa el 100% del alto de la pantalla
+          height: "66vh", // Ocupa el 100% del alto de la pantalla
           flexDirection: "column", // Coloca el icono y el texto uno debajo del otro
           gap: "20px", // Espacio entre el ícono y el texto
         }}
@@ -66,10 +63,10 @@ const ResultadosPage = () => {
   }
 
   return (
-    <div>
-      <h1 className="h2-bold txtcolor-primary txt-center">Resultados de búsqueda para: "{query}"</h1>
+    <div >
+      <h1 className="h2-bold txtcolor-primary txt-center" style={{ paddingTop: '21px' }}>Resultados de búsqueda para: "{query}"</h1>
       {articulos.length === 0 ? (
-        <p>No se encontraron resultados.</p>
+        <p className="n-bold" style={{ textAlign: "center", padding: "30px", height: "58vh" }}>No se encontraron resultados.</p>
       ) : (
         <ArticulosSinFoto
           articulos={articulos}

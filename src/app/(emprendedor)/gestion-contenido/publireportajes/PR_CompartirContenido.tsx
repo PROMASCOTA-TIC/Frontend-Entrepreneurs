@@ -18,8 +18,8 @@ const PR_CompartirContenido = () => {
             <h1 className='h1-bold'>¡Promociona tus productos o eventos!</h1>
 
             <p className='n-regular'>
-                ¿Tienes algo nuevo que ofrecer? ¡Comparte tus últimos productos o eventos con nuestra comunidad!
-                Lleva tu negocio al siguiente nivel.
+                ¿Tienes algo nuevo que ofrecer? <br />
+                ¡Comparte tus últimos productos o eventos con nuestra comunidad! <br />
             </p>
 
             <BotonAzul

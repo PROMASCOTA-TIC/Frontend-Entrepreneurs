@@ -7,8 +7,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { theme, themePalette } from "@/app/config/theme.config";
 
 interface ArchivosMultimediaProps {
-  onChange: (files: File[]) => void; 
-  error?: string; 
+  onChange: (files: File[]) => void;
+  error?: string;
 }
 
 interface PreviewFile {
@@ -29,7 +29,7 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ onChange, error
         isVideo: file.type.startsWith("video/"),
       }));
       const updatedFiles = [...selectedFiles, ...newFiles];
-      
+
       setPreviewFiles([...previewFiles, ...newPreviews]);
       setSelectedFiles(updatedFiles);
       onChange(updatedFiles);
@@ -47,15 +47,35 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ onChange, error
   };
 
   return (
-    <Box sx={{ p: 4, borderRadius: "8px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-      <Box sx={{ mt: 4, p: 3, borderRadius: "8px", width: "100%", textAlign: "center", background: themePalette.black10, border: error ? "2px solid red" : "1px solid #004040" }}>
-        <Typography align="left" sx={{ color: themePalette.primary, width: "100%", fontSize: "24px", paddingLeft: "30px", fontWeight: "bold", marginBottom: "8px" }}>
-          Archivos multimedia
-        </Typography>
-
+    <Box
+      sx={{
+        borderRadius: "8px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          p: 3,
+          borderRadius: "8px",
+          width: "100%",
+          textAlign: "center",
+          background: themePalette.black10,
+          border: error ? "2px solid red" : "1px solid #004040"
+        }}
+      >
         <input accept=".jpg,.png,.mp4" type="file" multiple onChange={handleLocalUpload} style={{ display: "none" }} id="local-upload" />
         <label htmlFor="local-upload">
-          <Button variant="contained" component="span" sx={{ textTransform: "none", width: "218px", height: "50px", borderRadius: "20px", fontSize: "18px", marginTop: "10px", background: theme.palette.primary.main }} startIcon={<FileUploadIcon />} disabled={previewFiles.length >= 4}>
+          <Button
+            variant="contained"
+            component="span"
+            className="bg-primary"
+            sx={{ textTransform: "none", width: "218px", height: "50px", borderRadius: "20px", marginTop: "10px" }}
+            startIcon={<FileUploadIcon />}
+            disabled={previewFiles.length >= 4}>
             Seleccionar archivos
           </Button>
         </label>

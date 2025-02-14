@@ -83,7 +83,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
     const urls: string[] = [];
     for (const file of files) {
       try {
-        const storageRef = ref(storage, `gestion-cotenido/publireportajes/${Date.now()}_${file.name}`);
+        const storageRef = ref(storage, `gestion-contenido/publireportajes/${Date.now()}_${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
         urls.push(downloadURL);
@@ -133,10 +133,8 @@ const Form_EnviarPublireportaje: React.FC = () => {
           `Error al crear el publireportaje. Status: ${response.status}`
         );
       }
-      console.log("Guardado exitoso");
 
       setOpenSnackbar(true);
-
       setTimeout(() => {
         router.push("http://localhost:3000/gestion-contenido/publireportajes");
       }, 4000);
@@ -175,7 +173,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Nombre */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Nombre</h2>
+              <h2 className='h2-bold txtcolor-primary'>Nombre *</h2>
             </Grid2>
 
             {/* Nombre: Input */}
@@ -204,7 +202,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Correo */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Correo</h2>
+              <h2 className='h2-bold txtcolor-primary'>Correo *</h2>
             </Grid2>
 
             {/* Correo: Input */}
@@ -239,7 +237,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Categoria */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Categoría</h2>
+              <h2 className='h2-bold txtcolor-primary'>Categoría *</h2>
             </Grid2>
 
             {/* Categoria: Select */}
@@ -282,7 +280,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Titulo */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Título</h2>
+              <h2 className='h2-bold txtcolor-primary'>Título *</h2>
             </Grid2>
 
             {/* Titulo: Input */}
@@ -317,7 +315,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Descripcion */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Descripción</h2>
+              <h2 className='h2-bold txtcolor-primary'>Descripción *</h2>
             </Grid2>
 
             {/* Descripcion: Input */}
@@ -342,6 +340,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
                     },
                     '& .MuiInputBase-input': {
                       minHeight: '100px',
+                      whiteSpace: 'pre-line',
                     },
                   }}
                 />
@@ -358,7 +357,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Fuentes */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Fuentes</h2>
+              <h2 className='h2-bold txtcolor-primary'>Fuentes *</h2>
             </Grid2>
 
             {/* Fuentes: Input */}

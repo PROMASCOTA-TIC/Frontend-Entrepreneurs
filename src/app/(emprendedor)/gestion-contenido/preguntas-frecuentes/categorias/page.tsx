@@ -28,11 +28,8 @@ const PF_Categorias = () => {
         const response = await fetch(`http://localhost:3001/api/faqs/categories/${categoryId}/faqs`);
         const data = await response.json();
 
-        // Filtrar solo los artículos con estado "approved"
-        const articulosAprobados = data.filter((articulo: any) => articulo.status === "approved");
-
         // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
-        const articulosAdaptados = articulosAprobados.map((articulo: any) => ({
+        const articulosAdaptados = data.map((articulo: any) => ({
           id: articulo.id || articulo.faqId, // Asignar `faqId` si `id` no existe
           titulo: articulo.title || "Sin título",
           descripcion: articulo.description || "Sin descripción disponible",
@@ -56,7 +53,7 @@ const PF_Categorias = () => {
       <div
         className="flex-center"
         style={{
-          height: "100vh", // Ocupa el 100% del alto de la pantalla
+          height: "66vh", // Ocupa el 100% del alto de la pantalla
           flexDirection: "column", // Coloca el icono y el texto uno debajo del otro
           gap: "20px", // Espacio entre el ícono y el texto
         }}
@@ -72,7 +69,7 @@ const PF_Categorias = () => {
   return (
     <div>
       <h1 className="h1-bold txtcolor-primary" style={{ padding: "21px 0px 0px 55px" }}>
-        Categoría: {categoryName}
+        {categoryName}
       </h1>
 
       {/* Mostrar mensaje si no hay artículos */}

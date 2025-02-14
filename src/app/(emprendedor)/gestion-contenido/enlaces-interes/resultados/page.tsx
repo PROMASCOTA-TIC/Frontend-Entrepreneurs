@@ -35,7 +35,9 @@ const ResultadosPage = () => {
           titulo: articulo.title,
           descripcion: articulo.description,
           link: articulo.sourceLink || "#", // Si no hay un enlace, se deja vacío
-          imagen: articulo.image || "/default-image.jpg", // Imagen por defecto si no tiene imagen
+          imagen: articulo.imagesUrl 
+            ? articulo.imagesUrl.split(",")[0].trim() // Tomar solo la primera imagen
+            : [], 
         }));
 
         setArticulos(articulosAdaptados);
@@ -56,7 +58,7 @@ const ResultadosPage = () => {
       <div
         className="flex-center"
         style={{
-          height: "100vh", // Ocupa el 100% del alto de la pantalla
+          height: "66vh", // Ocupa el 100% del alto de la pantalla
           flexDirection: "column", // Coloca el icono y el texto uno debajo del otro
           gap: "20px", // Espacio entre el ícono y el texto
         }}
@@ -71,9 +73,11 @@ const ResultadosPage = () => {
 
   return (
     <div>
-      <h1 className="h2-bold txtcolor-primary txt-center" style={{ paddingTop: '21px' }}>Resultados de búsqueda para: "{query}"</h1>
+      <h1 className="h2-bold txtcolor-primary txt-center" style={{ paddingTop: '21px' }}>
+        Resultados de búsqueda para: "{query}"
+      </h1>
       {articulos.length === 0 ? (
-        <p>No se encontraron resultados.</p>
+        <p className="n-bold" style={{ textAlign: "center", padding: "30px", height: "58vh" }}>No se encontraron resultados.</p>
       ) : (
         <ArticulosConFoto
           articulos={articulos}

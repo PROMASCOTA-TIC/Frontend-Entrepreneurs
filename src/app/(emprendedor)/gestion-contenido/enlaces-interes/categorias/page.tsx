@@ -38,7 +38,7 @@ const EI_Categorias = () => {
           link: articulo.sourceLink || "#", // Si no hay un enlace, se deja vacío
           imagen: articulo.imagesUrl 
             ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
-            : "/default-image.jpg", // Imagen por defecto si no tiene imagen
+            : [], // Imagen por defecto si no tiene imagen
         }));
 
         setArticulos(articulosAdaptados);
@@ -75,7 +75,7 @@ const EI_Categorias = () => {
   return (
     <div>
       <h1 className="h1-bold txtcolor-primary" style={{ padding: "21px 0px 0px 55px" }}>
-        Categoría: {categoryName}
+        {categoryName}
       </h1>
 
       {/* Mostrar mensaje si no hay artículos */}

@@ -137,8 +137,26 @@ const EntradaPregunta: React.FC = () => {
           {articulo.categoria}
         </h1>
         <div className="flex-column txt-justify" style={{ gap: "21px", paddingRight: "34px" }}>
-          <h2 className="h2-semiBold txtcolor-secondary">{articulo.titulo}</h2>
-          <p className="n-regular">{articulo.descripcion}</p>
+          <h2
+            className="h2-semiBold txtcolor-secondary txt-justify"
+            style={{
+              wordBreak: "break-word", // Permite que el texto salte de línea
+              overflowWrap: "break-word", // Rompe la palabra si es necesario
+              whiteSpace: "normal", // Asegura que el texto fluya
+            }}
+          >
+            {articulo?.titulo}
+          </h2>
+
+          <p
+            className="n-regular"
+            style={{
+              whiteSpace: "pre-line",
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >{articulo?.descripcion}
+          </p>
         </div>
       </div>
 

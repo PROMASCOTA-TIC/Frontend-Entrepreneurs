@@ -34,6 +34,12 @@ const BarraDeBusqueda: React.FC<BarraDeBusquedaProps> = ({ endpoint, seccion, pl
     );
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <Box className="bg-tertiary20 p-34 txt-center txtcolor-primary flex-column" sx={{ alignItems: "center", gap: "34px" }}>
       <h1 className="h1-bold">¿En qué podemos ayudarte?</h1>
@@ -41,6 +47,7 @@ const BarraDeBusqueda: React.FC<BarraDeBusquedaProps> = ({ endpoint, seccion, pl
         <TextField
           value={query}
           onChange={handleInputChange}
+          onKeyDown={handleKeyPress} // Detecta si se presiona Enter
           variant="outlined"
           placeholder={placeholder || "Escribe palabras de búsqueda"}
           sx={{

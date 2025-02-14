@@ -40,7 +40,7 @@ const EntradaPubliReportaje: React.FC = () => {
                     autor: data.ownerName || "Desconocido",
                     imagenes: data.imagesUrl
                         ? data.imagesUrl.split(",").map((url: string) => url.trim())
-                        : ["https://via.placeholder.com/200"],
+                        : [],
                 });
             } catch (error) {
                 console.error("Error al obtener los datos del artículo:", error);
@@ -60,7 +60,7 @@ const EntradaPubliReportaje: React.FC = () => {
             <div
                 className="flex-center"
                 style={{
-                    height: "100vh",
+                    height: "66vh",
                     flexDirection: "column",
                     gap: "20px",
                 }}
@@ -80,11 +80,34 @@ const EntradaPubliReportaje: React.FC = () => {
             <h1 className="h1-bold txtcolor-primary" style={{ padding: '21px 0px' }}>{articulo?.categoria}</h1>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <div className="flex-column txt-justify" style={{ width: "80%", gap: "21px", paddingRight: "34px" }}>
-                    <h2 className="h2-semiBold txtcolor-secondary">{articulo?.titulo}</h2>
-                    <p className="n-regular">{articulo?.descripcion}</p>
-                    <p className="n-regular">
-                        <b>Bibliografía:</b> {articulo?.bibliografia}
+                    <h2
+                        className="h2-semiBold txtcolor-secondary txt-justify"
+                        style={{
+                            wordBreak: "break-word", // Permite que el texto salte de línea
+                            overflowWrap: "break-word", // Rompe la palabra si es necesario
+                            whiteSpace: "normal", // Asegura que el texto fluya
+                        }}
+                    >
+                        {articulo?.titulo}
+                    </h2>
+
+                    <p
+                        className="n-regular"
+                        style={{
+                            whiteSpace: "pre-line",
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                        }}
+                    >{articulo?.descripcion}
                     </p>
+                    <p className="n-regular"
+                        style={{
+                            whiteSpace: "pre-line",
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                        }}
+                    >
+                        <b>Bibliografía:</b> {articulo?.bibliografia}</p>
                     <p className="n-regular">
                         <b>Compartido por:</b> {articulo?.autor}
                     </p>

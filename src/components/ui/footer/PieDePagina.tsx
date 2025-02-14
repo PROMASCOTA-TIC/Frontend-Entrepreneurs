@@ -27,12 +27,12 @@ const PieDePagina = () => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <b className='n-bold'>Soporte Técnico</b>
-                <Link href="/" color="inherit" className='minima-regular'>Preguntas frecuentes</Link>
-                <Link href="/" color="inherit" className='minima-regular'>Publi-Reportajes</Link>
+                <Link href="/gestion-contenido/preguntas-frecuentes" color="inherit" className='minima-regular'>Preguntas frecuentes</Link>
+                <Link href="/gestion-contenido/publireportajes" color="inherit" className='minima-regular'>Publi-Reportajes</Link>
             </div>
             <div>
                 <b className='n-bold'>Redes Sociales</b>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around'}}>
                     <IconButton href="https://www.facebook.com" target="_blank" color='inherit'>
                         <Facebook />
                     </IconButton>

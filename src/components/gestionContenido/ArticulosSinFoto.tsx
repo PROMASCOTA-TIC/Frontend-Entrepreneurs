@@ -28,11 +28,26 @@ const ArticulosSinFoto: React.FC<ArticulosSinFotoProps> = ({ articulos, basePath
         >
             {articulos.map((articulo) => (
                 <div key={articulo.id} className='articulo_contenedor'>
-                    <h2 className='h2-semiBold txtcolor-secondary txt-justify'>{articulo.titulo}</h2>
-                    <p className="txt-justify">
+                    <h2
+                        className="h2-semiBold txtcolor-secondary txt-justify"
+                        style={{
+                            wordBreak: "break-word", // Permite que el texto salte de línea
+                            overflowWrap: "break-word", // Rompe la palabra si es necesario
+                            whiteSpace: "normal", // Asegura que el texto fluya
+                        }}
+                    >
+                        {articulo.titulo || "Sin título"}
+                    </h2>
+
+                    <p className="txt-justify"
+                        style={{
+                            whiteSpace: "pre-line",
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                        }}>
                         {articulo.descripcion
-                            ? articulo.descripcion.length > 400
-                                ? `${articulo.descripcion.substring(0, 400)}...`
+                            ? articulo.descripcion.length > 315
+                                ? `${articulo.descripcion.substring(0, 315)}...`
                                 : articulo.descripcion
                             : "Sin descripción"}
                     </p>

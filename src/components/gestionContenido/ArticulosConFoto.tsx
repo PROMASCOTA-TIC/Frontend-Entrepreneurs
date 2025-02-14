@@ -9,7 +9,7 @@ interface Articulo {
   titulo: string;
   descripcion: string;
   link: string;
-  imagen: string;
+  imagen?: string; // Puede ser undefined si no hay imagen
 }
 
 interface ArticulosConFotoProps {
@@ -25,20 +25,56 @@ const ArticulosConFoto: React.FC<ArticulosConFotoProps> = ({ articulos, basePath
   return (
     <Box className="p-34 flex-column" sx={{ gap: "21px" }}>
       {articulos.map((articulo) => {
-        // Obtener solo la primera URL de la cadena separada por comas
-        const primeraImagen = articulo.imagen ? articulo.imagen.split(",")[0].trim() : "https://via.placeholder.com/100";
+        const imagenesArray = articulo.imagen ? articulo.imagen.split(",").map((url) => url.trim()) : [];
+        const primeraImagen = imagenesArray.length > 0 ? imagenesArray[0] : null;
 
         return (
-          <div key={articulo.id} className="categorias_articulo_contenedor">
-            <div className="flex-column" style={{ width: "90%", gap: "8px", paddingRight: "34px" }}>
-              <h2 className="h2-semiBold txtcolor-secondary txt-justify">{articulo.titulo || "Sin título"}</h2>
-              <p className="txt-justify">
+          <div
+            key={articulo.id}
+            className="categorias_articulo_contenedor"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              gap: "16px",
+            }}
+          >
+            {/* 🔹 Contenedor del texto */}
+            <div
+              className="flex-column"
+              style={{
+                width: primeraImagen ? "90%" : "100%",
+                gap: "8px",
+                paddingRight: primeraImagen ? "34px" : "0px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {/* 🔹 Asegurar que el título tenga un `max-width` dinámico */}
+              <h2
+                className="h2-semiBold txtcolor-secondary txt-justify"
+                style={{
+                  wordBreak: "break-word", // Permite que el texto salte de línea
+                  overflowWrap: "break-word", // Rompe la palabra si es necesario
+                  whiteSpace: "normal", // Asegura que el texto fluya
+                }}
+              >
+                {articulo.titulo || "Sin título"}
+              </h2>
+
+              <p className="txt-justify"
+                style={{
+                  whiteSpace: "pre-line",
+                  wordBreak: "break-word",
+                  overflowWrap: "break-word",
+                }}>
                 {articulo.descripcion
-                  ? articulo.descripcion.length > 400
-                    ? `${articulo.descripcion.substring(0, 400)}...`
+                  ? articulo.descripcion.length > 250
+                    ? `${articulo.descripcion.substring(0, 250)}...`
                     : articulo.descripcion
                   : "Sin descripción"}
               </p>
+
               <Link
                 className="h2-semiBold txtcolor-secondary"
                 style={{ textAlign: "right" }}
@@ -47,12 +83,21 @@ const ArticulosConFoto: React.FC<ArticulosConFotoProps> = ({ articulos, basePath
                 Ver más
               </Link>
             </div>
-            <img
-              src={primeraImagen}
-              alt={articulo.titulo}
-              className="categorias_articulo_imagen"
-              style={{ width: "10%" }}
-            />
+
+            {/* 🔹 Mostrar imagen solo si existe */}
+            {primeraImagen && (
+              <img
+                src={primeraImagen}
+                alt={articulo.titulo}
+                className="categorias_articulo_imagen"
+                style={{
+                  width: "10%",
+                  minWidth: "150px",
+                  borderRadius: "10px",
+                  alignSelf: "flex-start", // Asegura que la imagen no empuje el texto
+                }}
+              />
+            )}
           </div>
         );
       })}
