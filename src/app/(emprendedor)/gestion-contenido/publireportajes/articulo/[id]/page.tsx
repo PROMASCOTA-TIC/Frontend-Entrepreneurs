@@ -13,7 +13,7 @@ interface Articulo {
     categoria: string;
     titulo: string;
     descripcion: string;
-    imagen: string;
+    imagenes: string[];
     bibliografia: string;
     autor: string;
 }
@@ -38,7 +38,9 @@ const EntradaPubliReportaje: React.FC = () => {
                     descripcion: data.description || "Descripción no disponible",
                     bibliografia: data.sourceLink || "No especificada",
                     autor: data.ownerName || "Desconocido",
-                    imagen: data.image || "https://via.placeholder.com/200",
+                    imagenes: data.imagesUrl
+                        ? data.imagesUrl.split(",").map((url: string) => url.trim())
+                        : ["https://via.placeholder.com/200"],
                 });
             } catch (error) {
                 console.error("Error al obtener los datos del artículo:", error);
@@ -87,14 +89,20 @@ const EntradaPubliReportaje: React.FC = () => {
                         <b>Compartido por:</b> {articulo?.autor}
                     </p>
                 </div>
-                <img
-                    src={articulo?.imagen}
-                    className="articulo_imagen"
-                    alt={articulo?.titulo}
-                    style={{ width: "200px", borderRadius: "10px" }}
-                />
-            </div>
 
+                {/* Mostrar todas las imágenes */}
+                <div className="flex-column" style={{ gap: "10px", alignItems: "center" }}>
+                    {articulo.imagenes.map((imagen, index) => (
+                        <img
+                            key={index}
+                            src={imagen}
+                            className="articulo_imagen"
+                            alt={`Imagen ${index + 1} de ${articulo.titulo}`}
+                            style={{ width: "200px", borderRadius: "10px" }}
+                        />
+                    ))}
+                </div>
+            </div>
         </Box>
     );
 };

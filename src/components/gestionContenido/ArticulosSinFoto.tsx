@@ -29,7 +29,13 @@ const ArticulosSinFoto: React.FC<ArticulosSinFotoProps> = ({ articulos, basePath
             {articulos.map((articulo) => (
                 <div key={articulo.id} className='articulo_contenedor'>
                     <h2 className='h2-semiBold txtcolor-secondary txt-justify'>{articulo.titulo}</h2>
-                    <p className='txt-justify'>{articulo.descripcion}</p>
+                    <p className="txt-justify">
+                        {articulo.descripcion
+                            ? articulo.descripcion.length > 400
+                                ? `${articulo.descripcion.substring(0, 400)}...`
+                                : articulo.descripcion
+                            : "Sin descripción"}
+                    </p>
                     <Link
                         className='h2-semiBold txtcolor-secondary'
                         style={{ textAlign: 'right' }}

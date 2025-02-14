@@ -36,7 +36,9 @@ const EI_Categorias = () => {
           titulo: articulo.title || "Sin título",
           descripcion: articulo.description || "Sin descripción disponible",
           link: articulo.sourceLink || "#", // Si no hay un enlace, se deja vacío
-          imagen: articulo.image || "/default-image.jpg", // Imagen por defecto si no tiene imagen
+          imagen: articulo.imagesUrl 
+            ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
+            : "/default-image.jpg", // Imagen por defecto si no tiene imagen
         }));
 
         setArticulos(articulosAdaptados);

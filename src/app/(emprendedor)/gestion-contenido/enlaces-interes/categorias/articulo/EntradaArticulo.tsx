@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import { Download } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -13,7 +13,7 @@ interface Articulo {
     categoria: string;
     titulo: string;
     descripcion: string;
-    imagen: string;
+    imagenes: string[]; // Cambio a array para manejar múltiples imágenes
     bibliografia: string;
     autor: string;
 }
@@ -38,7 +38,9 @@ const EntradaArticulo: React.FC = () => {
                     descripcion: data.description || "Descripción no disponible",
                     bibliografia: data.sourceLink || "No especificada",
                     autor: data.ownerName || "Desconocido",
-                    imagen: data.image || "https://via.placeholder.com/200",
+                    imagenes: data.imagesUrl
+                        ? data.imagesUrl.split(",").map((url: string) => url.trim())
+                        : ["https://via.placeholder.com/200"], // Si no hay imágenes, usa un placeholder
                 });
             } catch (error) {
                 console.error("Error al obtener los datos del artículo:", error);
@@ -52,8 +54,21 @@ const EntradaArticulo: React.FC = () => {
         }
     }, [id]); // El efecto se ejecuta cada vez que cambia el ID
 
+    // Render de carga o error
     if (loading) {
-        return <p>Cargando artículo...</p>;
+        return (
+            <div
+                className="flex-center"
+                style={{
+                    height: "100vh",
+                    flexDirection: "column",
+                    gap: "20px",
+                }}
+            >
+                <CircularProgress style={{ color: "#004040" }} size={60} />
+                <h1 className="h1-bold txtcolor-primary">Cargando artículo...</h1>
+            </div>
+        );
     }
 
     if (!articulo) {
@@ -74,13 +89,21 @@ const EntradaArticulo: React.FC = () => {
                         <b>Compartido por:</b> {articulo?.autor}
                     </p>
                 </div>
-                <img
-                    src={articulo?.imagen}
-                    className="articulo_imagen"
-                    alt={articulo?.titulo}
-                    style={{ width: "200px", borderRadius: "10px" }}
-                />
+
+                {/* Mostrar todas las imágenes */}
+                <div className="flex-column" style={{ gap: "10px", alignItems: "center" }}>
+                    {articulo.imagenes.map((imagen, index) => (
+                        <img
+                            key={index}
+                            src={imagen}
+                            className="articulo_imagen"
+                            alt={`Imagen ${index + 1} de ${articulo.titulo}`}
+                            style={{ width: "200px", borderRadius: "10px" }}
+                        />
+                    ))}
+                </div>
             </div>
+            
             <Box className="flex-center">
                 <Button
                     className="boton_descargar"

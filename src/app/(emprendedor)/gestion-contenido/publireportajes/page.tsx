@@ -10,7 +10,7 @@ const PR_Categorias = () => {
   const [articulos, setArticulos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ** Función para obtener todos los publireportajes **
+  // ** Función para obtener todos los publireportajes aprobados **
   const fetchAllAdvertorials = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/advertorials/status/approved');
@@ -23,7 +23,9 @@ const PR_Categorias = () => {
         titulo: articulo.title || "Sin título",
         descripcion: articulo.description || "Sin descripción",
         link: articulo.link || "#",
-        imagen: articulo.image || "https://via.placeholder.com/100",
+        imagen: articulo.imagesUrl 
+          ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
+          : "https://via.placeholder.com/100", // Imagen por defecto si no tiene imagen
       }));
 
       setArticulos(articulosAdaptados);
@@ -35,7 +37,7 @@ const PR_Categorias = () => {
     }
   };
 
-  // Función para obtener publireportajes por categoría
+  // ** Función para obtener publireportajes por categoría **
   const fetchAdvertorialsByCategory = async (categoryId: string | null) => {
     if (categoryId === "none" || categoryId === null) {
       fetchAllAdvertorials();
@@ -55,7 +57,9 @@ const PR_Categorias = () => {
         titulo: articulo.title || "Sin título",
         descripcion: articulo.description || "Sin descripción",
         link: articulo.link || "#",
-        imagen: articulo.image || "https://via.placeholder.com/100",
+        imagen: articulo.imagesUrl 
+          ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
+          : "https://via.placeholder.com/100",
       }));
 
       setArticulos(articulosAdaptados);
@@ -65,16 +69,17 @@ const PR_Categorias = () => {
     }
   };
 
-  // Cargar todos los publireportajes por defecto al abrir la página
+  // ** Cargar todos los publireportajes aprobados al abrir la página **
   useEffect(() => {
     fetchAllAdvertorials();
   }, []);
 
+  // ** Manejar cambio de categoría **
   const handleCategoryChange = (categoryId: string | null) => {
     fetchAdvertorialsByCategory(categoryId);
   };
 
-  // Render de carga o error
+  // ** Render de carga **
   if (loading) {
     return (
       <div

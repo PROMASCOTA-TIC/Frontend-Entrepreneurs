@@ -12,6 +12,9 @@ import ArchivosMultimedia from '@/components/gestionContenido/ArchivosMultimedia
 import Btn_GuardarCancelar from '@/components/gestionContenido/barraBotones/Btn_GuardarCancelar';
 import { useRouter } from "next/navigation";
 
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 // Ajusta tu tipo Inputs para que coincida con el Zod Schema (enviarEnlaceSchema).
 // Agrega "imagesUrl" si en tu backend es opcional, etc.
 type Inputs = {
@@ -33,12 +36,25 @@ const categoryMap: Record<string, number> = {
   actividades: 6,
 };
 
+// Configuración de Firebase
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
 const Form_EnviarEnlace: React.FC = () => {
   // 1. Configurar React Hook Form
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(enviarEnlaceSchema),
@@ -55,32 +71,55 @@ const Form_EnviarEnlace: React.FC = () => {
   // Estados para feedback de la operación
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const [openSnackbar, setOpenSnackbar] = useState(false);
-
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Almacena los archivos seleccionados
   const router = useRouter();
+
+  // Función para subir archivos a Firebase
+  const uploadMediaToFirebase = async (files: File[]) => {
+    console.log("Subiendo archivos:", files); // Agregar log
+
+    if (files.length === 0) return "";
+
+    const urls: string[] = [];
+    for (const file of files) {
+      try {
+        const storageRef = ref(storage, `gestion-cotenido/enlaces-interes/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        urls.push(downloadURL);
+      } catch (error) {
+        console.error("Error al subir archivo:", error);
+      }
+    }
+
+    const urlsString = urls.join(","); // Convertir el array a string separado por comas
+    console.log("URLs de archivos subidos:", urlsString);
+    return urlsString;
+  };
 
   // 2. Función onSubmit con React Hook Form
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    console.log("Formulario enviado con datos:", data); // Agregar log
     try {
       setError("");
       setSuccess("");
 
-      // Construimos el payload para tu backend
-      // (en tu DTO, categoryId es un number, podrías parsear a number
-      //  si "categoria1", "categoria2" fuesen IDs reales).
+      // Subir archivos a Firebase y obtener un string de URLs
+      const imagesUrlString = await uploadMediaToFirebase(selectedFiles);
+
       const createLinkDto = {
         ownerName: data.ownerName,
         ownerEmail: data.ownerEmail,
-        // Si "category" es un ID, convierte a number:
-        // categoryId: parseInt(data.category, 10) || 0,
-        // Caso contrario, si solo es un string, asígnalo a un campo en tu backend:
         categoryId: categoryMap[data.category],
         title: data.title,
         description: data.description,
         sourceLink: data.sourceLink,
-        imagesUrl: data.imagesUrl || undefined,
+        imagesUrl: imagesUrlString,
+        // imagesUrl: imagesUrls.length > 0 ? imagesUrls.join(",") : null, // Guardar las URLs separadas por comas
       };
+
+      console.log("Datos a enviar al backend:", createLinkDto); // Agregar log
 
       // 3. Enviar al backend
       const response = await fetch("http://localhost:3001/api/links/create", {
@@ -92,30 +131,18 @@ const Form_EnviarEnlace: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Error al crear enlace. Status: ${response.status}`
-        );
+        throw new Error(`Error al crear enlace. Status: ${response.status}`);
       }
-      console.log("Guardado exitoso");
 
       setOpenSnackbar(true);
-
       setTimeout(() => {
-        router.push("http://localhost:3000/gestion-contenido/enlaces-interes");
+        router.push("/gestion-contenido/enlaces-interes");
       }, 4000);
-
-      const respData = await response.json();
-      setSuccess(
-        `Enlace creado con éxito. ID asignado: ${respData?.id || "(sin ID)"
-        }`
-      );
-
-      // Podrías resetear el formulario con "reset()"
-      // pero si lo deseas, lo dejas tal cual
     } catch (err: any) {
+      console.error("Error en el envío:", err);
       setError(err.message || "Ocurrió un error al crear el enlace");
+      setOpen(true);
     }
-    setOpen(true);
   };
 
   return (
@@ -363,7 +390,7 @@ const Form_EnviarEnlace: React.FC = () => {
             </Grid2>
 
             <Grid2 size={12} className='flex-center'>
-              <ArchivosMultimedia />
+              <ArchivosMultimedia onChange={(files) => setSelectedFiles(files)} />
             </Grid2>
 
             {/* Botones */}

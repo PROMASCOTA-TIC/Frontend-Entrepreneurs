@@ -12,6 +12,9 @@ import ArchivosMultimedia from '@/components/gestionContenido/ArchivosMultimedia
 import Btn_GuardarCancelar from '@/components/gestionContenido/barraBotones/Btn_GuardarCancelar';
 import { useRouter } from "next/navigation";
 
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 // Ajusta tu tipo Inputs para que coincida con el Zod Schema (enviarEnlaceSchema).
 // Agrega "imagesUrl" si en tu backend es opcional, etc.
 type Inputs = {
@@ -32,12 +35,25 @@ const categoryMap: Record<string, number> = {
   innovacionYTecnologia: 5,
 };
 
+// Configuración de Firebase
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+};
+
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
 const Form_EnviarPublireportaje: React.FC = () => {
   // 1. Configurar React Hook Form
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(enviarEnlaceSchema),
@@ -54,16 +70,42 @@ const Form_EnviarPublireportaje: React.FC = () => {
   // Estados para feedback de la operación
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const [openSnackbar, setOpenSnackbar] = useState(false);
-
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const router = useRouter();
+
+  // Función para subir archivos a Firebase
+  const uploadMediaToFirebase = async (files: File[]) => {
+    console.log("Subiendo archivos:", files); // Agregar log
+
+    if (files.length === 0) return "";
+
+    const urls: string[] = [];
+    for (const file of files) {
+      try {
+        const storageRef = ref(storage, `gestion-cotenido/publireportajes/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        urls.push(downloadURL);
+      } catch (error) {
+        console.error("Error al subir archivo:", error);
+      }
+    }
+
+    const urlsString = urls.join(","); // Convertir el array a string separado por comas
+    console.log("URLs de archivos subidos:", urlsString);
+    return urlsString;
+  };
+
 
   // 2. Función onSubmit con React Hook Form
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       setError("");
       setSuccess("");
+
+      // Subir archivos a Firebase y obtener un string de URLs
+      const imagesUrlString = await uploadMediaToFirebase(selectedFiles);
 
       const createAdvertorialDto = {
         ownerName: data.ownerName,
@@ -72,8 +114,10 @@ const Form_EnviarPublireportaje: React.FC = () => {
         title: data.title,
         description: data.description,
         sourceLink: data.sourceLink,
-        imagesUrl: data.imagesUrl || undefined,
+        imagesUrl: imagesUrlString,
       };
+
+      console.log("Datos a enviar al backend:", createAdvertorialDto); // Agregar log
 
       // 3. Enviar al backend
       const response = await fetch("http://localhost:3001/api/advertorials/create", {
@@ -353,7 +397,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
             </Grid2>
 
             <Grid2 size={12} className='flex-center'>
-              <ArchivosMultimedia />
+              <ArchivosMultimedia onChange={(files) => setSelectedFiles(files)} />
             </Grid2>
 
             {/* Botones */}
