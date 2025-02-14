@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, Button,Grid2 } from '@mui/material';
+import { Box, Typography, CircularProgress, Snackbar, Dialog, DialogTitle, DialogContent, Button,Grid2, IconButton } from '@mui/material';
 import { themePalette } from '@/config/theme.config';
 import ProductCard from './CardsProductosVendidos';
 import EditarProducto from '../actualizar-producto/EditarProducto';
 import { URL_BASE } from '@/config/config';
+import CloseIcon from "@mui/icons-material/Close";
 
 interface Product {
   id: string;
@@ -175,6 +176,17 @@ const CarruselProductosVendidos: React.FC = () => {
           }}
         >
           Confirmar Eliminación
+          <IconButton
+      onClick={() => setOpenDeleteDialog(false)}
+      sx={{
+        position: "absolute",
+        right: 8,
+        top: 8,
+        color: themePalette.cwhite,
+      }}
+    >
+      <CloseIcon />
+    </IconButton>
         </DialogTitle>
         <DialogContent dividers>
           <Typography sx={{ fontSize: '18px', textAlign: 'center', color: themePalette.black }}>

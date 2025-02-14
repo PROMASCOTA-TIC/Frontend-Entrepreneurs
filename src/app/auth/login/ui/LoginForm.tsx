@@ -173,7 +173,7 @@ export const LoginForm = () => {
                     )}
                 </Box>
 
-                <Link href="/auth/forgot-password"
+                <Link href="/auth/recuperar"
                     style={{
                         color: themePalette.secondary,
                         textDecoration: 'underline',

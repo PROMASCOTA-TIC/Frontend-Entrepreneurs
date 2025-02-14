@@ -75,7 +75,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ name, multimediaFiles, descri
           {truncatedDescription}
         </Typography>
 
-        <Typography variant="h6" color="text.primary" sx={{ marginTop: 1 }}>
+        <Typography variant="h6" color="text.primary"  sx={{ marginTop: 1, color: themePalette.primary, fontWeight: '520' }}>
           ${finalPrice ? finalPrice.toFixed(2) : "0.00"}
         </Typography>
       </CardContent>
