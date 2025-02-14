@@ -13,6 +13,7 @@ import OfertaProducto from "../oferta-producto/OfertaProducto";
 import DetallesProducto from "../detalles-producto/DetallesProducto";
 import EditarProducto from "../actualizar-producto/EditarProducto";
 import axios from "axios";
+import CloseIcon from "@mui/icons-material/Close";
 import { useGridApiRef } from "@mui/x-data-grid";
 import { URL_BASE } from "@/config/config";
 
@@ -278,6 +279,17 @@ const ListaProductos: React.FC = () => {
     }}
   >
     Confirmar Eliminación
+    <IconButton
+      onClick={() => setOpenDeleteDialog(false)}
+      sx={{
+        position: "absolute",
+        right: 8,
+        top: 8,
+        color: themePalette.cwhite,
+      }}
+    >
+      <CloseIcon />
+    </IconButton>
   </DialogTitle>
   <DialogContent dividers>
     <Typography sx={{ fontSize: '18px', textAlign: 'center', color: themePalette.black }}>

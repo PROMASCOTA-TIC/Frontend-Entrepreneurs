@@ -14,7 +14,7 @@ import EditarProducto from "../actualizar-producto/EditarProducto";
 import axios from "axios";
 import { useGridApiRef } from "@mui/x-data-grid";
 import { URL_BASE } from "@/config/config";
-
+import CloseIcon from "@mui/icons-material/Close";
 
 interface ProductDetails {
   id: string;
@@ -287,9 +287,21 @@ useEffect(() => {
       color: themePalette.cwhite,
       textAlign: 'center',
       fontWeight: 'bold',
+      position: 'relative',
     }}
   >
     Confirmar Eliminación
+    <IconButton
+      onClick={() => setOpenDeleteDialog(false)}
+      sx={{
+        position: "absolute",
+        right: 8,
+        top: 8,
+        color: themePalette.cwhite,
+      }}
+    > 
+    <CloseIcon/>
+    </IconButton>
   </DialogTitle>
   <DialogContent dividers>
     <Typography sx={{ fontSize: '18px', textAlign: 'center', color: themePalette.black }}>
