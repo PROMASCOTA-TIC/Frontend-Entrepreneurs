@@ -264,7 +264,7 @@ export default function RegistroProducto() {
         onChange={(urls) => updateProductData("multimediaFiles", urls)}
         error={errors.multimediaFiles}
       />
-      <Grid2 container spacing={2} justifyContent="space-evenly" alignItems="center">
+      <Grid2 container spacing={2} justifyContent="space-evenly" alignItems="center" >
         <Button
           variant="contained"
           onClick={handleGuardar}

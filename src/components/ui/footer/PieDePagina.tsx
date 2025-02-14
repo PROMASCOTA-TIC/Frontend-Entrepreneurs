@@ -15,6 +15,7 @@ const PieDePagina = () => {
                 alignItems: 'center',
                 gap: { xs: '20px', md: '0' },
                 bottom: '0',
+                marginTop: '60px',
             }}
         >
             <div>
