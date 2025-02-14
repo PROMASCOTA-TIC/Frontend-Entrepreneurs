@@ -203,10 +203,10 @@ const ListaProductos: React.FC = () => {
         rows={rows.length > 0 ? rows : []} 
           columns={[
             { field: "name", headerName: "Nombre", minWidth: 150, flex: 1.16 },
-            { field: "petType", headerName: "Tipo de Mascota", minWidth: 130, flex: 1 },
+            { field: "petType", headerName: "Tipo de Mascota", minWidth: 130, flex: 0.8 },
             { field: "category", headerName: "Categoría", minWidth: 130, flex:0.5 },
             { field: "subcategory", headerName: "Subcategoría", minWidth: 135, flex: 1 },
-            { field: "finalPrice", headerName: "Precio", minWidth: 100, flex: 0.5 },
+            { field: "finalPrice", headerName: "Precio final", minWidth: 100, flex: 0.5 },
             { field: "stock", headerName: "Stock", minWidth: 100, flex: 0.5 },
             {
               field: "ver",
@@ -223,9 +223,9 @@ const ListaProductos: React.FC = () => {
               field: "editar",
               headerName: "Editar",
               minWidth: 90,
-              flex: 0.5,
+              flex: 0.3,
               renderCell: (params) => (
-                <IconButton sx={{ color: themePalette.primary }} onClick={() => handleEditProduct(params.row.id)}>
+                <IconButton sx={{ color: "#FF5C00" }} onClick={() => handleEditProduct(params.row.id)}>
                   <EditIcon />
                 </IconButton>
               ),

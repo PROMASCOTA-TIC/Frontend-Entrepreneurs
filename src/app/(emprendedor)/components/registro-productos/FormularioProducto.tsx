@@ -208,13 +208,14 @@ const FormularioRegistroProducto: React.FC<FormularioRegistroProductoProps> = ({
             }
           },
         })}
-        {createField("Precio final", "finalPrice", "number", undefined, false, {
+        {createField("Precio final ($)", "finalPrice", "number", undefined, false, {
           onKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => {
             const currentValue = data.finalPrice?.toString() || "";
             if (!/^[0-9.]$/.test(event.key) || (event.key === "." && currentValue.includes("."))) {
               event.preventDefault();
             }
           },
+          helperText: "Incluir IVA si corresponde", // Aquí agregamos el texto sx: { maxWidth: "400px" }
         })}
         {createField("Descripción", "description", "text", undefined, false, {
           multiline: true,
