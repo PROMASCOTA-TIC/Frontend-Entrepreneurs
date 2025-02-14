@@ -1,40 +1,164 @@
 "use client";
 import { useState } from "react";
-import { Box, Grid2, Typography, Button } from "@mui/material";
+import { Box, Grid2, Typography } from "@mui/material";
 import Image from "next/image";
 import { icon, fondoDuenos } from "@/assets/images";
 import { themePalette } from "@/config/theme.config";
-
-// Importa los componentes del formulario
 import { RegisterForm } from "./registerForm";
-import  {BusinessDataForm}from "./registroDatosEmprendimiento";
+import { BusinessDataForm } from "./registroDatosEmprendimiento";
 import { ShippingDetailsForm } from "./registroEnvios";
 import { RegistroHorarioAtencion } from "./registroHorarios";
 import { CompletionMessage } from "./mensajeRegistro";
+import { UploadImagesForm } from "./subirImagenes";
 
 
-export default function Login() {
+
+type FormDataType = {
+  email: string;
+  password: string;
+  name: string;
+  aceptoTerminos: string;
+  nombreEmprendimiento?: string;
+  ruc?: string;
+  numeroCelular?: string;
+  bancoNombre?: string;
+  bancoTipoCuenta?: string;
+  bancoNumeroCuenta?: string;
+  bancoNombreDuenoCuenta?: string;
+  realizaEnvios?: string;
+  soloRetiraEnTienda?: string;
+  callePrincipal?: string;
+  calleSecundaria?: string;
+  numeracion?: string;
+  referencia?: string;
+  sectorLocal?: string;
+  horario?: Array<{
+    dia: string;
+    horaApertura?: string;
+    horaCierre?: string;
+    cerrado?: string;
+  }>;
+  fotosLocal?: string[];
+  fotosLogotipo?: string[];
+};
+
+const diasDeLaSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+
+export default function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState<FormDataType>({
+    email: "",
+    password: "",
+    name: "",
+    aceptoTerminos: "0",
+    nombreEmprendimiento: "",
+    ruc: "",
+    numeroCelular: "",
+    bancoNombre: "",
+    bancoTipoCuenta: "",
+    bancoNumeroCuenta: "",
+    bancoNombreDuenoCuenta: "",
+    realizaEnvios: "0",
+    soloRetiraEnTienda: "0",
+    callePrincipal: "",
+    calleSecundaria: "",
+    numeracion: "",
+    referencia: "",
+    sectorLocal: "",
+    horario: diasDeLaSemana.map((dia) => ({ dia, cerrado: "0", horaApertura: "", horaCierre: "" })), // Inicialización de horarios
+    fotosLocal: [],
+    fotosLogotipo: [],
+  });
 
-  // Funciones para manejar la navegación
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
+
+  const updateFormData = (data: Partial<FormDataType>) => {
+    setFormData((prev) => {
+      let updatedData = { ...prev, ...data };
+
+      if (data.horario) {
+        updatedData.horario = data.horario.map((dia) => ({
+          dia: dia.dia,
+          cerrado: dia.cerrado,
+          ...(dia.cerrado === "0" ? { horaApertura: dia.horaApertura, horaCierre: dia.horaCierre } : {}),
+        }));
+      }
+
+      console.log("🔹 Datos actualizados en formData:", updatedData);
+      return updatedData;
+    });
+  };
+
+
+
+
+  const nextStep = () => {
+    console.log("🔄 Avanzando al siguiente paso...");
+    setCurrentStep((prev) => prev + 1);
+};
+
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
-  // Función para renderizar el componente correspondiente según el paso actual
+  const handleSuccessfulSubmit = () => {
+    console.log("✅ Registro finalizado correctamente.");
+    nextStep();
+  };
+
+
+
   const renderFormComponent = () => {
     switch (currentStep) {
       case 1:
-        return <RegisterForm nextStep={nextStep} />;
+    return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} formData={formData} />;
       case 2:
-        return <BusinessDataForm nextStep={nextStep} prevStep={prevStep} />;
+        case 2:
+          return <BusinessDataForm 
+              nextStep={nextStep} 
+              prevStep={prevStep} 
+              updateFormData={updateFormData} 
+              formData={formData} 
+          />;
       case 3:
-        return <ShippingDetailsForm nextStep={nextStep} prevStep={prevStep} />;
+
+      return <ShippingDetailsForm nextStep={nextStep} prevStep={prevStep} updateFormData={updateFormData} formData={formData} />;
       case 4:
-        return <RegistroHorarioAtencion nextStep={nextStep} prevStep={prevStep} />;
-        case 5: 
-        return <CompletionMessage />;
+        return (
+          <RegistroHorarioAtencion
+            nextStep={nextStep}
+            prevStep={prevStep}
+            updateFormData={updateFormData}
+            formData={{
+              horario: formData.horario?.map((h) => ({
+                dia: h.dia,
+                cerrado: h.cerrado ?? "0",
+                horaApertura: h.horaApertura ?? "",
+                horaCierre: h.horaCierre ?? ""
+              })) ?? diasDeLaSemana.map((dia) => ({
+                dia,
+                cerrado: "0",  
+                horaApertura: "",
+                horaCierre: ""
+              }))
+              
+            }}
+          />
+        );
+        
+        case 5:
+          
+          return (
+          <UploadImagesForm
+            formData={formData} 
+            updateFormData={updateFormData}
+            onSubmit={handleSuccessfulSubmit} 
+            prevStep={prevStep}
+          />
+        );
+      case 6:
+    return <CompletionMessage/>;
       default:
-        return <RegisterForm  nextStep={nextStep} />;
+        return <RegisterForm nextStep={nextStep} updateFormData={updateFormData} formData={formData} />;
+
     }
   };
 
@@ -81,7 +205,7 @@ export default function Login() {
               flexDirection: "column",
               backgroundColor: "rgba(70, 218, 105, 0.08)",
               padding: { xs: "10px 20px", md: "5px 30px" },
-              width: { xs: "90%", sm: "80%", lg: "60%" },
+              width: { xs: "90%", sm: "80%", lg: "75%" },
               borderRadius: "20px",
             }}
           >
@@ -101,6 +225,8 @@ export default function Login() {
                 ? "Envíos y entregas"
                 : currentStep === 4
                 ? "Horario de atención"
+                : currentStep === 5
+                ? "Subir imágenes"
                 : "Registro completado"}
             </Typography>
             
@@ -126,17 +252,50 @@ export default function Login() {
             },
           }}
         >
-          <Image
-            src={fondoDuenos}
-            alt="imagen"
-            style={{
-              margin: 0,
-              padding: 0,
-              width: "100%",
-              height: "auto",
-            }}
-            priority
-          />
+  <Grid2 
+  size={{ xs: 0}}
+  sx={{
+    display: { xs: "none", md: "block" },
+    margin: 0,
+    padding: 0,
+    position: "relative",
+    width: "100%", 
+    height: "100%", // Cambio importante: Se adapta a la altura del contenedor padre
+    overflow: "hidden", // Evita desbordes
+  }}
+>
+  <Box sx={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
+    {/* Imagen de fondo */}
+    <Image 
+      src={fondoDuenos} 
+      alt="imagen"
+      layout="fill"
+      objectFit="cover" 
+      objectPosition="center center"
+      priority
+    />
+
+    {/* Texto encima de la imagen */}
+    <Typography 
+      sx={{
+        position: "absolute",
+        top: "3%",
+        left: "55%",
+        transform: "translate(-50%, -50%)",
+        color: "white",
+        fontSize: { xs: "2rem", md: "3rem" },
+        fontWeight: "bold",
+        textAlign: "center",
+        textShadow: "2px 2px 10px rgba(0, 0, 0, 0.5)",
+        width: "100%",
+      }}
+    >
+      Emprendedores
+    </Typography>
+  </Box>
+</Grid2>
+
+
         </Grid2>
       </Grid2>
     </div>

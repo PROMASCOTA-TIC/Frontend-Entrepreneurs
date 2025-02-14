@@ -86,15 +86,37 @@ export default function Login() {
               pointerEvents: 'none',
             }
           }}>
-          <Image src={fondoDuenos} alt="imagen"
-            style={{
-              margin: 0,
-              padding: 0,
-              width: '100%',
-              height: '100vh',
-            }}
-            priority
-          />
+       <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
+  <Image 
+    src={fondoDuenos} 
+    alt="imagen"
+    style={{
+      margin: 0,
+      padding: 0,
+      width: '100%',
+      height: '100vh',
+      objectFit: 'cover',
+      objectPosition: 'center',
+    }}
+    priority
+  />
+
+
+  <h1 style={{
+    position: 'absolute',
+    top: '3%', 
+    left: '55%',
+    transform: 'translate(-50%, -50%)', // Centra el texto horizontalmente
+    color: 'white',
+    fontSize: '3rem', 
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textShadow: '2px 2px 10px rgba(0, 0, 0, 0.5)', 
+  }}>
+    Emprendedores
+  </h1>
+</div>
+
         </Grid2>
       </Grid2>
     </div>
