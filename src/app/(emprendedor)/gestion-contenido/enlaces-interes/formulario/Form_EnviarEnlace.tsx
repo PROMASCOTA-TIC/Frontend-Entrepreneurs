@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { URL_BASE } from '@/config/config';
 
 // Ajusta tu tipo Inputs para que coincida con el Zod Schema (enviarEnlaceSchema).
 // Agrega "imagesUrl" si en tu backend es opcional, etc.
@@ -60,6 +61,8 @@ const Form_EnviarEnlace: React.FC = () => {
   //********************************************* */
   const [userData, setUserData] = useState({ name: "", email: "" });
 
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+
   // 1. Configurar React Hook Form
   const {
     register,
@@ -73,13 +76,31 @@ const Form_EnviarEnlace: React.FC = () => {
 
   const [open, setOpen] = useState(false);
 
-  const getUserData = async () => {
-    //const userId = localStorage.getItem('entrepreneurId');
-    const entrepreneurId = "60428875-6fcc-41c4-ae50-2df597504ca7"; // Cambiar por el id real
-    if (!entrepreneurId) return;
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
+
+  // Obtener productos solo si existe entrepreneurId
+  useEffect(() => {
+    if (entrepreneurId) {
+      getUserData();
+    }
+  }, [entrepreneurId]);
+
+  const getUserData = async (): Promise<void> => {
+    if (!entrepreneurId) {
+      console.error("No se encontró el ID del emprendedor.");
+      return;
+    }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/users/entrepreneurs/${entrepreneurId}`);
+      const response = await fetch(`${URL_BASE}/users/entrepreneurs/${entrepreneurId}`);
       if (!response.ok) {
         throw new Error(`Error al obtener datos de usuario. Status: ${response.status}`);
       }
@@ -95,9 +116,6 @@ const Form_EnviarEnlace: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    getUserData();
-  }, []);
   /**************************************************************************************************************** */
 
   // Función para subir archivos a Firebase
