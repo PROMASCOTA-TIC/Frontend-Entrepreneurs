@@ -37,7 +37,7 @@ const PieDePagina = () => {
                     <IconButton href="https://www.facebook.com/share/18kPrQkn6p/?mibextid=wwXIfr" target="_blank" color='inherit'>
                         <Facebook />
                     </IconButton>
-                    <IconButton href="https://www.facebook.com/share/18kPrQkn6p/?mibextid=wwXIfr" target="_blank" color='inherit'>
+                    <IconButton href="https://www.instagram.com/pro_maskota?igsh=MWJzcDh1ZXNwbzltZA==" target="_blank" color='inherit'>
                         <Instagram />
                     </IconButton>
                     <IconButton href="https://x.com/promaskota?s=21&t=zNTMFwVc03kXulFPEG6ZGg" target="_blank" color='inherit'>
