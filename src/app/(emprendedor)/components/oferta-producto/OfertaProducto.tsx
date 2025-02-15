@@ -231,7 +231,7 @@ const OfertaProducto: React.FC<OfertaProductoProps> = ({ open, onClose, entrepre
       headerName: 'Editar',
       flex: 0.5,
       renderCell: (params) => (
-        <IconButton onClick={() => handleEditOffer(params.row)} sx={{ color: themePalette.primary }}>
+        <IconButton onClick={() => handleEditOffer(params.row)} sx={{ color: "#FF5C00" }} >
           <Edit />
         </IconButton>
       ),

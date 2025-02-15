@@ -237,7 +237,7 @@ useEffect(() => {
               minWidth: 90,
               flex: 0.5,
               renderCell: (params) => (
-                <IconButton sx={{ color: themePalette.primary }} onClick={() => handleEditProduct(params.row.id)}>
+                <IconButton sx={{ color: "#FF5C00" }} onClick={() => handleEditProduct(params.row.id)}>
                   <EditIcon />
                 </IconButton>
               ),
