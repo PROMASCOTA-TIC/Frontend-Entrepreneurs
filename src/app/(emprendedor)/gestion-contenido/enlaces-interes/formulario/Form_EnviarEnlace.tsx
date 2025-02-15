@@ -64,48 +64,40 @@ const Form_EnviarEnlace: React.FC = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(enviarEnlaceSchema),
     mode: "onChange", // Valida en tiempo real
-    defaultValues: {
-      // **************************************************************************
-      ownerName: userData.name,
-      ownerEmail: userData.email,
-    },
   });
 
   const [open, setOpen] = useState(false);
 
-  // *************************************************
-  // Crear una funcion que obtenga datos de un usuario en base al id
-  // Tomar el id de localstorage.get('user_id') y hacer una peticion a la API
+  const getUserData = async () => {
+    //const userId = localStorage.getItem('entrepreneurId');
+    const entrepreneurId = "60428875-6fcc-41c4-ae50-2df597504ca7"; // Cambiar por el id real
+    if (!entrepreneurId) return;
 
-  // const getUserData = async () => {
-  //   //const userId = localStorage.getItem('entrepreneurId');
-  //   const entrepreneurId = "fcbb22fe-bfc5-4c63-8fe7-bb01f762f604"; // Cambiar por el id real
-  //   if (!entrepreneurId) return;
+    try {
+      const response = await fetch(`http://localhost:3001/api/users/entrepreneurs/${entrepreneurId}`);
+      if (!response.ok) {
+        throw new Error(`Error al obtener datos de usuario. Status: ${response.status}`);
+      }
 
-  //   try {
-  //     const response = await fetch(`http://localhost:3001/api/users/entrepreneurs/${entrepreneurId}`);
-  //     if (!response.ok) {
-  //       throw new Error(`Error al obtener datos de usuario. Status: ${response.status}`);
-  //     }
+      const userData = await response.json();
+      setUserData(userData); // Guardamos los datos en el estado
 
-  //     const userData = await response.json();
+      // Actualizamos los valores del formulario
+      setValue("ownerName", userData.name);
+      setValue("ownerEmail", userData.email);
+    } catch (error) {
+      console.error("Error al obtener datos de usuario:", error);
+    }
+  };
 
-  //     setUserData(userData);
-
-  //     console.log("Datos de usuario:", userData);
-  //   } catch (error) {
-  //     console.error("Error al obtener datos de usuario:", error);
-  //   }
-  // }
-
-  // // usar hook useEffect llamar a la funcion de arriba
-  // useEffect(() => {
-  //   getUserData();
-  // }, []);
+  useEffect(() => {
+    getUserData();
+  }, []);
   /**************************************************************************************************************** */
 
   // Función para subir archivos a Firebase
@@ -207,7 +199,7 @@ const Form_EnviarEnlace: React.FC = () => {
             <Grid2 size={{ xs: 12, sm: 8, md: 8 }}>
               <Grid2 size={12}>
                 <TextField
-                  //disabled
+                  disabled
                   placeholder="Nombre del usuario"
                   className='minima-regular'
                   required
@@ -236,7 +228,7 @@ const Form_EnviarEnlace: React.FC = () => {
             <Grid2 size={{ xs: 12, sm: 8, md: 8 }}>
               <Grid2 size={12}>
                 <TextField
-                  //disabled
+                  disabled
                   placeholder="Correo del usuario"
                   className='minima-regular'
                   required

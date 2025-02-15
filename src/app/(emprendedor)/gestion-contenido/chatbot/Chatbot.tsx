@@ -18,8 +18,35 @@ function Chatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const predefinedResponses: { [key: string]: string } = {
+    "cómo inicio sesión": "Para iniciar sesión, ve a la página principal y haz clic en 'Iniciar sesión'. Luego, introduce tu correo y contraseña.",
+    "cómo me registro": "Para registrarte, haz clic en 'Registrarse' en la página principal y completa el formulario con tus datos.",
+    "olvidé mi contraseña": "Si olvidaste tu contraseña, haz clic en '¿Olvidaste tu contraseña?' en la pantalla de inicio de sesión y sigue los pasos.",
+    "dónde encuentro soporte?": "Puedes ingresar en la página de Preguntas Frecuentes y buscar la respuesta a tu pregunta.Si no encuentras la respuesta, puedes contactar a soporte en el chatbot.",
+  };
+
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase() // Convertir a minúsculas
+      .trim() // Eliminar espacios extra al inicio y al final
+      .replace(/\s+/g, " "); // Reemplazar múltiples espacios por uno solo
+  };
+
   const handleSend = async (msg: string) => {
     setMessages((prev) => [...prev, { sender: "user", text: msg }]);
+
+    // Normalizar el mensaje (convertir a minúsculas y quitar espacios extras)
+    const normalizedMsg = normalizeText(msg);
+
+    // Verificar si el mensaje tiene una respuesta predefinida
+    if (predefinedResponses[normalizedMsg]) {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: predefinedResponses[normalizedMsg] },
+      ]);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
