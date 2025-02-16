@@ -382,7 +382,7 @@ export const CambioDatosEmprendimiento: React.FC = () => {
 
 
 
-          <Box display="flex" justifyContent="center" gap={2} mt={2}  className="button-is space-x-4">
+          <Box display="flex" justifyContent="center" gap={2} mt={2}  sx={{ padding: "20px 30px 30px 30px " }}>
             <Button variant="contained" onClick={() => router.push("/inicio")}
             
             sx={{

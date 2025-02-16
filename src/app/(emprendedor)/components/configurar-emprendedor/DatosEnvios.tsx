@@ -324,7 +324,7 @@ export const CambioDatosEnvio: React.FC = () => {
 
 {["callePrincipal", "calleSecundaria", "numeracion", "referencia"].map((field) => (
   <Box key={field} sx={{ mb: 2 }}>
-    <FormLabel sx={{ color: "black" }}>
+    <FormLabel sx={{ color: "black", fontWeight: "bold", textAlign: "left" }}>
       {field.replace(/([A-Z])/g, " $1").replace(/\b\w/g, (l) => l.toUpperCase())}
     </FormLabel>
     <Controller
@@ -365,7 +365,7 @@ export const CambioDatosEnvio: React.FC = () => {
 
 
 
-      <FormLabel sx={{ color: "black" }}>Sector</FormLabel>
+      <FormLabel sx={{ color: "black",fontWeight: "bold", textAlign: "left" }}>Sector</FormLabel>
       <Controller
         name="sectorLocal"
         control={control}
@@ -395,7 +395,7 @@ export const CambioDatosEnvio: React.FC = () => {
 
       {isLoaded && (
         <>
-          <FormLabel sx={{ color: "black" }}>Mapa de sectorización</FormLabel>
+          <FormLabel sx={{ color: "black",fontWeight: "bold", textAlign: "left" }}>Mapa de sectorización</FormLabel>
           <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
             {zonas.map((zona, index) => (
               <Polygon
@@ -413,7 +413,7 @@ export const CambioDatosEnvio: React.FC = () => {
         </>
       )}
 
-        <Box display="flex" justifyContent="center" gap={2} mt={2}  className="button-is space-x-4">
+        <Box display="flex" justifyContent="center" gap={2} mt={2}   sx={{ padding: "20px 30px 30px 30px " }}>
           <Button variant="contained" onClick={() => router.push("/inicio")}  sx={{
                                                  textTransform: "none",
                                                  backgroundColor: themePalette.primary,

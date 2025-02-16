@@ -63,9 +63,9 @@ export const RegisterFormCambiar: React.FC = () => {
     }
   }, []);
 
-  // ✅ Obtener datos del emprendedor dinámicamente
+
   useEffect(() => {
-    if (!entrepreneurId) return; // 🔥 Solo ejecuta si entrepreneurId no es null
+    if (!entrepreneurId) return; 
   
     const fetchEntrepreneurData = async () => {
       try {
@@ -229,7 +229,7 @@ export const RegisterFormCambiar: React.FC = () => {
           />
         </FormControl>
 
-        <Box display="flex" justifyContent="center" gap={2} mt={2}  className="button-is space-x-4" >
+        <Box display="flex" justifyContent="center" gap={2} mt={2}   sx={{ padding: "20px 30px 30px 30px " }} >
           <Button variant="contained" 
           sx={{
                                        textTransform: "none",

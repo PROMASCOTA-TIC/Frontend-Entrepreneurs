@@ -254,7 +254,7 @@ const CambiarHoraAtencion: React.FC = () => {
 
         
             <Grid2 
-            sx={{xs: 2}}
+            sx={{xs: 2, padding: "20px 30px 30px 30px "}}
             display="flex" justifyContent="center" gap={2} mt={2}  className="button-is space-x-4">
                 <Button variant="contained" onClick={() => router.push("/inicio")} sx={{
                                                        textTransform: "none",
