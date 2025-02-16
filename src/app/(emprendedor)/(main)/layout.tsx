@@ -2,6 +2,7 @@
 import TopNavbar from '@/components/ui/top-navbar/TopNavbar';
 import { TopMenu } from "@/components/ui/top-menu/TopMenu";
 import PieDePagina from "@/components/ui/footer/PieDePagina";
+import Chatbot from '../gestion-contenido/chatbot/Chatbot';
 
 
 const items = [
@@ -26,6 +27,7 @@ export default function ShopLayout({ children }: {
                 <TopMenu listaItems={items}/>
                 {children}
             </main>
+            <Chatbot />
             <PieDePagina />
         </>
     );

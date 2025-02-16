@@ -79,6 +79,7 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ onChange, error
             Seleccionar archivos
           </Button>
         </label>
+        <Typography style={{ fontSize: "15px", paddingTop: "8px" }}>En formato .jpg o .png</Typography>
 
         <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
           {previewFiles.map((file, index) => (

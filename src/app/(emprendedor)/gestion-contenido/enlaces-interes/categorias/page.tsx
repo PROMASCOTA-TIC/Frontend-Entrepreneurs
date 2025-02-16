@@ -1,6 +1,7 @@
 "use client";
 
 import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
+import { URL_BASE } from '@/config/config';
 import { CircularProgress } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -24,7 +25,7 @@ const EI_Categorias = () => {
   useEffect(() => {
     const fetchArticulosPorCategoria = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/links/categories/${categoryId}/links`);
+        const response = await fetch(`${URL_BASE}links/categories/${categoryId}/links`);
         const data = await response.json();
 
         // Filtrar solo los artículos con estado "approved"

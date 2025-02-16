@@ -7,6 +7,7 @@ import '/src/assets/styles/gestionContenido/general.css';
 import '/src/assets/styles/gestionContenido/estilos.css';
 
 import { useParams } from 'next/navigation';
+import { URL_BASE } from '@/config/config';
 
 interface Articulo {
     id: string;
@@ -26,13 +27,13 @@ const EntradaPubliReportaje: React.FC = () => {
     useEffect(() => {
         const fetchArticulo = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/advertorials/detail/${id}`);
+                const response = await fetch(`${URL_BASE}advertorials/detail/${id}`);
                 const data = await response.json();
                 console.log("Datos del artículo:", data); // Log de verificación
 
                 // Adaptación de las propiedades del backend al formato esperado en el frontend
                 setArticulo({
-                    id: data.linkId, // Propiedad `linkId` del backend
+                    id: data.advertorialId,
                     categoria: data.category?.name || "Sin categoría", // Nombre de la categoría
                     titulo: data.title || "Título no disponible",
                     descripcion: data.description || "Descripción no disponible",

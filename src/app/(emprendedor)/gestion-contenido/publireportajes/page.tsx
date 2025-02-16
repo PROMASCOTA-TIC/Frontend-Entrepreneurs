@@ -5,6 +5,7 @@ import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
 import PR_Filtro from './PR_Filtro';
 import PR_CompartirContenido from './PR_CompartirContenido';
 import { CircularProgress } from '@mui/material';
+import { URL_BASE } from '@/config/config';
 
 const PR_Categorias = () => {
   const [articulos, setArticulos] = useState<any[]>([]);
@@ -13,7 +14,7 @@ const PR_Categorias = () => {
   // ** Función para obtener todos los publireportajes aprobados **
   const fetchAllAdvertorials = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/advertorials/status/approved');
+      const response = await fetch(`${URL_BASE}advertorials/status/approved`);
       const data = await response.json();
       console.log('Datos recibidos:', data); // Log para ver los datos de la API
 
@@ -48,7 +49,7 @@ const PR_Categorias = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/advertorials/categories/${categoryId}/advertorials`);
+      const response = await fetch(`${URL_BASE}advertorials/categories/${categoryId}/advertorials`);
       const data = await response.json();
       console.log(`Publireportajes de la categoría ${categoryId}:`, data);
 

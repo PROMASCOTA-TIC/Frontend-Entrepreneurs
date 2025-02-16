@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 
 import "/src/assets/styles/gestionContenido/general.css";
 import "/src/assets/styles/gestionContenido/estilos.css";
+import { URL_BASE } from "@/config/config";
 
 interface ChatMessage {
   sender: "user" | "bot";
@@ -19,10 +20,19 @@ function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
 
   const predefinedResponses: { [key: string]: string } = {
-    "cómo inicio sesión": "Para iniciar sesión, ve a la página principal y haz clic en 'Iniciar sesión'. Luego, introduce tu correo y contraseña.",
-    "cómo me registro": "Para registrarte, haz clic en 'Registrarse' en la página principal y completa el formulario con tus datos.",
-    "olvidé mi contraseña": "Si olvidaste tu contraseña, haz clic en '¿Olvidaste tu contraseña?' en la pantalla de inicio de sesión y sigue los pasos.",
-    "dónde encuentro soporte?": "Puedes ingresar en la página de Preguntas Frecuentes y buscar la respuesta a tu pregunta.Si no encuentras la respuesta, puedes contactar a soporte en el chatbot.",
+    "cómo inicio sesión?": "Para iniciar sesión, ve a la página principal y haz clic en 'Iniciar sesión'. Luego, introduce tu correo y contraseña.",
+    "cómo me registro?": "Para registrarte, haz clic en 'Registrarse' en la página principal y completa el formulario con tus datos.",
+    "olvidé mi contraseña?": "Si olvidaste tu contraseña, haz clic en '¿Olvidaste tu contraseña?' en la pantalla de inicio de sesión y sigue los pasos.",
+    "dónde encuentro soporte?": "Puedes ingresar en la página de Preguntas Frecuentes y buscar la respuesta a tu pregunta.Si no encuentras la respuesta, puedes contactar a soporte a través de nuestras redes sociales.",
+    "cómo puedo enviar contenido?": "Accede a la sección correspondiente de Enlaces de interés o Publi-reportajes, ingresa al formulario para compartir contenido, completa el formulario y envíalo ",
+    "cuánto tiempo tarda en aprobarse mi cuenta de emprendedor?": "El proceso de aprobación de una cuenta de emprendedor toma entre 24 y 48 horas",
+    "cuáles son los métodos de pago disponibles?": "Se aceptan tarjetas de crédito y débito, transferencias bancarias y Payphone",
+    "cómo puedo hacer una compra?": "Explora los productos, agrega los productos al carrito, revisa tu pedido, selecciona el método de entrega, elige el método de pago y confirma tu compra",
+    "qué debo hacer si mi pago fue rechazado": "Verifica los datos ingresados, consulta con tu banco, intenta con otro método de pago, contacta a nuestro soporte",
+    "para qué tipos de mascotas están disponibles los productos y servicios": "Perros, gatos, aves, pequeños mamíferos, peces, entre otros",
+    "los precios de los productos y servicios incluyen IVA?": "Sí, todos los precios mostrados en la plataforma ya incluyen el IVA.",
+    "cómo se protege mi información personal en la plataforma?": "Se tienen medidas de protección como cifrado de datos, acceso restringido, autenticación segura y cumplimiento de normativas de protección de datos",
+    "qué pasa si incumplo los términos y condiciones de la plataforma?": "Se puede suspender de forma temporal tu cuenta, desactivar productos o servicios. En casos graves, se puede cerrar tu cuenta.",
   };
 
   const normalizeText = (text: string) => {
@@ -42,7 +52,7 @@ function Chatbot() {
     if (predefinedResponses[normalizedMsg]) {
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: predefinedResponses[normalizedMsg] },
+        { sender: "bot", text: predefinedResponses[normalizedMsg], },
       ]);
       return;
     }
@@ -50,7 +60,7 @@ function Chatbot() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chatbot/chat", {
+      const response = await fetch(`${URL_BASE}chatbot/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +99,7 @@ function Chatbot() {
 
   const handleFeedback = async (responseId: string, rating: number) => {
     try {
-      const response = await fetch("http://localhost:3001/api/chatbot/feedback", {
+      const response = await fetch(`${URL_BASE}chatbot/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +147,8 @@ function Chatbot() {
               <div key={idx} className={`bubble ${m.sender}`}>
                 {m.text}
 
-                {m.sender === "bot" && m.responseId && m.feedback === null && (
+                {/* Mostrar botones de feedback SOLO si el mensaje NO es predefinido */}
+                {m.sender === "bot" && m.responseId && !m.responseId.startsWith("predefined-") && m.feedback === null && (
                   <div className="feedbackButtons">
                     <button className="thumbsUp" onClick={() => handleFeedback(m.responseId!, 1)}>
                       👍
@@ -148,16 +159,17 @@ function Chatbot() {
                   </div>
                 )}
 
-                {m.sender === "bot" && m.feedback !== null && (
+                {/* Mostrar mensaje de feedback SOLO si el mensaje NO es predefinido */}
+                {m.sender === "bot" && m.responseId && !m.responseId.startsWith("predefined-") && m.feedback !== null && (
                   <p className="feedbackStatus">
                     {m.feedback === 1 ? "✔ Agradecemos tu feedback positivo" : "❌ Tomaremos en cuenta tu retroalimentación"}
                   </p>
                 )}
               </div>
             ))}
+
             {isLoading && <p className="bot-loading">Escribiendo...</p>}
           </div>
-
 
           <input
             className="chatInputContainer"

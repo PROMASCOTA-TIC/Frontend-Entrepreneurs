@@ -11,6 +11,7 @@ import EncuestaNegativa from "./EncuestaNegativa";
 
 import '/src/assets/styles/gestionContenido/general.css';
 import '/src/assets/styles/gestionContenido/estilos.css';
+import { URL_BASE } from "@/config/config";
 
 // Interfaz del artículo (FAQ)
 interface Articulo {
@@ -38,7 +39,7 @@ const EntradaPregunta: React.FC = () => {
   const handleOpenPositive = async () => {
     try {
       // Crea feedback con response: "positivo"
-      const res = await fetch(`http://localhost:3001/api/faqs/feedback/${singleId}`, {
+      const res = await fetch(`${URL_BASE}faqs/feedback/${singleId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ response: "positivo" }),
@@ -62,7 +63,7 @@ const EntradaPregunta: React.FC = () => {
   const handleOpenNegative = async () => {
     try {
       // Crea feedback con response: "negativo"
-      const res = await fetch(`http://localhost:3001/api/faqs/feedback/${singleId}`, {
+      const res = await fetch(`${URL_BASE}faqs/feedback/${singleId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ response: "negativo" }),
@@ -85,7 +86,7 @@ const EntradaPregunta: React.FC = () => {
   useEffect(() => {
     const fetchArticulo = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/faqs/detail/${singleId}`);
+        const response = await fetch(`${URL_BASE}faqs/detail/${singleId}`);
         if (!response.ok) throw new Error("Error al obtener datos del artículo");
         const data = await response.json();
 

@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 
 import "/src/assets/styles/gestionContenido/general.css";
 import "/src/assets/styles/gestionContenido/estilos.css";
+import { URL_BASE } from "@/config/config";
 
 interface Articulo {
     id: string;
@@ -26,7 +27,7 @@ const EntradaArticulo: React.FC = () => {
     useEffect(() => {
         const fetchArticulo = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/links/detail/${id}`);
+                const response = await fetch(`${URL_BASE}links/detail/${id}`);
                 const data = await response.json();
                 console.log("Datos del artículo:", data); // Log de verificación
 
@@ -135,7 +136,7 @@ const EntradaArticulo: React.FC = () => {
                     className="boton_descargar"
                     variant="contained"
                     startIcon={<Download />}
-                    href={`http://localhost:3001/api/links/download/${id}/pdf`}
+                    href={`${URL_BASE}links/download/${id}/pdf`}
                     sx={{
                         width: { xs: "auto", md: "auto" },
                         height: { xs: "40px", md: "50px" },

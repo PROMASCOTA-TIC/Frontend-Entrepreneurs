@@ -3,12 +3,14 @@ import PF_Categorias from "./PF_Categorias";
 
 import "/src/assets/styles/gestionContenido/general.css";
 import "/src/assets/styles/gestionContenido/estilos.css";
+import { URL_BASE } from "@/config/config";
 
 export default function PreguntasFrecuentes() {
     return (
         <div>
             <BarraDeBusqueda
-                endpoint="http://localhost:3001/api/faqs/search"
+                // endpoint="http://localhost:3001/api/faqs/search"
+                endpoint={`${URL_BASE}faqs/search`}
                 seccion="preguntas-frecuentes"
                 placeholder="Escribe palabras de búsqueda"
             />
