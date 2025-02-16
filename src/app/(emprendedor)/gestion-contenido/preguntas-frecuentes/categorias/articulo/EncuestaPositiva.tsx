@@ -5,6 +5,7 @@ import { Box, Button, Modal, Checkbox, FormControlLabel, TextField, Rating } fro
 
 import '/src/assets/styles/gestionContenido/general.css';
 import '/src/assets/styles/gestionContenido/estilos.css';
+import { URL_BASE } from "@/config/config";
 
 const style = {
   position: "absolute" as "absolute",
@@ -66,7 +67,7 @@ const EncuestaPositiva: React.FC<EncuestaPositivaProps> = ({
     };
 
     try {
-      const response = await fetch(`http://localhost:3001/api/faqs/feedback/${feedbackId}`, {
+      const response = await fetch(`${URL_BASE}faqs/feedback/${feedbackId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

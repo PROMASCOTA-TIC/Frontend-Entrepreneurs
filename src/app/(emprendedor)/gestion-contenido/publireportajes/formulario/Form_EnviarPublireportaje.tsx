@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Alert, Box, Grid2, MenuItem, Select, Snackbar, TextField } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { URL_BASE } from '@/config/config';
 
 // Ajusta tu tipo Inputs para que coincida con el Zod Schema (enviarEnlaceSchema).
 // Agrega "imagesUrl" si en tu backend es opcional, etc.
@@ -35,6 +36,7 @@ const categoryMap: Record<string, number> = {
   innovacionYTecnologia: 5,
 };
 
+
 // Configuración de Firebase
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -50,29 +52,65 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 const Form_EnviarPublireportaje: React.FC = () => {
-  // 1. Configurar React Hook Form
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>({
-    resolver: zodResolver(enviarEnlaceSchema),
-    mode: "onChange", // Valida en tiempo real
-    defaultValues: {
-      // Si deseas inicializar ciertos campos (por ejemplo, si ya conoces el ownerName).
-      ownerName: "",
-      ownerEmail: "",
-    },
-  });
-
-  const [open, setOpen] = useState(false);
-
-  // Estados para feedback de la operación
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [open, setOpen] = useState(false);
   const router = useRouter();
+  const [userData, setUserData] = useState({ name: "", email: "" });
+  const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
+
+  // 1. Configurar React Hook Form
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<Inputs>({
+    resolver: zodResolver(enviarEnlaceSchema),
+    mode: "onChange", // Valida en tiempo real
+  });
+
+  useEffect(() => {
+    const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
+
+    if (storedEntrepreneurId) {
+      setEntrepreneurId(storedEntrepreneurId);
+    } else {
+      console.warn("⚠️ No se encontró el ID del emprendedor en localStorage.");
+    }
+  }, []);
+
+  // Obtener productos solo si existe entrepreneurId
+  useEffect(() => {
+    if (entrepreneurId) {
+      getUserData();
+    }
+  }, [entrepreneurId]);
+
+  const getUserData = async (): Promise<void> => {
+    if (!entrepreneurId) {
+      console.error("No se encontró el ID del emprendedor.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${URL_BASE}users/entrepreneurs/${entrepreneurId}`);
+      if (!response.ok) {
+        throw new Error(`Error al obtener datos de usuario. Status: ${response.status}`);
+      }
+
+      const userData = await response.json();
+      setUserData(userData); // Guardamos los datos en el estado
+
+      // Actualizamos los valores del formulario
+      setValue("ownerName", userData.name);
+      setValue("ownerEmail", userData.email);
+    } catch (error) {
+      console.error("Error al obtener datos de usuario:", error);
+    }
+  };
 
   // Función para subir archivos a Firebase
   const uploadMediaToFirebase = async (files: File[]) => {
@@ -97,7 +135,6 @@ const Form_EnviarPublireportaje: React.FC = () => {
     return urlsString;
   };
 
-
   // 2. Función onSubmit con React Hook Form
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
@@ -120,7 +157,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
       console.log("Datos a enviar al backend:", createAdvertorialDto); // Agregar log
 
       // 3. Enviar al backend
-      const response = await fetch("http://localhost:3001/api/advertorials/create", {
+      const response = await fetch(`${URL_BASE}advertorials/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,14 +166,12 @@ const Form_EnviarPublireportaje: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Error al crear el publireportaje. Status: ${response.status}`
-        );
+        throw new Error(`Error al crear el publireportaje. Status: ${response.status}`);
       }
 
       setOpenSnackbar(true);
       setTimeout(() => {
-        router.push("http://localhost:3000/gestion-contenido/publireportajes");
+        router.push("/gestion-contenido/publireportajes");
       }, 4000);
 
       const respData = await response.json();
@@ -180,7 +215,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
             <Grid2 size={{ xs: 12, sm: 8, md: 8 }}>
               <Grid2 size={12}>
                 <TextField
-                  //disabled
+                  disabled
                   placeholder="Nombre del usuario"
                   className='minima-regular'
                   required
@@ -209,7 +244,7 @@ const Form_EnviarPublireportaje: React.FC = () => {
             <Grid2 size={{ xs: 12, sm: 8, md: 8 }}>
               <Grid2 size={12}>
                 <TextField
-                  //disabled
+                  disabled
                   placeholder="Correo del usuario"
                   className='minima-regular'
                   required
@@ -357,14 +392,14 @@ const Form_EnviarPublireportaje: React.FC = () => {
 
             {/* Fuentes */}
             <Grid2 size={{ xs: 12, sm: 4, md: 4 }}>
-              <h2 className='h2-bold txtcolor-primary'>Fuentes *</h2>
+              <h2 className='h2-bold txtcolor-primary'>Bibliografía *</h2>
             </Grid2>
 
             {/* Fuentes: Input */}
             <Grid2 size={{ xs: 12, sm: 8, md: 8 }}>
               <Grid2 size={12}>
                 <TextField
-                  placeholder="Ingresar"
+                  placeholder="Ingresar una sola fuente bibliográfica, en formato URL"
                   className='minima-regular'
                   {...register('sourceLink')}
                   error={!!errors.sourceLink}

@@ -56,11 +56,9 @@ const Form_EnviarEnlace: React.FC = () => {
   const [success, setSuccess] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // Almacena los archivos seleccionados
+  const [open, setOpen] = useState(false);
   const router = useRouter();
-
-  //********************************************* */
   const [userData, setUserData] = useState({ name: "", email: "" });
-
   const [entrepreneurId, setEntrepreneurId] = useState<string | null>(null);
 
   // 1. Configurar React Hook Form
@@ -73,8 +71,6 @@ const Form_EnviarEnlace: React.FC = () => {
     resolver: zodResolver(enviarEnlaceSchema),
     mode: "onChange", // Valida en tiempo real
   });
-
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const storedEntrepreneurId = localStorage.getItem("entrepreneur_id");
@@ -100,7 +96,7 @@ const Form_EnviarEnlace: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${URL_BASE}/users/entrepreneurs/${entrepreneurId}`);
+      const response = await fetch(`${URL_BASE}users/entrepreneurs/${entrepreneurId}`);
       if (!response.ok) {
         throw new Error(`Error al obtener datos de usuario. Status: ${response.status}`);
       }
@@ -115,8 +111,6 @@ const Form_EnviarEnlace: React.FC = () => {
       console.error("Error al obtener datos de usuario:", error);
     }
   };
-
-  /**************************************************************************************************************** */
 
   // Función para subir archivos a Firebase
   const uploadMediaToFirebase = async (files: File[]) => {
@@ -164,7 +158,7 @@ const Form_EnviarEnlace: React.FC = () => {
       console.log("Datos a enviar al backend:", createLinkDto); // Agregar log
 
       // 3. Enviar al backend
-      const response = await fetch("http://localhost:3001/api/links/create", {
+      const response = await fetch(`${URL_BASE}links/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -402,7 +396,7 @@ const Form_EnviarEnlace: React.FC = () => {
             <Grid2 size={{ xs: 12, sm: 8, md: 8 }}>
               <Grid2 size={12}>
                 <TextField
-                  placeholder="Ingresar"
+                  placeholder="Ingresar una sola fuente bibliográfica, en formato URL"
                   className='minima-regular'
                   {...register('sourceLink')}
                   error={!!errors.sourceLink}

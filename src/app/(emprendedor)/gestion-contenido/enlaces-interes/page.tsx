@@ -1,12 +1,14 @@
 import BarraDeBusqueda from "@/components/gestionContenido/BarraBusqueda";
 import EI_Categorias from "./EI_Categorias";
 import EI_CompartirContenido from "./EI_CompartirContenido";
+import { URL_BASE } from '@/config/config';
 
 export default function EnlacesDeInteres() {
     return (
         <div>
             <BarraDeBusqueda
-                endpoint="http://localhost:3001/api/links/search"
+                endpoint={`${URL_BASE}links/search`}
+                // endpoint="http://localhost:3001/api/links/search"
                 seccion="enlaces-interes"
                 placeholder="Escribe palabras de búsqueda"
             />

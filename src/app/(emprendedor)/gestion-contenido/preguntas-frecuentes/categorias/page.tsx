@@ -2,6 +2,7 @@
 
 import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
 import ArticulosSinFoto from '@/components/gestionContenido/ArticulosSinFoto';
+import { URL_BASE } from '@/config/config';
 import { CircularProgress } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,7 @@ const PF_Categorias = () => {
   useEffect(() => {
     const fetchArticulosPorCategoria = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/faqs/categories/${categoryId}/faqs`);
+        const response = await fetch(`${URL_BASE}faqs/categories/${categoryId}/faqs`);
         const data = await response.json();
 
         // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`

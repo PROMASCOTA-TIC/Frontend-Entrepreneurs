@@ -4,7 +4,6 @@ import { TopMenu } from "@/components/ui/top-menu/TopMenu";
 import PieDePagina from "@/components/ui/footer/PieDePagina";
 import Chatbot from './chatbot/Chatbot';
 
-
 const items = [
     { name: 'Inicio', url: '/inicio' },
     { name: 'Registro de Productos', url: '/registro-productos' },
@@ -25,8 +24,8 @@ export default function ShopLayout({ children }: {
             <TopNavbar />
             <TopMenu listaItems={items}/>
             {children}
-            <PieDePagina />
             <Chatbot />
+            <PieDePagina />
         </main>
     );
 }
