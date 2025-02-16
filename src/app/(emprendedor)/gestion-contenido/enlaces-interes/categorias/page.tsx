@@ -1,10 +1,10 @@
 "use client";
 
-import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
-import { URL_BASE } from '@/config/config';
-import { CircularProgress } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import ArticulosConFoto from "@/components/gestionContenido/ArticulosConFoto";
+import { URL_BASE } from "@/config/config";
+import { CircularProgress } from "@mui/material";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 
 const categoryNames: { [key: string]: string } = {
   "1": "Higiene",
@@ -16,30 +16,36 @@ const categoryNames: { [key: string]: string } = {
 };
 
 const EI_Categorias = () => {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <CategoriasContent />
+    </Suspense>
+  );
+};
+
+const CategoriasContent = () => {
   const searchParams = useSearchParams();
-  const categoryId = searchParams.get("categoryId"); // Obtener el ID de la categoría desde la URL
+  const categoryId = searchParams.get("categoryId");
   const [articulos, setArticulos] = useState([]);
   const [loading, setLoading] = useState(true);
   const categoryName = categoryId ? categoryNames[categoryId] : "Categoría desconocida";
 
   useEffect(() => {
     const fetchArticulosPorCategoria = async () => {
+      if (!categoryId) return;
+
       try {
         const response = await fetch(`${URL_BASE}links/categories/${categoryId}/links`);
         const data = await response.json();
 
-        // Filtrar solo los artículos con estado "approved"
         const articulosAprobados = data.filter((articulo: any) => articulo.status === "approved");
 
-        // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
         const articulosAdaptados = articulosAprobados.map((articulo: any) => ({
-          id: articulo.id || articulo.linkId, // Asignar `linkId` si `id` no existe
+          id: articulo.id || articulo.linkId,
           titulo: articulo.title || "Sin título",
           descripcion: articulo.description || "Sin descripción disponible",
-          link: articulo.sourceLink || "#", // Si no hay un enlace, se deja vacío
-          imagen: articulo.imagesUrl 
-            ? articulo.imagesUrl.split(",")[0].trim()  // Tomar solo la primera imagen
-            : [], // Imagen por defecto si no tiene imagen
+          link: articulo.sourceLink || "#",
+          imagen: articulo.imagesUrl ? articulo.imagesUrl.split(",")[0].trim() : "",
         }));
 
         setArticulos(articulosAdaptados);
@@ -50,27 +56,11 @@ const EI_Categorias = () => {
       }
     };
 
-    if (categoryId) {
-      fetchArticulosPorCategoria();
-    }
+    fetchArticulosPorCategoria();
   }, [categoryId]);
 
   if (loading) {
-    return (
-      <div
-        className="flex-center"
-        style={{
-          height: "100vh", // Ocupa el 100% del alto de la pantalla
-          flexDirection: "column", // Coloca el icono y el texto uno debajo del otro
-          gap: "20px", // Espacio entre el ícono y el texto
-        }}
-      >
-        <CircularProgress style={{ color: "#004040" }} size={60} /> {/* Ícono de carga */}
-        <h1 className="h1-bold txtcolor-primary">
-          Cargando resultados...
-        </h1>
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
   return (
@@ -79,18 +69,8 @@ const EI_Categorias = () => {
         {categoryName}
       </h1>
 
-      {/* Mostrar mensaje si no hay artículos */}
       {articulos.length === 0 ? (
-        <div
-          className="flex-center"
-          style={{
-            height: "50vh",
-            flexDirection: "column",
-            gap: "10px",
-          }}
-        >
-          <h2 className="h2-semiBold txtcolor-primary">No existen artículos en esta categoría.</h2>
-        </div>
+        <NoResultsComponent />
       ) : (
         <ArticulosConFoto
           articulos={articulos}
@@ -100,5 +80,32 @@ const EI_Categorias = () => {
     </div>
   );
 };
+
+const LoadingComponent = () => (
+  <div
+    className="flex-center"
+    style={{
+      height: "100vh",
+      flexDirection: "column",
+      gap: "20px",
+    }}
+  >
+    <CircularProgress style={{ color: "#004040" }} size={60} />
+    <h1 className="h1-bold txtcolor-primary">Cargando resultados...</h1>
+  </div>
+);
+
+const NoResultsComponent = () => (
+  <div
+    className="flex-center"
+    style={{
+      height: "50vh",
+      flexDirection: "column",
+      gap: "10px",
+    }}
+  >
+    <h2 className="h2-semiBold txtcolor-primary">No existen artículos en esta categoría.</h2>
+  </div>
+);
 
 export default EI_Categorias;

@@ -1,11 +1,10 @@
 "use client";
 
-import ArticulosConFoto from '@/components/gestionContenido/ArticulosConFoto';
-import ArticulosSinFoto from '@/components/gestionContenido/ArticulosSinFoto';
-import { URL_BASE } from '@/config/config';
-import { CircularProgress } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import ArticulosSinFoto from "@/components/gestionContenido/ArticulosSinFoto";
+import { URL_BASE } from "@/config/config";
+import { CircularProgress } from "@mui/material";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 
 const categoryNames: { [key: string]: string } = {
   "1": "Publicar contenido",
@@ -17,21 +16,30 @@ const categoryNames: { [key: string]: string } = {
 };
 
 const PF_Categorias = () => {
+  return (
+    <Suspense fallback={<LoadingComponent />}>
+      <CategoriasContent />
+    </Suspense>
+  );
+};
+
+const CategoriasContent = () => {
   const searchParams = useSearchParams();
-  const categoryId = searchParams.get("categoryId"); // Obtener el ID de la categoría desde la URL
+  const categoryId = searchParams.get("categoryId");
   const [articulos, setArticulos] = useState([]);
   const [loading, setLoading] = useState(true);
   const categoryName = categoryId ? categoryNames[categoryId] : "Categoría desconocida";
 
   useEffect(() => {
     const fetchArticulosPorCategoria = async () => {
+      if (!categoryId) return;
+
       try {
         const response = await fetch(`${URL_BASE}faqs/categories/${categoryId}/faqs`);
         const data = await response.json();
 
-        // Adaptar la respuesta para que coincida con el componente `ArticulosConFoto`
         const articulosAdaptados = data.map((articulo: any) => ({
-          id: articulo.id || articulo.faqId, // Asignar `faqId` si `id` no existe
+          id: articulo.id || articulo.faqId,
           titulo: articulo.title || "Sin título",
           descripcion: articulo.description || "Sin descripción disponible",
         }));
@@ -44,27 +52,11 @@ const PF_Categorias = () => {
       }
     };
 
-    if (categoryId) {
-      fetchArticulosPorCategoria();
-    }
+    fetchArticulosPorCategoria();
   }, [categoryId]);
 
   if (loading) {
-    return (
-      <div
-        className="flex-center"
-        style={{
-          height: "66vh", // Ocupa el 100% del alto de la pantalla
-          flexDirection: "column", // Coloca el icono y el texto uno debajo del otro
-          gap: "20px", // Espacio entre el ícono y el texto
-        }}
-      >
-        <CircularProgress style={{ color: "#004040" }} size={60} /> {/* Ícono de carga */}
-        <h1 className="h1-bold txtcolor-primary">
-          Cargando resultados...
-        </h1>
-      </div>
-    );
+    return <LoadingComponent />;
   }
 
   return (
@@ -73,18 +65,8 @@ const PF_Categorias = () => {
         {categoryName}
       </h1>
 
-      {/* Mostrar mensaje si no hay artículos */}
       {articulos.length === 0 ? (
-        <div
-          className="flex-center"
-          style={{
-            height: "50vh",
-            flexDirection: "column",
-            gap: "10px",
-          }}
-        >
-          <h2 className="h2-semiBold txtcolor-primary">No existen artículos en esta categoría.</h2>
-        </div>
+        <NoResultsComponent />
       ) : (
         <ArticulosSinFoto
           articulos={articulos}
@@ -94,5 +76,32 @@ const PF_Categorias = () => {
     </div>
   );
 };
+
+const LoadingComponent = () => (
+  <div
+    className="flex-center"
+    style={{
+      height: "66vh",
+      flexDirection: "column",
+      gap: "20px",
+    }}
+  >
+    <CircularProgress style={{ color: "#004040" }} size={60} />
+    <h1 className="h1-bold txtcolor-primary">Cargando resultados...</h1>
+  </div>
+);
+
+const NoResultsComponent = () => (
+  <div
+    className="flex-center"
+    style={{
+      height: "50vh",
+      flexDirection: "column",
+      gap: "10px",
+    }}
+  >
+    <h2 className="h2-semiBold txtcolor-primary">No existen artículos en esta categoría.</h2>
+  </div>
+);
 
 export default PF_Categorias;
