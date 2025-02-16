@@ -10,7 +10,7 @@ import { esES } from "@mui/x-data-grid/locales";
 import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { URL_BASE, URL_BASE2 } from "@/config/config";
+import { URL_BASE} from "@/config/config";
 
 const ListaPedidos: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -93,13 +93,13 @@ const ListaPedidos: React.FC = () => {
           headers: { "Content-Type": "application/json" },
         });
   
-        await axios.patch(`${URL_BASE2}orders/${orderId}/item/${orderItemId}`, {}, {
+        await axios.patch(`${URL_BASE}orders/${orderId}/item/${orderItemId}`, {}, {
           headers: { "Content-Type": "application/json" },
         });
       });
   
       await Promise.all(requests);
-      console.log("✅ Todos los productos y estados de ítems fueron actualizados exitosamente.");
+      console.log(" Todos los productos y estados de ítems fueron actualizados exitosamente.");
   
       setSelectedOrder((prevOrder: any) => ({
         ...prevOrder,
@@ -113,7 +113,7 @@ const ListaPedidos: React.FC = () => {
       );
   
     } catch (error: any) {
-      console.error("❌ Error en la actualización:", error.response?.data || error.message);
+      console.error("Error en la actualización:", error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
