@@ -6,11 +6,10 @@ import BotonGuardar from '../botones/BotonGuardar';
 import BotonCancelar from '../botones/BotonCancelar';
 
 interface Btn_GuardarCancelarProps {
-    linkGuardar: string;
     linkCancelar: string;
 }
 
-const Btn_GuardarCancelar: FC<Btn_GuardarCancelarProps> = ({ linkGuardar, linkCancelar }) => {
+const Btn_GuardarCancelar: FC<Btn_GuardarCancelarProps> = ({linkCancelar }) => {
     const handleDelete = () => {
         // Lógica para eliminar el elemento
         console.log("Elemento eliminado");
@@ -28,7 +27,6 @@ const Btn_GuardarCancelar: FC<Btn_GuardarCancelarProps> = ({ linkGuardar, linkCa
             }}
         >
             <BotonGuardar
-                mensaje='Guardado con éxito'
             />
 
             <BotonCancelar

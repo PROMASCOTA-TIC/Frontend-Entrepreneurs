@@ -99,7 +99,7 @@ export default function PasswordRecovery() {
                   }}
                   className="text-primary"
                 >
-                  Recuperar Clave
+                  Recuperar Contraseña
                 </Typography>
                 <Typography
                   sx={{
@@ -108,18 +108,9 @@ export default function PasswordRecovery() {
                     marginBottom: '10px',
                   }}
                 >
-                  Ingresa el correo electrónico que usas en Promascota para recuperar tu cuenta:
+                  Para recuperar tu contraseña debes comunicarte con el administradora de la plataforma a info@promaskota.com.
                 </Typography>
-                <TextField
-                  label="Correo Electrónico"
-                  variant="outlined"
-                  fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  error={!!emailError}
-                  helperText={emailError}
-                  sx={{ marginBottom: "20px" }}
-                />
+
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
                     variant="contained"
@@ -131,9 +122,9 @@ export default function PasswordRecovery() {
                       fontSize: '18px',
                       margin: '20px',
                     }}
-                    onClick={handleSendEmail}
+                    onClick={() => (window.location.href = "/auth/login")}
                   >
-                    Recuperar
+                    Salir
                   </Button>
                 </Box>
               </>

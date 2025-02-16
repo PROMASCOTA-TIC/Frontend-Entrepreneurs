@@ -23,23 +23,23 @@ const PieDePagina = () => {
                     <p>0999999999</p>
                     <p>0999999999</p>
                 </div>
-                <p className='minima-regular'>info@promascota.com</p>
+                <p className='minima-regular'>info@promaskota.com</p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <b className='n-bold'>Soporte Técnico</b>
-                <Link href="/" color="inherit" className='minima-regular'>Preguntas frecuentes</Link>
-                <Link href="/" color="inherit" className='minima-regular'>Publi-Reportajes</Link>
+                <Link href="/gestion-contenido/preguntas-frecuentes" color="inherit" className='minima-regular'>Preguntas frecuentes</Link>
+                <Link href="/gestion-contenido/publireportajes" color="inherit" className='minima-regular'>Publi-Reportajes</Link>
             </div>
             <div>
                 <b className='n-bold'>Redes Sociales</b>
-                <div style={{ display: 'flex' }}>
-                    <IconButton href="https://www.facebook.com" target="_blank" color='inherit'>
+                <div style={{ display: 'flex', justifyContent: 'space-around'}}>
+                    <IconButton href="https://www.facebook.com/share/18kPrQkn6p/?mibextid=wwXIfr" target="_blank" color='inherit'>
                         <Facebook />
                     </IconButton>
-                    <IconButton href="https://www.instagram.com" target="_blank" color='inherit'>
+                    <IconButton href="https://www.instagram.com/pro_maskota?igsh=MWJzcDh1ZXNwbzltZA==" target="_blank" color='inherit'>
                         <Instagram />
                     </IconButton>
-                    <IconButton href="https://www.tiktok.com" target="_blank" color='inherit'>
+                    <IconButton href="https://x.com/promaskota?s=21&t=zNTMFwVc03kXulFPEG6ZGg" target="_blank" color='inherit'>
                         <X />
                     </IconButton>
                 </div>

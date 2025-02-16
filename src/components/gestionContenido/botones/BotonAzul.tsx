@@ -14,11 +14,10 @@ const BotonAzul: React.FC<ButtonAzulProps> = ({ name, link }) => {
         <Link href={link} passHref>
             <Button 
                 variant="contained" 
-                className='bg-primary n-regular'
+                className='boton_azul'
                 sx={{
                     width: 'auto', // Ajusta el ancho según el tamaño de pantalla
-                    height: { xs: '40px', md: '50px' }, // Ajusta la altura según el tamaño de pantalla
-                    textTransform: 'none' 
+                    height: { xs: '40px', md: '50px' }, // Ajusta la altura según el tamaño de pantalla 
                 }}
             >
                 {name} {/* Cambia "Compartir" por el prop name */}

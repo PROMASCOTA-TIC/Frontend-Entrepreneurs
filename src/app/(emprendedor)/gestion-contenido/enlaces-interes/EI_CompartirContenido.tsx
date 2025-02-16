@@ -19,7 +19,7 @@ const EI_CompartirContenido = () => {
 
             <p className='n-regular'>
                 ¡Ayuda a otros dueños de mascotas a descubrir contenido útil y emocionante!<br />
-                Comparte tus fotos, videos y consejos sobre el cuidado de mascotas.<br />
+                Comparte fotos y consejos sobre el cuidado de mascotas.<br />
                 ¡Tu experiencia puede hacer una gran diferencia!
             </p>
 

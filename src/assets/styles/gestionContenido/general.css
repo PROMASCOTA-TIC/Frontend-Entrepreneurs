@@ -1,48 +1,23 @@
                                     /**************** BACKGROUND COLOR ***********************/
 .bg-primary {
-    background-color: #004040;
+    background-color: #004040 !important;
 }
 
 .bg-secondary {
-    background-color: #00AA28;
+    background-color: #00AA28 !important;
 }
 
 .bg-tertiary {
-    background-color: #46DA69;
+    background-color: #46DA69 !important;
 }
 
 .bg-tertiary20 {
-    background-color: #46DA6933;
+    background-color: #46DA6933 !important;
 }
 
 .bg-black10 {
-    background-color: #0000001A;
+    background-color: #0000001A !important;
 }
-
-/* .bg-primarydos{
-    background-color: #00404099;
-}
-
-.bg-secondary40 {
-    background-color: #00AA2866;
-}
-
-.bg-quarternary {
-    background-color: #002828;
-}
-
-.bg-quarternary40 {
-    background-color: #00282866;
-}
-
-.bg-quintenary {
-    background-color: #006060;
-}
-
-.bg-quinary50 {
-    background-color: #00606080;
-}
- */
 
 /***********************************************************************************************************************/
                                         /**************** Text Color ***********************/
@@ -253,4 +228,30 @@ input::placeholder {
 .flex-column {
     display: flex;
     flex-direction: column;
+}
+
+
+.boton_descargar {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    background-color: #00AA28 !important;
+    font-size: var(--font-size-n) !important;
+    font-weight: 400 !important;
+    margin-top: 21px !important;
+    text-transform: none !important;
+}
+
+.boton_azul {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    background-color: #004040 !important;
+    font-size: var(--font-size-n) !important;
+    font-weight: 400 !important;
+    margin-top: 21px !important;
+    text-transform: none !important;
+    margin: 0px !important;
 }

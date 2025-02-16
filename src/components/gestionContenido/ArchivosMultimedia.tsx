@@ -1,142 +1,103 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography, IconButton, Card, CardMedia, CardContent } from '@mui/material';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useForm } from 'react-hook-form';
 
-import '/src/assets/styles/gestionContenido/general.css';
+import React, { useState } from "react";
+import { Box, Button, Typography, IconButton, CardMedia } from "@mui/material";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { theme, themePalette } from "@/app/config/theme.config";
 
-interface FormData {
-    localPhotos: File[];
+interface ArchivosMultimediaProps {
+  onChange: (files: File[]) => void;
+  error?: string;
 }
 
-const ArchivosMultimedia: React.FC = () => {
-    const { handleSubmit, control, setValue, watch } = useForm<FormData>({
-        defaultValues: {
-            localPhotos: [],
-        },
-    });
+interface PreviewFile {
+  url: string;
+  isVideo: boolean;
+}
 
-    const localPhotos = watch('localPhotos');
+const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ onChange, error }) => {
+  const [previewFiles, setPreviewFiles] = useState<PreviewFile[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-    useEffect(() => {
-        const head = document.querySelector('head');
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = '/assets/styles/emprendedores/general.css';
-        head?.appendChild(link);
+  const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files).slice(0, 4 - previewFiles.length);
+      const newPreviews = newFiles.map((file) => ({
+        url: URL.createObjectURL(file),
+        isVideo: file.type.startsWith("video/"),
+      }));
+      const updatedFiles = [...selectedFiles, ...newFiles];
 
-        return () => {
-            head?.removeChild(link); // Limpiar al desmontar el componente
-        };
-    }, []);
+      setPreviewFiles([...previewFiles, ...newPreviews]);
+      setSelectedFiles(updatedFiles);
+      onChange(updatedFiles);
+    }
+  };
 
-    const onSubmit = (data: FormData) => {
-        console.log(data);
-    };
+  const handleRemoveFile = (index: number) => {
+    const updatedFiles = previewFiles.filter((_, i) => i !== index);
+    const updatedSelectedFiles = selectedFiles.filter((_, i) => i !== index);
 
-    const handleLocalUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files) {
-            const fileArray = Array.from(files).slice(0, 4); // Limitar a 4 archivos
-            setValue('localPhotos', fileArray);
-        }
-    };
+    URL.revokeObjectURL(previewFiles[index].url);
+    setPreviewFiles(updatedFiles);
+    setSelectedFiles(updatedSelectedFiles);
+    onChange(updatedSelectedFiles);
+  };
 
-    const handleRemoveLocalPhoto = (index: number) => {
-        setValue(
-            'localPhotos',
-            localPhotos.filter((_, i) => i !== index)
-        );
-    };
+  return (
+    <Box
+      sx={{
+        borderRadius: "8px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      <Box
+        sx={{
+          p: 3,
+          borderRadius: "8px",
+          width: "100%",
+          textAlign: "center",
+          background: themePalette.black10,
+          border: error ? "2px solid red" : "1px solid #004040"
+        }}
+      >
+        <input accept=".jpg,.png,.mp4" type="file" multiple onChange={handleLocalUpload} style={{ display: "none" }} id="local-upload" />
+        <label htmlFor="local-upload">
+          <Button
+            variant="contained"
+            component="span"
+            className="bg-primary"
+            sx={{ textTransform: "none", width: "218px", height: "50px", borderRadius: "20px", marginTop: "10px" }}
+            startIcon={<FileUploadIcon />}
+            disabled={previewFiles.length >= 4}>
+            Seleccionar archivos
+          </Button>
+        </label>
+        <Typography style={{ fontSize: "15px", paddingTop: "8px" }}>En formato .jpg o .png</Typography>
 
-    const renderEmptySlots = (maxSlots: number, items: File[]) => {
-        const emptySlots = maxSlots - items.length;
-        const placeholders = Array(emptySlots).fill(null);
-
-        return placeholders.map((_, index) => (
-            <Box
-                key={index}
-                className='flex-center'
-                sx={{
-                    width: 200,
-                    height: 200,
-                    border: '2px dashed #ccc',
-                    borderRadius: '8px',
-                    color: '#ccc',
-
-                }}
-            >
-                <Typography variant="body2">Ingresar imagen</Typography>
+        <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
+          {previewFiles.map((file, index) => (
+            <Box key={index} sx={{ position: "relative", width: "200px", height: "200px" }}>
+              {file.isVideo ? (
+                <video style={{ width: "200px", height: "200px", objectFit: "cover", borderRadius: "8px" }} src={file.url} controls />
+              ) : (
+                <CardMedia component="img" sx={{ width: "200px", height: "200px", objectFit: "cover", borderRadius: "8px" }} image={file.url} alt={`Vista previa ${index + 1}`} />
+              )}
+              <IconButton aria-label="delete" onClick={() => handleRemoveFile(index)} sx={{ position: "absolute", top: "5px", right: "5px", backgroundColor: "rgba(255, 0, 0, 0.8)", color: "white", "&:hover": { backgroundColor: "red" } }}>
+                <DeleteIcon />
+              </IconButton>
             </Box>
-        ));
-    };
-
-    return (
-        <Box onSubmit={handleSubmit(onSubmit)}>
-            <Box
-                className='flex-center'
-                sx={{
-                    borderRadius: '8px',
-                    flexDirection: 'column',
-                }}
-            >
-                <Box
-                    className='bg-black10 txt-center'
-                    sx={{
-                        p: 3,
-                        borderRadius: '8px',
-                        width: '100%',
-                        height: 'auto',
-                        border: '1px solid #004040',
-                    }}
-                >
-                    <input
-                        accept=".jpg,.png"
-                        type="file"
-                        multiple
-                        onChange={handleLocalUpload}
-                        style={{ display: 'none' }}
-                        id="local-upload"
-                    />
-                    <label htmlFor="local-upload">
-                        <Button
-                            variant="contained"
-                            component="span"
-                            className='bg-primary txtcolor-white'
-                            sx={{
-                                textTransform: 'none',
-                            }}
-                            startIcon={<FileUploadIcon />}
-                        >
-                            Seleccionar Archivos
-                        </Button>
-                    </label>
-
-                    <Box display="flex" flexWrap="wrap" mt={2} gap={2} justifyContent="center">
-                        {localPhotos.map((file, index) => (
-                            <Box key={index} sx={{ width: 200 }}>
-                                <Card>
-                                    <CardMedia component="img" height="140" image={URL.createObjectURL(file)} alt={file.name} />
-                                    <CardContent>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {file.name}
-                                        </Typography>
-                                        <IconButton aria-label="delete" onClick={() => handleRemoveLocalPhoto(index)} color="secondary" size="small">
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </CardContent>
-                                </Card>
-                            </Box>
-                        ))}
-                        {renderEmptySlots(4, localPhotos)}
-                    </Box>
-                </Box>
-
-            </Box>
+          ))}
         </Box>
-    );
+      </Box>
+    </Box>
+  );
 };
 
 export default ArchivosMultimedia;

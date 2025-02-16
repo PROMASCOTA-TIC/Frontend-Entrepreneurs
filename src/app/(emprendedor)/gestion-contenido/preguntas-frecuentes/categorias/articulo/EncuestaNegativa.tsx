@@ -3,6 +3,10 @@
 import React from 'react';
 import { Box, Button, Modal, Checkbox, FormControlLabel, TextField, Rating } from '@mui/material';
 
+import '/src/assets/styles/gestionContenido/general.css';
+import '/src/assets/styles/gestionContenido/estilos.css';
+import { URL_BASE } from '@/config/config';
+
 // Estilos para el modal
 const style = {
     position: 'absolute' as 'absolute',
@@ -17,12 +21,13 @@ const style = {
     p: 4,
 };
 
-interface EncuestaNegativaProps  {
+interface EncuestaNegativaProps {
     open: boolean;
     handleClose: () => void;
+    feedbackId: string | null; // Recibido del padre
 }
 
-const EncuestaNegativa: React.FC<EncuestaNegativaProps > = ({ open, handleClose }) => {
+const EncuestaNegativa: React.FC<EncuestaNegativaProps> = ({ open, handleClose, feedbackId }) => {
     // Estado para los datos de la encuesta
     const [rating, setRating] = React.useState<number | null>(0);
     const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
@@ -45,24 +50,38 @@ const EncuestaNegativa: React.FC<EncuestaNegativaProps > = ({ open, handleClose 
     };
 
     const handleSubmit = async () => {
-        const surveyData = { rating, selectedOptions, additionalComments };
-
-        // Enviar datos de la encuesta
-        const response = await fetch('/api/enviarEncuesta', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(surveyData),
-        });
-
-        if (response.ok) {
-            console.log('Encuesta enviada correctamente');
-        } else {
-            console.error('Error al enviar encuesta');
+        // Necesitamos un feedbackId para hacer PATCH
+        if (!feedbackId) {
+            console.error("No se puede actualizar la encuesta: falta feedbackId");
+            return;
         }
 
-        handleClose(); // Cierra la encuesta después de enviar
+        const surveyData = {
+            // En este PATCH no enviamos 'response', ya se guardó como 'positivo'
+            rating,
+            selectedOptions,
+            additionalComments,
+        };
+
+        try {
+            const response = await fetch(`${URL_BASE}faqs/feedback/${feedbackId}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(surveyData),
+            });
+
+            if (response.ok) {
+                console.log("Encuesta negativa enviada correctamente");
+            } else {
+                console.error("Error al enviar encuesta negativa");
+            }
+        } catch (error) {
+            console.error("Error de red o fetch al enviar la encuesta positiva:", error);
+        }
+
+        handleClose();
     };
 
     return (
@@ -110,13 +129,13 @@ const EncuestaNegativa: React.FC<EncuestaNegativaProps > = ({ open, handleClose 
                     onChange={(e) => setAdditionalComments(e.target.value)}
                     sx={{ mt: 2 }}
                 />
-                <Box 
-                className='flex-center'
-                sx={{ marginTop: '16px', gap:'34px' }}>
+                <Box
+                    className='flex-center'
+                    sx={{ marginTop: '16px', gap: '34px' }}>
                     <Button variant="contained" onClick={handleSubmit} className='bg-secondary' style={{ textTransform: 'none' }}>
                         Enviar
                     </Button>
-                    <Button variant="outlined" onClick={handleClose} style={{ borderColor: '#00AA28',color: '#00AA28', textTransform: 'none' }}>
+                    <Button variant="outlined" onClick={handleClose} style={{ borderColor: '#00AA28', color: '#00AA28', textTransform: 'none' }}>
                         Cancelar
                     </Button>
                 </Box>

@@ -1,52 +1,81 @@
+"use client"; // Indica que es un componente cliente
+
 import { Search } from "@mui/icons-material";
 import { Box, IconButton, TextField } from "@mui/material";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
-import '/src/assets/styles/gestionContenido/general.css';
+interface BarraDeBusquedaProps {
+  endpoint: string;  // Propiedad para pasar el endpoint del backend
+  seccion: string;
+  placeholder?: string;  // Propiedad opcional para personalizar el placeholder
+}
 
-const BarraDeBusqueda = () => {
-    return (
-        <Box
-            className='bg-tertiary20 p-21 txt-center txtcolor-primary flex-column'
-            sx={{
-                alignItems: 'center',
-                gap: '34px'
-            }}
-        >
-            <h1 className="h1-bold">¿En qué podemos ayudarte?</h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '21px', }}>
-                <TextField
-                    variant="outlined"
-                    placeholder="Escribe palabras de búsqueda"
-                    sx={{
-                        borderRadius: '15px',
-                        backgroundColor: 'white',
-                        // Ajusta el ancho mínimo según el tamaño de pantalla
-                        minWidth: {
-                            xs: '200px', // Para pantallas pequeñas
-                            md: '300px', // Para pantallas medianas y mayores
-                        },
-                        '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                                borderRadius: '15px',
-                            },
-                        },
-                        '& .MuiInputBase-input': {
-                            height: 'auto',
-                            textAlign: 'center',
-                        },
-                    }}
-                />
+const BarraDeBusqueda: React.FC<BarraDeBusquedaProps> = ({ endpoint, seccion, placeholder }) => {
+  const [query, setQuery] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
-                <IconButton
-                    className="bg-secondary"
-                    sx={{ borderRadius: '100px' }}
-                >
-                    <Search />
-                </IconButton>
-            </div>
-            <p className="n-semiBold">También puedes revisar los siguientes temas para encontrar la información que buscas.</p>
-        </Box>
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
+  };
+
+  const handleSearch = () => {
+    if (!query.trim()) {
+      setErrorMessage("Por favor, ingresa un término de búsqueda.");
+      return;
+    }
+
+    // Redirige al usuario a la página de resultados con el endpoint en la query
+    router.push(
+      `/gestion-contenido/${encodeURIComponent(seccion)}/resultados?query=${encodeURIComponent(
+        query.trim()
+      )}&endpoint=${encodeURIComponent(endpoint)}`
     );
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  return (
+    <Box className="bg-tertiary20 p-34 txt-center txtcolor-primary flex-column" sx={{ alignItems: "center", gap: "34px" }}>
+      <h1 className="h1-bold">¿En qué podemos ayudarte?</h1>
+      <div style={{ display: "flex", alignItems: "center", gap: "21px" }}>
+        <TextField
+          value={query}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyPress} // Detecta si se presiona Enter
+          variant="outlined"
+          placeholder={placeholder || "Escribe palabras de búsqueda"}
+          sx={{
+            borderRadius: "15px",
+            backgroundColor: "white",
+            minWidth: {
+              xs: "200px",
+              md: "300px",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderRadius: "15px",
+              },
+            },
+            "& .MuiInputBase-input": {
+              height: "auto",
+              textAlign: "center",
+            },
+          }}
+        />
+        <IconButton onClick={handleSearch} className="bg-secondary" sx={{ borderRadius: "100px", color: "white" }}>
+          <Search />
+        </IconButton>
+      </div>
+      <h2 className="h2-bold txtcolor-primary flex-center">También puedes revisar los siguientes temas para encontrar la información que buscas.</h2>
+      {errorMessage && <p className="error-text">{errorMessage}</p>}
+    </Box>
+  );
 };
 
 export default BarraDeBusqueda;
