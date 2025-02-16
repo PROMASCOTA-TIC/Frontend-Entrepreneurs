@@ -55,7 +55,6 @@ useEffect(() => {
   }
 }, []);
 
-// Obtener productos solo si existe entrepreneurId
 useEffect(() => {
   if (entrepreneurId) {
     fetchProducts();
@@ -192,7 +191,7 @@ useEffect(() => {
   );
 
   return (
-    <Box>
+    <Box sx={{ padding: "20px 30px 60px 30px" }}>
       <Typography
         sx={{
           marginBottom: "20px",

@@ -174,7 +174,7 @@ const ListaPedidos: React.FC = () => {
         Lista de Pedidos
       </Typography>
 
-      <Box sx={{ height: 500, width: "100%", marginTop: "30px" }}>
+      <Box sx={{ height: 500, width: "100%", marginTop: "30px", padding: "20px 30px 60px 30px "}}>
         <DataGrid 
         localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         initialState={{

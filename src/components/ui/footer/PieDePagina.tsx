@@ -15,7 +15,6 @@ const PieDePagina = () => {
                 alignItems: 'center',
                 gap: { xs: '20px', md: '0' },
                 bottom: '0',
-                marginTop: '60px',
             }}
         >
             <div>
@@ -24,7 +23,7 @@ const PieDePagina = () => {
                     <p>0999999999</p>
                     <p>0999999999</p>
                 </div>
-                <p className='minima-regular'>info@promascota.com</p>
+                <p className='minima-regular'>info@promaskota.com</p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <b className='n-bold'>Soporte Técnico</b>

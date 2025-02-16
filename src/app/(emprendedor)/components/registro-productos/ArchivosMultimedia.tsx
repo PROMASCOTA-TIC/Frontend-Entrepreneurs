@@ -93,7 +93,7 @@ const ArchivosMultimedia: React.FC<ArchivosMultimediaProps> = ({ value, onChange
         </Typography>
 
         <input
-          accept=".jpg,.png,.mp4"
+          accept=".jpg,.png,.mp4,.jpeg"
           type="file"
           multiple
           onChange={handleLocalUpload}

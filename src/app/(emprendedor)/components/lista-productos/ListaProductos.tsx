@@ -163,7 +163,7 @@ const ListaProductos: React.FC = () => {
   );
 
   return (
-    <Box>
+    <Box sx={{ padding: "20px 30px 60px 30px " }}>
       <Typography
         sx={{
           marginBottom: "20px",
