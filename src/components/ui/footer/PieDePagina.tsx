@@ -20,8 +20,8 @@ const PieDePagina = () => {
             <div>
                 <b className='n-bold'>Información De Contacto</b>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '55px' }} className='minima-regular'>
-                    <p>0999999999</p>
-                    <p>0999999999</p>
+                    <p>0984606792</p>
+                    <p>0961470709</p>
                 </div>
                 <p className='minima-regular'>info@promaskota.com</p>
             </div>
@@ -32,7 +32,7 @@ const PieDePagina = () => {
             </div>
             <div>
                 <b className='n-bold'>Redes Sociales</b>
-                <div style={{ display: 'flex', justifyContent: 'space-around'}}>
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                     <IconButton href="https://www.facebook.com/share/18kPrQkn6p/?mibextid=wwXIfr" target="_blank" color='inherit'>
                         <Facebook />
                     </IconButton>
